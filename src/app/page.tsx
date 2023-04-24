@@ -1,6 +1,8 @@
 import { prisma } from "@/db";
 import Form from "@/components/form";
 
+export const revalidate = 0;
+
 export default async function Home() {
   const todos = await prisma.todo.findMany();
 
