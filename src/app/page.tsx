@@ -1,7 +1,24 @@
+import { redirect } from "next/navigation";
+import { z } from "zod";
+
 import { prisma } from "@/db";
-import Form from "@/components/form";
 
 export const revalidate = 0;
+
+const create = async (formData: FormData) => {
+  "use server";
+  const todo = z.object({
+    content: z.string(),
+  });
+  const res = todo.safeParse({
+    content: formData.get("content"),
+  });
+  if (!res.success) {
+    return;
+  }
+  await prisma.todo.create({ data: res.data });
+  redirect("/");
+};
 
 export default async function Home() {
   const todos = await prisma.todo.findMany();
@@ -10,7 +27,10 @@ export default async function Home() {
     <main>
       <section>
         <h1 className="text-4xl">Todos</h1>
-        <Form />
+        <form action={create}>
+          <input name="content" type="text" />
+          <button type="submit">submit</button>
+        </form>
       </section>
       <section>
         <ul>
