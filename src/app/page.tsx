@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -34,7 +35,11 @@ export default async function Home() {
       </section>
       <section>
         <ul>
-          {todos.map((todo) => <li key={todo.id}>{todo.content}</li>)}
+          {todos.map((todo) => (
+            <li key={todo.id}>
+              <Link href={`/todo/${todo.id}`}>{todo.content}</Link>
+            </li>
+          ))}
         </ul>
       </section>
     </main>
