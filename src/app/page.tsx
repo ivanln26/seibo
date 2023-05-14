@@ -2,27 +2,28 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-import { prisma } from "@/db";
+import { db } from "@/db/db";
+import { todo } from "@/db/schema";
 
 export const revalidate = 0;
 
 const create = async (formData: FormData) => {
   "use server";
-  const todo = z.object({
+  const t = z.object({
     content: z.string(),
   });
-  const res = todo.safeParse({
+  const res = t.safeParse({
     content: formData.get("content"),
   });
   if (!res.success) {
     return;
   }
-  await prisma.todo.create({ data: res.data });
+  await db.insert(todo).values({ content: res.data.content });
   redirect("/");
 };
 
 export default async function Home() {
-  const todos = await prisma.todo.findMany();
+  const todos = await db.select().from(todo);
 
   return (
     <main>
