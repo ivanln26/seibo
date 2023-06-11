@@ -1,7 +1,9 @@
 import { redirect } from "next/navigation";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 
-import { prisma } from "@/db";
+import { db, findUnique } from "@/db/db";
+import { todo } from "@/db/schema";
 
 type Props = {
   params: {
@@ -11,38 +13,35 @@ type Props = {
 
 const update = async (formData: FormData) => {
   "use server";
-  const todo = z.object({
+  const t = z.object({
     id: z.coerce.number().int(),
     content: z.string(),
   });
-  const res = todo.safeParse({
+  const res = t.safeParse({
     id: formData.get("id"),
     content: formData.get("content"),
   });
   if (!res.success) {
     return;
   }
-  await prisma.todo.update({
-    where: { id: res.data.id },
-    data: { content: res.data.content },
-  });
+  await db.update(todo).set({ content: res.data.content }).where(
+    eq(todo.id, res.data.id),
+  );
   redirect("/");
 };
 
 export default async function Page({ params }: Props) {
-  const todo = await prisma.todo.findUnique({
-    where: { id: Number(params.id) },
-  });
+  const t = await findUnique(params.id);
 
   return (
     <main>
       <section>
         <form action={update}>
-          <input name="content" defaultValue={todo?.content} type="text" />
+          <input name="content" defaultValue={t.content} type="text" />
           <input
             className="hidden"
             name="id"
-            defaultValue={todo?.id}
+            defaultValue={t.id}
             type="text"
           />
           <button type="submit">submit</button>
