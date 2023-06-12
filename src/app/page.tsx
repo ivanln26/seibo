@@ -7,23 +7,23 @@ import { todo } from "@/db/schema";
 
 export const revalidate = 0;
 
-const create = async (formData: FormData) => {
-  "use server";
-  const t = z.object({
-    content: z.string(),
-  });
-  const res = t.safeParse({
-    content: formData.get("content"),
-  });
-  if (!res.success) {
-    return;
-  }
-  await db.insert(todo).values({ content: res.data.content });
-  redirect("/");
-};
-
 export default async function Home() {
   const todos = await db.select().from(todo);
+
+  const create = async (formData: FormData) => {
+    "use server";
+    const t = z.object({
+      content: z.string(),
+    });
+    const res = t.safeParse({
+      content: formData.get("content"),
+    });
+    if (!res.success) {
+      return;
+    }
+    await db.insert(todo).values({ content: res.data.content });
+    redirect("/");
+  };
 
   return (
     <main>
