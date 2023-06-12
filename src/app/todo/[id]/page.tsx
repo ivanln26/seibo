@@ -22,7 +22,7 @@ export default async function Page({ params }: Props) {
       topics: z.string(),
     });
     const res = t.safeParse({
-      id: formData.get("id"),
+      id: params.id,
       name: formData.get("name"),
       topics: formData.get("topics"),
     });
@@ -38,19 +38,24 @@ export default async function Page({ params }: Props) {
     redirect("/");
   };
 
+  const del = async () => {
+    "use server";
+    await db.delete(course).where(
+      eq(course.id, Number(params.id)),
+    );
+    redirect("/");
+  };
+
   return (
     <main>
       <section>
         <form action={update}>
           <input name="name" defaultValue={t.name} type="text" />
           <input name="topics" defaultValue={t.topics} type="text" />
-          <input
-            className="hidden"
-            name="id"
-            defaultValue={t.id}
-            type="text"
-          />
           <button type="submit">submit</button>
+        </form>
+        <form action={del}>
+          <button type="submit">delete</button>
         </form>
       </section>
     </main>
