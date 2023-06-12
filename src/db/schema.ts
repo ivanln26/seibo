@@ -118,6 +118,9 @@ export const course = mysqlTable("course", {
   ),
 }));
 
+export type Course = InferModel<typeof course>;
+export type NewCourse = InferModel<typeof course, "insert">;
+
 export const courseProfessor = mysqlTable("course_professor", {
   id: int("id").autoincrement().primaryKey(),
   courseId: int("course_id").notNull(),

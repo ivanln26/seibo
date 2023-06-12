@@ -3,42 +3,51 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { db } from "@/db/db";
-import { todo } from "@/db/schema";
+import { course } from "@/db/schema";
 
 export const revalidate = 0;
 
 export default async function Home() {
-  const todos = await db.select().from(todo);
+  const courses = await db.select().from(course);
 
   const create = async (formData: FormData) => {
     "use server";
     const t = z.object({
       content: z.string(),
+      topics: z.string(),
     });
     const res = t.safeParse({
       content: formData.get("content"),
+      topics: formData.get("topics"),
     });
     if (!res.success) {
       return;
     }
-    await db.insert(todo).values({ content: res.data.content });
+    await db.insert(course).values({
+      name: res.data.content,
+      topics: res.data.topics,
+      schoolId: 1,
+    });
     redirect("/");
   };
 
   return (
     <main>
       <section>
-        <h1 className="text-4xl">Todos</h1>
+        <h1 className="text-4xl">Courses</h1>
         <form action={create}>
           <input name="content" type="text" />
+          <input name="topics" type="text" />
           <button type="submit">submit</button>
         </form>
       </section>
       <section>
         <ul>
-          {todos.map((todo) => (
-            <li key={todo.id}>
-              <Link href={`/todo/${todo.id}`}>{todo.content}</Link>
+          {courses.map((course) => (
+            <li key={course.id}>
+              <Link href={`/todo/${course.id}`}>
+                {course.name} - {course.topics}
+              </Link>
             </li>
           ))}
         </ul>

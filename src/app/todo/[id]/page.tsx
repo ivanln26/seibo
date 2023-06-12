@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { db, findUnique } from "@/db/db";
-import { todo } from "@/db/schema";
+import { course } from "@/db/schema";
 
 type Props = {
   params: {
@@ -18,17 +18,22 @@ export default async function Page({ params }: Props) {
     "use server";
     const t = z.object({
       id: z.coerce.number().int(),
-      content: z.string(),
+      name: z.string(),
+      topics: z.string(),
     });
     const res = t.safeParse({
       id: formData.get("id"),
-      content: formData.get("content"),
+      name: formData.get("name"),
+      topics: formData.get("topics"),
     });
     if (!res.success) {
       return;
     }
-    await db.update(todo).set({ content: res.data.content }).where(
-      eq(todo.id, res.data.id),
+    await db.update(course).set({
+      name: res.data.name,
+      topics: res.data.topics,
+    }).where(
+      eq(course.id, res.data.id),
     );
     redirect("/");
   };
@@ -37,7 +42,8 @@ export default async function Page({ params }: Props) {
     <main>
       <section>
         <form action={update}>
-          <input name="content" defaultValue={t.content} type="text" />
+          <input name="name" defaultValue={t.name} type="text" />
+          <input name="topics" defaultValue={t.topics} type="text" />
           <input
             className="hidden"
             name="id"
