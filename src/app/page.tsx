@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
+import Button from "@/components/button";
 import { db } from "@/db/db";
 import { course } from "@/db/schema";
 
@@ -38,7 +39,7 @@ export default async function Home() {
         <form action={create}>
           <input name="content" type="text" />
           <input name="topics" type="text" />
-          <button type="submit">submit</button>
+          <Button type="submit">Submit</Button>
         </form>
       </section>
       <section>
