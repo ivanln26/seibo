@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
-import Add from "@/components/add";
+import Icon from "@/components/icons/icon";
+import type { Icon as IconType } from "@/components/icons/icon";
 
 type Color = "primary" | "secondary" | "tertiary" | "error";
 
@@ -8,14 +9,12 @@ type Kind = "filled" | "tonal" | "outlined" | "text" | "elevated";
 
 type Type = "button" | "submit" | "reset";
 
-type Icon = "add";
-
 type ButtonProps = {
   children: ReactNode;
   color?: Color;
   kind?: Kind;
   type?: Type;
-  icon?: Icon;
+  icon?: IconType;
 };
 
 const config: Record<Kind, Record<Color, string>> = {
@@ -81,7 +80,7 @@ export default function Button(
       } rounded-full ${config[kind][color]}`}
       type={type}
     >
-      {icon && <Add height={18} width={18} />}
+      {icon && <Icon icon={icon} height={18} width={18} />}
       {children}
     </button>
   );
