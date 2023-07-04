@@ -3,8 +3,15 @@ import CheckList from "./checklist";
 import Clock from "./clock";
 import Description from "./description";
 import Home from "./home";
+import Person from "./person";
 
-export type Icon = "add" | "checklist" | "clock" | "description" | "home";
+export type Icon =
+  | "add"
+  | "checklist"
+  | "clock"
+  | "description"
+  | "home"
+  | "person";
 
 export type IconProps = {
   height: number;
@@ -25,6 +32,8 @@ export default function Icon({ icon, ...props }: IconPickerProps) {
       return <Description {...props} />;
     case "home":
       return <Home {...props} />;
+    case "person":
+      return <Person {...props} />;
     default:
       return <Add {...props} />;
   }
