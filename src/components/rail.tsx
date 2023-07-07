@@ -1,10 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 import Icon from "@/components/icons/icon";
 import type { Icon as IconType } from "@/components/icons/icon";
+
+import Logo from "@/../public/logo.png";
 
 type RailButton = {
   name: string;
@@ -41,11 +44,6 @@ function RailButton({ name, icon, href, isActive }: RailButton) {
 
 const buttons: RailButton[] = [
   {
-    name: "Inicio",
-    icon: "home",
-    href: "/",
-  },
-  {
     name: "Asistencia",
     icon: "checklist",
     href: "/attendance",
@@ -66,8 +64,11 @@ export default function NavigationRail() {
   const pathname = usePathname();
 
   return (
-    <nav className="hidden md:flex md:flex-col justify-between w-20 h-screen">
-      <ul className="flex flex-col gap-y-3">
+    <nav className="hidden md:flex md:flex-col w-20 h-screen">
+      <Link className="" href="/">
+        <Image src={Logo} alt="Seibo Logo" />
+      </Link>
+      <ul className="flex flex-col gap-y-3 grow mt-2">
         {buttons.map((props, i) => {
           const isActive = pathname.startsWith(props.href);
 
