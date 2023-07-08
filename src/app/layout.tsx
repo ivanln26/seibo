@@ -1,3 +1,4 @@
+import NavigationDrawer from "@/components/nav-drawer";
 import NavigationRail from "@/components/rail";
 import "./globals.css";
 
@@ -15,6 +16,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="flex dark:text-white dark:bg-neutral-900">
         <NavigationRail />
+        <NavigationDrawer />
         {children}
       </body>
     </html>
