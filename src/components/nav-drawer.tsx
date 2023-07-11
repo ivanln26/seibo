@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -47,11 +48,25 @@ function DrawerButton({ name, icon, href, isActive }: DrawerButton) {
   );
 }
 
-export default function NavigationDrawer() {
+type NavigationDrawerProps = {
+  isOpen: boolean;
+  toggleOpen: () => void;
+};
+
+export default function NavigationDrawer(
+  { isOpen, toggleOpen }: NavigationDrawerProps,
+) {
   const pathname = usePathname();
 
   return (
-    <nav className="absolute h-[100svh] px-1 bg-blue-500">
+    <nav
+      className={`${
+        isOpen ? "absolute" : "hidden"
+      } h-[100svh] px-1 bg-blue-500`}
+    >
+      <button onClick={toggleOpen}>
+        Cerrar
+      </button>
       <ul>
         {buttons.map((button, i) => {
           const isActive = pathname.startsWith(button.href);
