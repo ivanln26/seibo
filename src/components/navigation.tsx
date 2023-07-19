@@ -8,14 +8,17 @@ import NavigationRail from "@/components/rail";
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const toggleDrawer = () => {
-    setIsOpen((prev) => !prev);
+  const open = () => {
+    setIsOpen(true);
+  };
+  const close = () => {
+    setIsOpen(false);
   };
 
   return (
     <>
-      <NavigationDrawer isOpen={isOpen} toggleOpen={toggleDrawer} />
-      <NavigationRail toggleDrawer={toggleDrawer} />
+      <NavigationDrawer isOpen={isOpen} close={close} />
+      <NavigationRail open={open} />
     </>
   );
 }

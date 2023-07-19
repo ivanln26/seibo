@@ -61,10 +61,10 @@ const buttons: RailButton[] = [
 ];
 
 type NavigationRailProps = {
-  toggleDrawer: () => void;
+  open: () => void;
 };
 
-export default function NavigationRail({ toggleDrawer }: NavigationRailProps) {
+export default function NavigationRail({ open }: NavigationRailProps) {
   const pathname = usePathname();
 
   return (
@@ -72,10 +72,14 @@ export default function NavigationRail({ toggleDrawer }: NavigationRailProps) {
       <Link className="" href="/">
         <Image src={Logo} alt="Seibo Logo" />
       </Link>
-      <button onClick={toggleDrawer}>
-        Toggle
+      <button
+        className="flex flex-col justify-center items-center gap-y-1 mt-2 fill-black dark:fill-white"
+        onClick={open}
+      >
+        <Icon icon="menu" height={24} width={24} />
+        <span>Menu</span>
       </button>
-      <ul className="flex flex-col gap-y-3 grow mt-2">
+      <ul className="flex flex-col gap-y-3 grow mt-6">
         {buttons.map((props, i) => {
           const isActive = pathname.startsWith(props.href);
 
