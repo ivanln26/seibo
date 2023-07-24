@@ -5,6 +5,7 @@ import Button from "@/components/button";
 import TextField from "@/components/text-field";
 import Table from "@/components/table";
 import type { TableRow } from "@/components/table";
+import Modal from "@/components/modal";
 import { db } from "@/db/db";
 import { course } from "@/db/schema";
 
@@ -66,6 +67,16 @@ export default async function Home() {
       <section>
         <Table cols={columnNames} rows={createTableRows()}></Table>
       </section>
+      <Modal
+        camps={[{ title: "content", data: "", type: "text" }, {
+          title: "topics",
+          data: "",
+          type: "text",
+        }]}
+        api="http://localhost:3000/api/courses"
+        buttonText="Crear curso"
+      >
+      </Modal>
     </main>
   );
 }
