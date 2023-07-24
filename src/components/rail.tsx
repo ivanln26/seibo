@@ -60,7 +60,11 @@ const buttons: RailButton[] = [
   },
 ];
 
-export default function NavigationRail() {
+type NavigationRailProps = {
+  open: () => void;
+};
+
+export default function NavigationRail({ open }: NavigationRailProps) {
   const pathname = usePathname();
 
   return (
@@ -68,7 +72,14 @@ export default function NavigationRail() {
       <Link className="" href="/">
         <Image src={Logo} alt="Seibo Logo" />
       </Link>
-      <ul className="flex flex-col gap-y-3 grow mt-2">
+      <button
+        className="flex flex-col justify-center items-center gap-y-1 mt-2 fill-black dark:fill-white"
+        onClick={open}
+      >
+        <Icon icon="menu" height={24} width={24} />
+        <span>Menu</span>
+      </button>
+      <ul className="flex flex-col gap-y-3 grow mt-6">
         {buttons.map((props, i) => {
           const isActive = pathname.startsWith(props.href);
 

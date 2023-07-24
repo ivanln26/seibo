@@ -1,4 +1,4 @@
-import NavigationRail from "@/components/rail";
+import Navigation from "@/components/navigation";
 import "./globals.css";
 
 export const metadata = {
@@ -13,8 +13,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="flex dark:text-white dark:bg-neutral-900">
-        <NavigationRail />
+      <body className="flex flex-wrap bg-neutral-99 dark:text-white dark:bg-neutral-4">
+        <Navigation />
         {children}
       </body>
     </html>
