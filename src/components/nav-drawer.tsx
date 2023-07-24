@@ -75,7 +75,7 @@ export default function NavigationDrawer(
     <nav
       className={`${
         isOpen ? "absolute" : "hidden"
-      } h-[100svh] px-1 bg-blue-500`}
+      } h-[100svh] px-1 bg-neutral-98 dark:bg-neutral-5`}
       ref={ref}
     >
       <ul>

@@ -13,7 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="flex dark:text-white dark:bg-neutral-900">
+      <body className="flex bg-neutral-99 dark:text-white dark:bg-neutral-4">
         <Navigation />
         {children}
       </body>
