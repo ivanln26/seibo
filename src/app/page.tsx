@@ -51,31 +51,21 @@ export default async function Home() {
     <main>
       <section>
         <h1 className="text-4xl">Courses</h1>
-        <form action={create}>
-          <TextField id="content" name="content" label="Contenido" required />
-          <TextField
-            id="topics"
-            name="topics"
-            label="Temas"
-            helpText="Texto de ayuda."
-            icon="add"
-            required
-          />
-          <Button type="submit">Submit</Button>
-        </form>
       </section>
       <section>
         <Table cols={columnNames} rows={createTableRows()}></Table>
       </section>
-      <Modal
-        camps={[{ title: "content", data: "", type: "text" }, {
-          title: "topics",
-          data: "",
-          type: "text",
-        }]}
-        api="http://localhost:3000/api/courses"
-        buttonText="Crear curso"
-      >
+      <Modal buttonText="Crear curso">
+        <div>
+          <h1 className="text-2xl">Nuevo curso</h1>
+          <form action={create} className="flex flex-col gap-1 mx-5">
+            <TextField id="content" name="content" label="Contenido" required />
+            <TextField id="topics" name="topics" label="Temas" required />
+            <div className="flex justify-end">
+              <Button type="submit">Guardar</Button>
+            </div>
+          </form>
+        </div>
       </Modal>
     </main>
   );
