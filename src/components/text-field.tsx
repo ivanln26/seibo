@@ -1,8 +1,12 @@
+import Icon from "@/components/icons/icon";
+import type { Icon as TIcon } from "@/components/icons/icon";
+
 type TextFieldProps = {
   id: string;
   name: string;
   label?: string;
   helpText?: string;
+  icon?: TIcon;
   required?: boolean;
   type?: "email" | "password" | "text" | "url";
 };
@@ -12,6 +16,7 @@ export default function TextField({
   name,
   label,
   helpText,
+  icon,
   required,
   type,
 }: TextFieldProps) {
@@ -25,16 +30,22 @@ export default function TextField({
         {required && (
           <span>
             <strong>*</strong>
+      <div className="relative">
+        {icon && (
+          <span className="absolute left-2 top-3 fill-black dark:fill-white group-focus-within:fill-primary-600 dark:group-focus-within:fill-primary-200">
+            <Icon icon={icon} height={24} width={24} />
           </span>
         )}
-      </label>
-      <input
-        id={id}
-        className="h-14 px-4 rounded bg-transparent outline outline-1 outline-outline focus:outline-2 focus:outline-primary-600 dark:focus:outline-primary-200"
-        name={name}
-        type={type}
-        required={required}
-      />
+        <input
+          id={id}
+          className={`h-12 ${
+            icon ? "pl-10" : "pl-4"
+          } text-base pr-4 w-full rounded bg-transparent outline outline-1 outline-outline focus:outline-2 focus:outline-primary-600 dark:focus:outline-primary-200`}
+          name={name}
+          type={type}
+          required={required}
+        />
+      </div>
       {helpText && (
         <span className="text-xs text-neutral-variant-30 dark:text-neutral-variant-90">
           {helpText}
