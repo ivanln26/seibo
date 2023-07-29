@@ -2,6 +2,7 @@ type TextFieldProps = {
   id: string;
   name: string;
   label?: string;
+  helpText?: string;
   required?: boolean;
   type?: "email" | "password" | "text" | "url";
 };
@@ -10,6 +11,7 @@ export default function TextField({
   id,
   name,
   label,
+  helpText,
   required,
   type,
 }: TextFieldProps) {
@@ -33,6 +35,11 @@ export default function TextField({
         type={type}
         required={required}
       />
+      {helpText && (
+        <span className="text-xs text-neutral-variant-30 dark:text-neutral-variant-90">
+          {helpText}
+        </span>
+      )}
     </div>
   );
 }
