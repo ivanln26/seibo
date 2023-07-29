@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import Button from "@/components/button";
+import TextField from "@/components/text-field";
 import { db } from "@/db/db";
 import { course } from "@/db/schema";
 
@@ -37,8 +38,15 @@ export default async function Home() {
       <section>
         <h1 className="text-4xl">Courses</h1>
         <form action={create}>
-          <input name="content" type="text" />
-          <input name="topics" type="text" />
+          <TextField id="content" name="content" label="Contenido" required />
+          <TextField
+            id="topics"
+            name="topics"
+            label="Temas"
+            helpText="Texto de ayuda."
+            icon="add"
+            required
+          />
           <Button type="submit">Submit</Button>
         </form>
       </section>
