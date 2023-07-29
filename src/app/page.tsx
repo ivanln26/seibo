@@ -39,7 +39,14 @@ export default async function Home() {
         <h1 className="text-4xl">Courses</h1>
         <form action={create}>
           <TextField id="content" name="content" label="Contenido" required />
-          <TextField id="topics" name="topics" label="Temas" required />
+          <TextField
+            id="topics"
+            name="topics"
+            label="Temas"
+            helpText="Texto de ayuda."
+            icon="add"
+            required
+          />
           <Button type="submit">Submit</Button>
         </form>
       </section>

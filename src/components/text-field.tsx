@@ -22,14 +22,19 @@ export default function TextField({
 }: TextFieldProps) {
   return (
     <div className="flex flex-col gap-y-1 group py-2">
-      <label
-        className="left-5 group-focus-within:left-4 group-focus-within:-top-3 group-focus-within:font-bold group-focus-within:text-primary-600 dark:group-focus-within:text-primary-200"
-        htmlFor={id}
-      >
-        {label}
-        {required && (
-          <span>
-            <strong>*</strong>
+      {label && (
+        <label
+          className="left-5 group-focus-within:left-4 group-focus-within:-top-3 group-focus-within:font-bold group-focus-within:text-primary-600 dark:group-focus-within:text-primary-200"
+          htmlFor={id}
+        >
+          {label}
+          {required && (
+            <span aria-label="required">
+              <strong>*</strong>
+            </span>
+          )}
+        </label>
+      )}
       <div className="relative">
         {icon && (
           <span className="absolute left-2 top-3 fill-black dark:fill-white group-focus-within:fill-primary-600 dark:group-focus-within:fill-primary-200">
