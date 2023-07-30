@@ -9,32 +9,40 @@ export type TableCell = {
   href: string;
 };
 
-export default function Table(
-  { cols, rows }: { cols: String[]; rows: TableRow[] },
-) {
+type TableProps = {
+  cols: String[];
+  rows: TableRow[];
+};
+
+export default function Table({ cols, rows }: TableProps) {
   return (
-    <div className="rounded-lg overflow-x-auto border">
-      <table className="w-full">
-        <thead>
-          <tr className="text-on-primary">
-            {cols.map((col, i) => {
-              return <th className="py-1 bg-primary-100 border-b">{col}</th>;
-            })}
+    <table className="w-full table-auto border-collapse">
+      <thead>
+        <tr>
+          {cols.map((col, i) => (
+            <th
+              key={i}
+              className="py-1 text-primary-900 border border-neutral-variant-50 bg-primary-100 dark:text-primary-100 dark:border-neutral-variant-60 dark:bg-primary-700"
+            >
+              {col}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row, i) => (
+          <tr key={i}>
+            {row.cells.map((cell, j) => (
+              <td
+                key={j}
+                className="text-center border border-neutral-variant-50 dark:border-neutral-variant-60"
+              >
+                <Link href={cell.href}>{cell.text}</Link>
+              </td>
+            ))}
           </tr>
-        </thead>
-        <tbody className="">
-          {rows.map((row, i) => {
-            const cells = row.cells.map((cell, i) => {
-              return (
-                <td className="bg-primary-container text-on-primary-container border">
-                  <Link href={cell.href}>{cell.text}</Link>
-                </td>
-              );
-            });
-            return <tr key={Number(i)} className="text-center">{cells}</tr>;
-          })}
-        </tbody>
-      </table>
-    </div>
+        ))}
+      </tbody>
+    </table>
   );
 }
