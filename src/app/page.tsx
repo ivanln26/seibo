@@ -1,11 +1,10 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import Button from "@/components/button";
 import TextField from "@/components/text-field";
 import Table from "@/components/table";
-import { TableRow } from "@/components/table";
+import type { TableRow } from "@/components/table";
 import { db } from "@/db/db";
 import { course } from "@/db/schema";
 
@@ -36,16 +35,15 @@ export default async function Home() {
     redirect("/");
   };
 
-  const CreateTableRows = (): TableRow[] => {
-    const rows: TableRow[] = [];
-    courses.forEach((course, i) => {
-      rows.push({
-        cells: Object.values(course).map((attribute) => {
-          return { text: String(attribute), href: `/todo/${course.id}` };
-        }),
-      });
-    });
-    return rows;
+  const createTableRows = (): TableRow[] => {
+    return courses.map((course) => (
+      {
+        cells: Object.values(course).map((attribute) => ({
+          text: String(attribute),
+          href: `/todo/${course.id}`,
+        })),
+      }
+    ));
   };
 
   return (
@@ -66,7 +64,7 @@ export default async function Home() {
         </form>
       </section>
       <section>
-        <Table cols={columnNames} rows={CreateTableRows()}></Table>
+        <Table cols={columnNames} rows={createTableRows()}></Table>
       </section>
     </main>
   );
