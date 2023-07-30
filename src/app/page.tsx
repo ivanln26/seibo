@@ -1,9 +1,10 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import Button from "@/components/button";
 import TextField from "@/components/text-field";
+import Table from "@/components/table";
+import type { TableRow } from "@/components/table";
 import { db } from "@/db/db";
 import { course } from "@/db/schema";
 
@@ -11,6 +12,7 @@ export const revalidate = 0;
 
 export default async function Home() {
   const courses = await db.select().from(course);
+  const columnNames = Object.keys(courses[0]);
 
   const create = async (formData: FormData) => {
     "use server";
@@ -33,6 +35,17 @@ export default async function Home() {
     redirect("/");
   };
 
+  const createTableRows = (): TableRow[] => {
+    return courses.map((course) => (
+      {
+        cells: Object.values(course).map((attribute) => ({
+          text: String(attribute),
+          href: `/todo/${course.id}`,
+        })),
+      }
+    ));
+  };
+
   return (
     <main>
       <section>
@@ -51,15 +64,7 @@ export default async function Home() {
         </form>
       </section>
       <section>
-        <ul>
-          {courses.map((course) => (
-            <li key={course.id}>
-              <Link href={`/todo/${course.id}`}>
-                {course.name} - {course.topics}
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <Table cols={columnNames} rows={createTableRows()}></Table>
       </section>
     </main>
   );
