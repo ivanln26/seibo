@@ -66,7 +66,7 @@ export default {
           87: "#e3d8d2",
           90: "#ece0da",
           92: "#f2e6e0",
-          94: "#d8ebe5",
+          94: "#f8ebe5",
           95: "#fbeee8",
           96: "#fef1eb",
           98: "#fff8f5",

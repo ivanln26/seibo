@@ -13,6 +13,7 @@ type ButtonProps = {
   children: ReactNode;
   color?: Color;
   kind?: Kind;
+  onClick?: () => void;
   type?: Type;
   icon?: IconType;
 };
@@ -71,13 +72,15 @@ const config: Record<Kind, Record<Color, string>> = {
 } as const;
 
 export default function Button(
-  { children, kind = "filled", color = "primary", icon, type }: ButtonProps,
+  { children, kind = "filled", color = "primary", icon, onClick, type }:
+    ButtonProps,
 ) {
   return (
     <button
       className={`flex items-center h-10 ${
         !icon ? "px-6" : "pl-4 pr-6 gap-x-2"
       } rounded-full ${config[kind][color]}`}
+      onClick={onClick}
       type={type}
     >
       {icon && <Icon icon={icon} height={18} width={18} />}
