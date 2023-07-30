@@ -3,6 +3,8 @@
 import { useState } from "react";
 import type { ReactNode } from "react";
 
+import Button from "@/components/button";
+
 type ModalProps = {
   buttonText: string;
   children: ReactNode;
@@ -10,16 +12,17 @@ type ModalProps = {
 
 export default function Modal({ buttonText, children }: ModalProps) {
   const [hidden, setHidden] = useState(true);
+
   return (
     <>
-      <button
+      <Button
+        color="tertiary"
         onClick={() => {
           setHidden(false);
         }}
-        className="bg-tertiary-100 hover:bg-lime-400 px-1 text-black rounded-lg flex items-center justify-center shadow"
       >
         {buttonText}
-      </button>
+      </Button>
       <div
         className={`fixed inset-0 bg-gray-200 bg-opacity-75 ${
           hidden ? "hidden" : ""
