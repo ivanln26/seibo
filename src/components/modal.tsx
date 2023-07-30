@@ -24,13 +24,13 @@ export default function Modal({ buttonText, children }: ModalProps) {
         {buttonText}
       </Button>
       <div
-        className={`fixed inset-0 bg-gray-200 bg-opacity-75 ${
-          hidden ? "hidden" : ""
-        } transition-opacity flex justify-center items-center`}
+        className={`fixed inset-0 flex justify-center items-center transition-opacity bg-black bg-opacity-50 ${
+          hidden && "hidden"
+        }`}
         onClick={() => setHidden(true)}
       >
         <div
-          className="bg-white p-5 m-5 rounded border"
+          className="p-5 m-5 rounded bg-neutral-94 dark:bg-neutral-12"
           onClick={(e) => e.stopPropagation()}
         >
           {children}
