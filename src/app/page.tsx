@@ -52,7 +52,6 @@ export default async function Home() {
     <main>
       <section>
         <h1 className="text-4xl">Courses</h1>
-        <Switch />
       </section>
       <section>
         <Table cols={columnNames} rows={createTableRows()}></Table>
@@ -69,6 +68,10 @@ export default async function Home() {
           </form>
         </div>
       </Modal>
+      <section className="flex gap-x-2 mt-2">
+        <Switch id="test1" name="test1" />
+        <Switch id="test2" name="test2" />
+      </section>
     </main>
   );
 }

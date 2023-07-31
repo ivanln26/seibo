@@ -1,10 +1,15 @@
-export default function Switch() {
+type SwitchProps = {
+  id: string;
+  name: string;
+};
+
+export default function Switch({ id, name }: SwitchProps) {
   return (
-    <label className="relative">
+    <label className="relative" htmlFor={id}>
       <input
-        id="switch"
+        id={id}
         className="sr-only peer"
-        name="switch"
+        name={name}
         type="checkbox"
       />
       <div className="h-8 w-14 cursor-pointer rounded-full bg-neutral-variant-90 dark:bg-neutral-variant-30 peer-checked:bg-primary-600 peer-checked:dark:bg-primary-200 border border-2 peer-checked:border-0 border-neutral-variant-50 dark:border-neutral-variant-60" />
