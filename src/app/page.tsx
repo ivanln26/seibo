@@ -6,6 +6,7 @@ import TextField from "@/components/text-field";
 import Table from "@/components/table";
 import type { TableRow } from "@/components/table";
 import Modal from "@/components/modal";
+import Switch from "@/components/switch";
 import { db } from "@/db/db";
 import { course } from "@/db/schema";
 
@@ -51,6 +52,7 @@ export default async function Home() {
     <main>
       <section>
         <h1 className="text-4xl">Courses</h1>
+        <Switch />
       </section>
       <section>
         <Table cols={columnNames} rows={createTableRows()}></Table>
