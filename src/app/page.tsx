@@ -6,6 +6,7 @@ import TextField from "@/components/text-field";
 import Table from "@/components/table";
 import type { TableRow } from "@/components/table";
 import Modal from "@/components/modal";
+import Switch from "@/components/switch";
 import { db } from "@/db/db";
 import { course } from "@/db/schema";
 
@@ -67,6 +68,10 @@ export default async function Home() {
           </form>
         </div>
       </Modal>
+      <section className="flex gap-x-2 mt-2">
+        <Switch id="test1" name="test1" />
+        <Switch id="test2" name="test2" />
+      </section>
     </main>
   );
 }
