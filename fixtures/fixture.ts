@@ -1,3 +1,4 @@
+import { SQL } from 'drizzle-orm';
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
 import dotenv from 'dotenv';
@@ -20,19 +21,6 @@ import {
 dotenv.config();
 const poolConnection = mysql.createPool(process.env.DATABASE_URL);
 const db = drizzle(poolConnection);
-
-async function loadData() {
-    await db.insert(school).values(schools);
-    await db.insert(user).values(users);
-    await db.insert(course).values(courses);
-    await db.insert(grade).values(grades);
-    await db.insert(student).values(students);
-    await db.insert(classroom).values(classrooms);
-    await db.insert(instance).values(instances);
-    poolConnection.end()
-}
-
-loadData()
 
 const schools = [
     {
@@ -86,28 +74,28 @@ const students = [
         firstName: "Ramiro",
         lastName: "Ghilino",
         schoolId: 1,
-        studentCode: "AF2001"
+        studentCode: "AF2002"
     },
     {
         email: "manuelbobadilla@gmail.com",
         firstName: "Manuel",
         lastName: "Bobadilla",
         schoolId: 1,
-        studentCode: "AF2001"
+        studentCode: "AF2003"
     },
     {
         email: "ivannunez@gmail.com",
         firstName: "Ivan",
         lastName: "Nuñez",
         schoolId: 1,
-        studentCode: "AF2001"
+        studentCode: "AF2004"
     },
     {
         email: "juanvillareal@gmail.com",
         firstName: "Juan",
         lastName: "Villareal",
         schoolId: 1,
-        studentCode: "AF2001"
+        studentCode: "AF2005"
     },
 ]
 
@@ -168,12 +156,103 @@ const instances = [
         courseId: 1,
         professorId: 1,
         classroomId: 1,
-        gradeId:1,
+        gradeId: 1,
     },
     {
         courseId: 2,
         professorId: 2,
         classroomId: 2,
-        gradeId:2,
+        gradeId: 2,
     },
 ]
+
+const schedules = [
+    {
+        instanceId: 1,
+        weekday: "monday",
+        startTime: "14:00:00",
+        endTime: "14:45:00",
+    },
+    {
+        instanceId: 1,
+        weekday: "tuesday",
+        startTime: "09:00:00",
+        endTime: "09:45:00",
+    }
+];
+
+const lectures = [
+    {
+        scheduleId: 1,
+        notes: "",
+        date: "2023-12-02T15:00:00",
+    },
+    {
+        scheduleId: 1,
+        notes: "",
+        date: "2023-12-02T15:00:00",
+    },
+]
+
+const attendances = [
+    {
+        studentId: 1,
+        lectureId: 1,
+        isPresent: true,
+    },
+    {
+        studentId: 2,
+        lectureId: 1,
+        isPresent: true,
+    },
+    {
+        studentId: 3,
+        lectureId: 1,
+        isPresent: false,
+    }
+]
+
+const scores = [
+    {
+        testId: 1,
+        studentId: 1,
+        score: 4
+    },
+    {
+        testId: 1,
+        studentId: 2,
+        score: 7
+    },
+    {
+        testId: 1,
+        studentId: 3,
+        score: 10
+    },
+]
+
+const tests = [
+    {
+        instanceId: 1,
+        title: "Primera evaluación",
+        topics: "Primera guerra mundial",
+        date: "2023-08-04T13:15:00",
+    }
+]
+
+async function loadData() {
+    await db.insert(school).values(schools);
+    await db.insert(user).values(users);
+    await db.insert(course).values(courses);
+    await db.insert(grade).values(grades);
+    await db.insert(student).values(students);
+    await db.insert(classroom).values(classrooms);
+    await db.insert(instance).values(instances);
+    await db.insert(schedule).values(schedules);
+    await db.insert(lecture).values(lectures);
+    await db.insert(attendance).values(attendances);
+    await db.insert(test).values(tests);
+    await db.insert(score).values(scores);
+    poolConnection.end()
+}
+
+loadData()
