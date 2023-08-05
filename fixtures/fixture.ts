@@ -1,4 +1,3 @@
-import { SQL } from 'drizzle-orm';
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
 import dotenv from 'dotenv';
@@ -169,13 +168,13 @@ const instances = [
 const schedules = [
     {
         instanceId: 1,
-        weekday: "monday",
+        weekday: "monday" as any,
         startTime: "14:00:00",
         endTime: "14:45:00",
     },
     {
         instanceId: 1,
-        weekday: "wednesday",
+        weekday: "wednesday" as any,
         startTime: "09:00:00",
         endTime: "09:45:00",
     }
