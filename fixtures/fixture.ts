@@ -175,7 +175,7 @@ const schedules = [
     },
     {
         instanceId: 1,
-        weekday: "tuesday",
+        weekday: "wednesday",
         startTime: "09:00:00",
         endTime: "09:45:00",
     }
@@ -185,12 +185,12 @@ const lectures = [
     {
         scheduleId: 1,
         notes: "",
-        date: "2023-12-02T15:00:00",
+        date: new Date("2023-08-05"),
     },
     {
         scheduleId: 1,
         notes: "",
-        date: "2023-12-02T15:00:00",
+        date: new Date("2023-08-05"),
     },
 ]
 
@@ -235,7 +235,7 @@ const tests = [
         instanceId: 1,
         title: "Primera evaluación",
         topics: "Primera guerra mundial",
-        date: "2023-08-04T13:15:00",
+        date: new Date("2023-08-05"),
     }
 ]
 
