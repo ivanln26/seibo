@@ -240,18 +240,20 @@ const tests = [
 ]
 
 async function loadData() {
-    await db.insert(school).values(schools);
-    await db.insert(user).values(users);
-    await db.insert(course).values(courses);
-    await db.insert(grade).values(grades);
-    await db.insert(student).values(students);
-    await db.insert(classroom).values(classrooms);
-    await db.insert(instance).values(instances);
-    await db.insert(schedule).values(schedules);
-    await db.insert(lecture).values(lectures);
-    await db.insert(attendance).values(attendances);
-    await db.insert(test).values(tests);
-    await db.insert(score).values(scores);
+    await db.transaction(async (tx) => {
+        await tx.insert(school).values(schools);
+        await tx.insert(user).values(users);
+        await tx.insert(course).values(courses);
+        await tx.insert(grade).values(grades);
+        await tx.insert(student).values(students);
+        await tx.insert(classroom).values(classrooms);
+        await tx.insert(instance).values(instances);
+        await tx.insert(schedule).values(schedules);
+        await tx.insert(lecture).values(lectures);
+        await tx.insert(attendance).values(attendances);
+        await tx.insert(test).values(tests);
+        await tx.insert(score).values(scores);
+      });
     poolConnection.end()
 }
 
