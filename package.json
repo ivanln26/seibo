@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "db:push": "drizzle-kit push:mysql",
-    "db:loaddata": "tsx fixtures/fixture.ts"
+    "db:loaddata": "tsx src/fixtures/fixture.ts"
   },
   "dependencies": {
     "@types/node": "^20.4.5",
