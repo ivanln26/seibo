@@ -1,4 +1,5 @@
 import Navigation from "@/components/navigation";
+import AuthProvider from "@/components/auth-provider";
 import "./globals.css";
 
 export const metadata = {
@@ -14,8 +15,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="flex flex-wrap bg-neutral-99 dark:text-white dark:bg-neutral-4">
-        <Navigation />
-        {children}
+        <AuthProvider>
+          <Navigation />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );
