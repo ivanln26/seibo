@@ -1,6 +1,8 @@
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
 import dotenv from "dotenv";
+import dotenvExpand from "dotenv-expand";
+import { z } from "zod";
 
 import {
   attendance,
@@ -17,8 +19,17 @@ import {
   user,
 } from "@/db/schema";
 
-dotenv.config();
-const poolConnection = mysql.createPool(process.env.DATABASE_URL);
+const envSchema = z.object({
+  databaseURL: z.string(),
+});
+
+const { parsed } = dotenvExpand.expand(dotenv.config());
+
+const env = envSchema.parse({
+  databaseURL: parsed?.DATABASE_URL,
+});
+
+const poolConnection = mysql.createPool(env.databaseURL);
 const db = drizzle(poolConnection);
 
 const schools = [
