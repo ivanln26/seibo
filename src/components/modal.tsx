@@ -17,6 +17,7 @@ export default function Modal({ buttonText, children }: ModalProps) {
     <>
       <Button
         color="tertiary"
+        type="button"
         onClick={() => {
           setHidden(false);
         }}
