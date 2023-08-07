@@ -9,7 +9,6 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db/db";
 import {
   attendance,
-  lecture,
   student,
 } from "@/db/schema";
 
