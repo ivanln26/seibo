@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import { redirect } from 'next/navigation'
 
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
@@ -28,12 +29,17 @@ export default async function Page() {
     .innerJoin(student, eq(attendance.studentId, student.id))
     .where(eq(attendance.lectureId, Number(lectureID)));
 
-  async function updateAssistances(formData: FormData){
+  async function updateAssistances(formData: FormData) {
     'use server'
-    console.log(formData)
+    const data = formData.entries();
+    data.next();
+    for (let pair of data) {
+      await db.update(attendance)
+        .set({ isPresent: pair[1] === "on" })
+        .where(eq(attendance.id, Number(pair[0])))
+    }
+    // redirect(pathName)
   }
-
-  console.log(attendances)
 
   return (
     <div className="flex flex-col gap-5 h-screen mx-2">
@@ -56,7 +62,7 @@ export default async function Page() {
           })}
           <div className="fixed bottom-2 right-5 flex flex-row gap-5">
             <Button color="error" kind="tonal">Deshacer</Button>
-            <Modal  buttonText="Guardar">
+            <Modal buttonText="Guardar">
               <Button type="submit">guardar</Button>
             </Modal>
           </div>
