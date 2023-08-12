@@ -58,15 +58,12 @@ export default async function Home() {
         <Table cols={columnNames} rows={createTableRows()}></Table>
       </section>
       <div className="fixed bottom-5 right-10">
-        <Modal buttonText="Crear curso">
+        <Modal buttonText="Crear curso" confirmButton={{text: "Crear", type:"submit"}}>
           <div>
             <h1 className="text-2xl">Nuevo curso</h1>
             <form action={create} className="flex flex-col gap-1 mx-5">
               <TextField id="content" name="content" label="Contenido" required />
               <TextField id="topics" name="topics" label="Temas" required />
-              <div className="flex justify-end">
-                <Button type="submit">Guardar</Button>
-              </div>
             </form>
           </div>
         </Modal>
