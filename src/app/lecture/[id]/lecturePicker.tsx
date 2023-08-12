@@ -17,6 +17,7 @@ export default async function LecturePicker() {
     .innerJoin(course, eq(instance.courseId, course.id))
     .innerJoin(grade, eq(instance.gradeId, grade.id))
     .where(eq(instance.professorId, 1))
+    .orderBy(schedule.weekday, schedule.startTime)
 
   return lectures.map((l) => {
     return (
