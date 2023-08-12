@@ -5,10 +5,10 @@ import { useState } from "react";
 type SwitchProps = {
   id: string;
   name: string;
-  checked: boolean
+  checked: boolean | undefined
 };
 
-export default function Switch({ id, name, checked }: SwitchProps) {
+export default function Switch({ id, name, checked=false }: SwitchProps) {
   const [check, setCheck] = useState(checked)
   return (
     <label className="relative" htmlFor={id}>
