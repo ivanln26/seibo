@@ -49,7 +49,7 @@ export default async function Home() {
   };
 
   return (
-    <main>
+    <>
       <section>
         <h1 className="text-4xl">Courses</h1>
       </section>
@@ -72,6 +72,6 @@ export default async function Home() {
         <Switch id="test1" name="test1" />
         <Switch id="test2" name="test2" />
       </section>
-    </main>
+    </>
   );
 }
