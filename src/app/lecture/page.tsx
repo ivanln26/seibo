@@ -39,6 +39,6 @@ export default async function Page() {
                 closerTimeDiff = timeDiff
         }
     })
-    redirect(`/attendance/${String(closerLecture)}`)
+    redirect(`/lecture/${String(closerLecture)}`)
     
 }
