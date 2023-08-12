@@ -1,4 +1,3 @@
-import Navigation from "@/components/navigation";
 import AuthProvider from "@/components/auth-provider";
 import "./globals.css";
 
@@ -16,10 +15,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="flex flex-wrap md:flex-nowrap bg-neutral-99 dark:text-white dark:bg-neutral-4">
         <AuthProvider>
-          <Navigation />
-          <main className="w-full px-4 md:px-2 py-2">
-            {children}
-          </main>
+          {children}
         </AuthProvider>
       </body>
     </html>
