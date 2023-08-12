@@ -47,17 +47,15 @@ export default async function Page({ params }: Props) {
   };
 
   return (
-    <main>
-      <section>
-        <form action={update}>
-          <input name="name" defaultValue={t.name} type="text" />
-          <input name="topics" defaultValue={t.topics} type="text" />
-          <button type="submit">submit</button>
-        </form>
-        <form action={del}>
-          <button type="submit">delete</button>
-        </form>
-      </section>
-    </main>
+    <section>
+      <form action={update}>
+        <input name="name" defaultValue={t.name} type="text" />
+        <input name="topics" defaultValue={t.topics} type="text" />
+        <button type="submit">submit</button>
+      </form>
+      <form action={del}>
+        <button type="submit">delete</button>
+      </form>
+    </section>
   );
 }
