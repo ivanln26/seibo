@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
@@ -10,6 +11,7 @@ import AssistanceRow from "./AssistanceRow";
 import LecturePicker from "./lecturePicker"
 import Button from "@/components/button";
 import Modal from "@/components/modal";
+import UndoButton from "./undoButton";
 
 export default async function Page() {
   const pathName = headers().get("x-invoke-path") || "";
@@ -21,6 +23,8 @@ export default async function Page() {
   const attendances = await getAttendances(lectureID)
   const students = await getStudents(lectureCourse[0].instance.courseId)
 
+  {/* TODO: Añadir logica en caso de que añada un NUEVO alumno 
+  al curso y la lista ya este creada */}
   const listIsCreated = students.length === attendances.length;
 
   return (
@@ -51,7 +55,7 @@ export default async function Page() {
             })
           }
           <div className="fixed bottom-2 right-5 flex flex-row gap-5">
-            <Button color="error" kind="tonal">Deshacer</Button>
+            <UndoButton pathName={pathName} />
             <Modal buttonText="Guardar">
               <Button type="submit">guardar</Button>
             </Modal>
