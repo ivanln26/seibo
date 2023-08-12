@@ -56,8 +56,8 @@ export default async function Page() {
           }
           <div className="fixed bottom-2 right-5 flex flex-row gap-5">
             <UndoButton pathName={pathName} />
-            <Modal buttonText="Guardar">
-              <Button type="submit">guardar</Button>
+            <Modal buttonText="Guardar" confirmButton={{ text: "guardar", type: "submit"}}>
+              <h1 className="text-2xl">¿Segur@ que desea guardar los cambios?</h1>
             </Modal>
           </div>
         </form>
