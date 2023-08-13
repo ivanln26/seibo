@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import Icon from "@/components/icons/icon";
 import type { Icon as IconType } from "@/components/icons/icon";
 
-import Logo from "@/../public/logo.png";
+import Logo from "@public/logo.png";
 
 type RailButton = {
   name: string;
