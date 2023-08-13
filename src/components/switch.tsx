@@ -5,7 +5,7 @@ import { useState } from "react";
 type SwitchProps = {
   id: string;
   name: string;
-  checked: boolean | undefined;
+  checked?: boolean;
 };
 
 export default function Switch({ id, name, checked = false }: SwitchProps) {

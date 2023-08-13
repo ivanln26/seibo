@@ -64,7 +64,13 @@ export default function Page() {
       </section>
       <div className="fixed bottom-2 right-5 flex flex-row gap-5">
         <Button color="error" kind="tonal">Deshacer</Button>
-        <Modal buttonText="Guardar">Item guardado con exito</Modal>
+        <Modal
+          buttonText="Guardar"
+          confirmButton={{ text: "guardar", type: "submit" }}
+        >
+          Item guardado con exito
+        </Modal>
+
         {/* <Button color="tertiary" kind="tonal">Guardar</Button> */}
       </div>
     </div>
