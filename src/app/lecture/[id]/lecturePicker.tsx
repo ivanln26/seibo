@@ -2,13 +2,7 @@ import Link from "next/link";
 import { eq } from "drizzle-orm";
 
 import { db } from "@/db/db";
-import {
-  lecture,
-  grade,
-  course,
-  schedule,
-  instance
-} from "@/db/schema";
+import { course, grade, instance, lecture, schedule } from "@/db/schema";
 
 export default async function LecturePicker() {
   const lectures = await db.select().from(lecture)
@@ -17,7 +11,7 @@ export default async function LecturePicker() {
     .innerJoin(course, eq(instance.courseId, course.id))
     .innerJoin(grade, eq(instance.gradeId, grade.id))
     .where(eq(instance.professorId, 1))
-    .orderBy(schedule.weekday, schedule.startTime)
+    .orderBy(schedule.weekday, schedule.startTime);
 
   return lectures.map((l) => {
     return (
@@ -29,6 +23,6 @@ export default async function LecturePicker() {
           <p>{l.schedule.startTime} - {l.schedule.endTime}</p>
         </div>
       </Link>
-    )
-  })
+    );
+  });
 }

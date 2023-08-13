@@ -8,17 +8,19 @@ import Button from "@/components/button";
 type Type = "button" | "submit" | "reset";
 
 type confirmButtonProps = {
-  text: string,
-  type: Type,
-}
+  text: string;
+  type: Type;
+};
 
 type ModalProps = {
   buttonText: string;
   children: ReactNode;
-  confirmButton: confirmButtonProps
+  confirmButton: confirmButtonProps;
 };
 
-export default function Modal({ buttonText, children, confirmButton }: ModalProps) {
+export default function Modal(
+  { buttonText, children, confirmButton }: ModalProps,
+) {
   const [hidden, setHidden] = useState(true);
 
   return (
@@ -33,8 +35,9 @@ export default function Modal({ buttonText, children, confirmButton }: ModalProp
         {buttonText}
       </Button>
       <div
-        className={`fixed inset-0 flex justify-center items-center transition-opacity bg-black bg-opacity-50 ${hidden && "hidden"
-          }`}
+        className={`fixed inset-0 flex justify-center items-center transition-opacity bg-black bg-opacity-50 ${
+          hidden && "hidden"
+        }`}
         onClick={() => setHidden(true)}
       >
         <div
@@ -43,8 +46,19 @@ export default function Modal({ buttonText, children, confirmButton }: ModalProp
         >
           {children}
           <div className="flex flex-row gap-5 justify-center mt-5">
-            <Button kind="tonal" color="error" type="button" onClick={() => {setHidden(true)}}>Cancelar</Button>
-            <Button type={confirmButton.type} kind="tonal" color="tertiary">{confirmButton.text}</Button>
+            <Button
+              kind="tonal"
+              color="error"
+              type="button"
+              onClick={() => {
+                setHidden(true);
+              }}
+            >
+              Cancelar
+            </Button>
+            <Button type={confirmButton.type} kind="tonal" color="tertiary">
+              {confirmButton.text}
+            </Button>
           </div>
         </div>
       </div>

@@ -35,7 +35,7 @@ export default async function Home() {
       topics: res.data.topics,
       schoolId: 1,
     });
-    revalidatePath("/",);
+    revalidatePath("/");
   };
 
   const createTableRows = (): TableRow[] => {
@@ -58,11 +58,19 @@ export default async function Home() {
         <Table cols={columnNames} rows={createTableRows()}></Table>
       </section>
       <div className="fixed bottom-5 right-10">
-        <Modal buttonText="Crear curso" confirmButton={{text: "Crear", type:"submit"}}>
+        <Modal
+          buttonText="Crear curso"
+          confirmButton={{ text: "Crear", type: "submit" }}
+        >
           <div>
             <h1 className="text-2xl">Nuevo curso</h1>
             <form action={create} className="flex flex-col gap-1 mx-5">
-              <TextField id="content" name="content" label="Contenido" required />
+              <TextField
+                id="content"
+                name="content"
+                label="Contenido"
+                required
+              />
               <TextField id="topics" name="topics" label="Temas" required />
             </form>
           </div>

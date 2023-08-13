@@ -1,17 +1,18 @@
-import Switch from "@/components/switch"
+import Switch from "@/components/switch";
 import Button from "@/components/button";
 import Modal from "@/components/modal";
-import { format } from 'date-fns'
-import { es } from 'date-fns/locale'
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 
 export default function Page() {
-
   const today = new Date();
-  const monthName = format(today, 'MMMM', { locale: es });
+  const monthName = format(today, "MMMM", { locale: es });
 
   return (
     <div className="flex flex-col gap-5 h-screen mx-2">
-      <h1 className="text-4xl">Asistencias - {today.getDay()} de {monthName} de {today.getFullYear()}</h1>
+      <h1 className="text-4xl">
+        Asistencias - {today.getDay()} de {monthName} de {today.getFullYear()}
+      </h1>
       <h2 className="text-2xl">Clases</h2>
       <div className="flex flex-row gap-5 overflow-x-auto w-screen md:w-max text-center">
         <div className="p-5 px-6 m-2 border rounded-xl w-max flex flex-col font-bold">
@@ -68,5 +69,4 @@ export default function Page() {
       </div>
     </div>
   );
-
 }
