@@ -6,12 +6,16 @@ import Button from "@/components/button";
 import { ReactNode } from "react";
 
 type props = {
-  pathName: string;
+  lectureID: number;
 };
 
-export default function UndoButton({ pathName }: props): ReactNode {
+export default function UndoButton({ lectureID }: props): ReactNode {
   return (
-    <Button color="error" kind="tonal" onClick={() => redirect(pathName)}>
+    <Button
+      color="error"
+      kind="tonal"
+      onClick={() => redirect(`/lecture/${lectureID}`)}
+    >
       Deshacer
     </Button>
   );

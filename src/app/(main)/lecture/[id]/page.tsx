@@ -1,4 +1,4 @@
-import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
@@ -9,9 +9,19 @@ import AssistanceRow from "./assistance-row";
 import LecturePicker from "./lecture-picker";
 import UndoButton from "./undo-button";
 
-export default async function Page() {
-  const pathName = headers().get("x-invoke-path") || "";
-  const lectureID = Number(pathName.split("/").pop());
+type Props = {
+  params: {
+    id: string;
+  };
+};
+
+export default async function Page({ params }: Props) {
+  const lectureID = Number(params.id);
+
+  if (Number.isNaN(lectureID)) {
+    redirect("/");
+  }
+
   const today = new Date();
   const monthName = format(today, "MMMM", { locale: es });
 
@@ -62,7 +72,7 @@ export default async function Page() {
               );
             })}
           <div className="fixed bottom-2 right-5 flex flex-row gap-5">
-            <UndoButton pathName={pathName} />
+            <UndoButton lectureID={lectureID} />
             <Modal
               buttonText="Guardar"
               confirmButton={{ text: "guardar", type: "submit" }}
