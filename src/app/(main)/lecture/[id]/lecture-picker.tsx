@@ -15,7 +15,7 @@ export default async function LecturePicker() {
 
   return lectures.map((l) => {
     return (
-      <Link href={`http://localhost:3000/lecture/${l.lecture.id}`}>
+      <Link href={`/lecture/${l.lecture.id}`}>
         <div className="p-5 px-6 m-2 border rounded-xl w-max flex flex-col font-bold">
           <p>{l.course.name}</p>
           <p>{l.grade.name}</p>
