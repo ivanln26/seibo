@@ -5,18 +5,29 @@ import type { ReactNode } from "react";
 
 import Button from "@/components/button";
 
+type Type = "button" | "submit" | "reset";
+
+type confirmButtonProps = {
+  text: string;
+  type: Type;
+};
+
 type ModalProps = {
   buttonText: string;
   children: ReactNode;
+  confirmButton: confirmButtonProps;
 };
 
-export default function Modal({ buttonText, children }: ModalProps) {
+export default function Modal(
+  { buttonText, children, confirmButton }: ModalProps,
+) {
   const [hidden, setHidden] = useState(true);
 
   return (
     <>
       <Button
         color="tertiary"
+        type="button"
         onClick={() => {
           setHidden(false);
         }}
@@ -30,10 +41,25 @@ export default function Modal({ buttonText, children }: ModalProps) {
         onClick={() => setHidden(true)}
       >
         <div
-          className="p-5 m-5 rounded bg-neutral-94 dark:bg-neutral-12"
+          className="flex flex-col gap-5 p-5 m-5 rounded bg-neutral-94 dark:bg-neutral-12"
           onClick={(e) => e.stopPropagation()}
         >
           {children}
+          <div className="flex flex-row gap-5 justify-center mt-5">
+            <Button
+              kind="tonal"
+              color="error"
+              type="button"
+              onClick={() => {
+                setHidden(true);
+              }}
+            >
+              Cancelar
+            </Button>
+            <Button type={confirmButton.type} kind="tonal" color="tertiary">
+              {confirmButton.text}
+            </Button>
+          </div>
         </div>
       </div>
     </>

@@ -9,6 +9,7 @@ import Modal from "@/components/modal";
 import Switch from "@/components/switch";
 import { db } from "@/db/db";
 import { course } from "@/db/schema";
+import { revalidatePath } from "next/cache";
 
 export const revalidate = 0;
 
@@ -34,7 +35,7 @@ export default async function Home() {
       topics: res.data.topics,
       schoolId: 1,
     });
-    redirect("/");
+    revalidatePath("/");
   };
 
   const createTableRows = (): TableRow[] => {
@@ -56,22 +57,25 @@ export default async function Home() {
       <section>
         <Table cols={columnNames} rows={createTableRows()}></Table>
       </section>
-      <Modal buttonText="Crear curso">
-        <div>
-          <h1 className="text-2xl">Nuevo curso</h1>
-          <form action={create} className="flex flex-col gap-1 mx-5">
-            <TextField id="content" name="content" label="Contenido" required />
-            <TextField id="topics" name="topics" label="Temas" required />
-            <div className="flex justify-end">
-              <Button type="submit">Guardar</Button>
-            </div>
-          </form>
-        </div>
-      </Modal>
-      <section className="flex gap-x-2 mt-2">
-        <Switch id="test1" name="test1" />
-        <Switch id="test2" name="test2" />
-      </section>
+      <div className="fixed bottom-5 right-10">
+        <Modal
+          buttonText="Crear curso"
+          confirmButton={{ text: "Crear", type: "submit" }}
+        >
+          <div>
+            <h1 className="text-2xl">Nuevo curso</h1>
+            <form action={create} className="flex flex-col gap-1 mx-5">
+              <TextField
+                id="content"
+                name="content"
+                label="Contenido"
+                required
+              />
+              <TextField id="topics" name="topics" label="Temas" required />
+            </form>
+          </div>
+        </Modal>
+      </div>
     </>
   );
 }

@@ -46,7 +46,7 @@ const buttons: RailButton[] = [
   {
     name: "Asistencia",
     icon: "checklist",
-    href: "/attendance",
+    href: "/lecture",
   },
   {
     name: "Notas",
