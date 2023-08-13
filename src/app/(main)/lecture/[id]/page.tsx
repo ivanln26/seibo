@@ -1,15 +1,13 @@
 import { headers } from "next/headers";
-
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
-import { updateAssistances } from "./updateAssistances";
-import { getAttendances, getLectureCourses, getStudents } from "./queries";
-
-import AssistanceRow from "./AssistanceRow";
-import LecturePicker from "./lecturePicker";
 import Modal from "@/components/modal";
-import UndoButton from "./undoButton";
+import { updateAssistances } from "./update-assistances";
+import { getAttendances, getLectureCourses, getStudents } from "./queries";
+import AssistanceRow from "./assistance-row";
+import LecturePicker from "./lecture-picker";
+import UndoButton from "./undo-button";
 
 export default async function Page() {
   const pathName = headers().get("x-invoke-path") || "";
@@ -21,10 +19,8 @@ export default async function Page() {
   const attendances = await getAttendances(lectureID);
   const students = await getStudents(lectureCourse[0].instance.courseId);
 
-  {
-    /* TODO: Añadir logica en caso de que añada un NUEVO alumno
-  al curso y la lista ya este creada */
-  }
+  // TODO: Añadir logica en caso de que añada un NUEVO alumno
+  // al curso y la lista ya este creada.
   const listIsCreated = students.length === attendances.length;
 
   return (
