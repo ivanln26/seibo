@@ -9,6 +9,7 @@ type TextFieldProps = {
   icon?: TIcon;
   required?: boolean;
   type?: "email" | "password" | "text" | "url";
+  defaultValue: string;
 };
 
 export default function TextField({
@@ -19,6 +20,7 @@ export default function TextField({
   icon,
   required,
   type,
+  defaultValue = ""
 }: TextFieldProps) {
   return (
     <div className="flex flex-col gap-y-1 group py-2">
@@ -49,6 +51,7 @@ export default function TextField({
           name={name}
           type={type}
           required={required}
+          defaultValue={defaultValue}
         />
       </div>
       {helpText && (
