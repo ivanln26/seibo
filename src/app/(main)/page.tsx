@@ -43,7 +43,7 @@ export default async function Home() {
       {
         cells: Object.values(course).map((attribute) => ({
           text: String(attribute),
-          href: `/todo/${course.id}`,
+          href: `/course/${course.id}`,
         })),
       }
     ));
@@ -71,7 +71,12 @@ export default async function Home() {
                 label="Contenido"
                 required
               />
-              <TextField id="topics" name="topics" label="Temas" required />
+              <TextField
+                id="topics"
+                name="topics"
+                label="Temas"
+                required
+              />
             </form>
           </div>
         </Modal>
