@@ -9,7 +9,7 @@ type TextFieldProps = {
   icon?: TIcon;
   required?: boolean;
   type?: "email" | "password" | "text" | "url";
-  defaultValue: string;
+  defaultValue?: string;
 };
 
 export default function TextField({
@@ -20,7 +20,7 @@ export default function TextField({
   icon,
   required,
   type,
-  defaultValue = ""
+  defaultValue,
 }: TextFieldProps) {
   return (
     <div className="flex flex-col gap-y-1 group py-2">

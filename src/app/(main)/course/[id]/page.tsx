@@ -55,16 +55,24 @@ export default async function Page({ params }: Props) {
       <h1 className="text-4xl ml-5">Modificar curso</h1>
       <div className="bg-primary-100 flex flex-col gap-5 m-5 p-4 rounded-xl">
         <form action={update}>
-          <TextField defaultValue={t.name} label="Nombre" id="name" name="name"></TextField>
-          <TextField defaultValue={t.topics} label="Temas" id="topics" name="topics"></TextField>
+          <TextField
+            defaultValue={t.name}
+            label="Nombre"
+            id="name"
+            name="name"
+          />
+          <TextField
+            defaultValue={t.topics}
+            label="Temas"
+            id="topics"
+            name="topics"
+          />
           <Button color="tertiary" type="submit">Guardar</Button>
         </form>
         <form action={del}>
           <Button color="error" type="submit">Borrar</Button>
-          
         </form>
       </div>
-
     </section>
   );
 }

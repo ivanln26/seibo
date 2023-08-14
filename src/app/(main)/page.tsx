@@ -69,14 +69,12 @@ export default async function Home() {
                 id="content"
                 name="content"
                 label="Contenido"
-                defaultValue=""
                 required
               />
               <TextField
                 id="topics"
                 name="topics"
                 label="Temas"
-                defaultValue=""
                 required
               />
             </form>
