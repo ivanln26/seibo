@@ -26,8 +26,13 @@ export default async function Page({ params }: Props) {
   const monthName = format(today, "MMMM", { locale: es });
 
   const lectureCourse = await getLectureCourses(lectureID);
+
+  if(lectureCourse.instance.professorId !== 1){
+    throw new Error("Profesor no valido");
+  }
+
   const attendances = await getAttendances(lectureID);
-  const students = await getStudents(lectureCourse[0].instance.courseId);
+  const students = await getStudents(lectureCourse.instance.courseId);
 
   // TODO: Añadir logica en caso de que añada un NUEVO alumno
   // al curso y la lista ya este creada.
