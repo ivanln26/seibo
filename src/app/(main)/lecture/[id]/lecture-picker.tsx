@@ -4,6 +4,11 @@ import { eq, and, between } from "drizzle-orm";
 import { db } from "@/db/db";
 import { course, grade, instance, lecture, schedule } from "@/db/schema";
 
+
+type props = {
+  lectureID: number
+}
+
 function getMonday(d: Date) {
   d = new Date(d);
   var day = d.getDay(),
@@ -11,7 +16,6 @@ function getMonday(d: Date) {
   const newDate = new Date(d.setDate(diff));
   return new Date(newDate.setUTCHours(0,0,0,0));
 }
-
 
 function getFriday(d: Date) {
   d = new Date(d);
@@ -21,7 +25,7 @@ function getFriday(d: Date) {
   return new Date(newDate.setUTCHours(23,59,59)); 
 }
 
-export default async function LecturePicker() {
+export default async function LecturePicker({lectureID}: props) {
   const d = new Date()
   const lectures = await db.select().from(lecture)
     .innerJoin(schedule, eq(lecture.scheduleId, schedule.id))
@@ -33,11 +37,10 @@ export default async function LecturePicker() {
       between(lecture.date, getMonday(d), getFriday(d))
     ))
     .orderBy(schedule.weekday, schedule.startTime);
-
   return lectures.map((l) => {
     return (
       <Link href={`/lecture/${l.lecture.id}`}>
-        <div className="p-5 px-6 m-2 border rounded-xl w-max flex flex-col font-bold">
+        <div className={`p-5 px-6 m-2 border rounded-xl w-max flex flex-col font-bold ${lectureID === Number(l.lecture.id) ? "bg-secondary-100": ""}`}>
           <p>{l.course.name}</p>
           <p>{l.grade.name}</p>
           <p>{l.schedule.weekday}</p>

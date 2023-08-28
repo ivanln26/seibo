@@ -8,6 +8,7 @@ import { getAttendances, getLectureCourses, getStudents } from "./queries";
 import AssistanceRow from "./assistance-row";
 import LecturePicker from "./lecture-picker";
 import UndoButton from "./undo-button";
+import { lecture } from "@/db/schema";
 
 type Props = {
   params: {
@@ -37,7 +38,6 @@ export default async function Page({ params }: Props) {
   // TODO: Añadir logica en caso de que añada un NUEVO alumno
   // al curso y la lista ya este creada.
   const listIsCreated = students.length === attendances.length;
-
   return (
     <div className="flex flex-col gap-5 h-screen mx-2">
       <h1 className="text-4xl">
@@ -45,7 +45,7 @@ export default async function Page({ params }: Props) {
       </h1>
       <h2 className="text-2xl">Clases</h2>
       <section className="flex flex-row gap-5 overflow-x-auto w-screen md:w-max text-center">
-        <LecturePicker />
+        <LecturePicker lectureID={Number(lectureID)} />
       </section>
       <section className="flex px-4 flex-col gap-2 mt-2 w-screen md:w-[1080px] ">
         <form action={updateAssistances}>
