@@ -16,12 +16,11 @@ export default function Error({
   useEffect(() => {
     // Log the error to an error reporting service
     console.error(error)
+    router.back()
   }, [error])
 
   return (
     <div className='flex flex-col h-full w-full justify-center items-center gap-5'>
-      <h2 className='text-4xl'>{error.message}</h2>
-      <Button onClick={() => router.back()}>Volver</Button>
     </div>
   )
 }
