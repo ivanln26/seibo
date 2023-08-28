@@ -12,6 +12,7 @@ function getMonday(d: Date) {
   return new Date(newDate.setUTCHours(0,0,0,0));
 }
 
+
 function getFriday(d: Date) {
   d = new Date(d);
   var day = d.getDay(),
