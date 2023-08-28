@@ -8,14 +8,16 @@ function getMonday(d: Date) {
   d = new Date(d);
   var day = d.getDay(),
       diff = d.getDate() - day + (day == 0 ? -6:1); // adjust when day is sunday
-  return new Date(d.setDate(diff));
+  const newDate = new Date(d.setDate(diff));
+  return new Date(newDate.setUTCHours(0,0,0,0));
 }
 
 function getFriday(d: Date) {
   d = new Date(d);
   var day = d.getDay(),
       diff = d.getDate() - day + (day <= 5 ? (5 - day) : (12 - day)); // adjust when day is after Friday
-  return new Date(d.setDate(diff));
+  const newDate = new Date(d.setDate(diff));
+  return new Date(newDate.setUTCHours(23,59,59)); 
 }
 
 export default async function LecturePicker() {
