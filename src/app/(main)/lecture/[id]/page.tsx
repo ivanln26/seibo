@@ -8,7 +8,6 @@ import { getAttendances, getLectureCourses, getStudents } from "../utils";
 import AssistanceRow from "./assistance-row";
 import LecturePicker from "./lecture-picker";
 import UndoButton from "./undo-button";
-import { lecture } from "@/db/schema";
 
 type Props = {
   params: {
