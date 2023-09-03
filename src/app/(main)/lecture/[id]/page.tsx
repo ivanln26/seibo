@@ -54,6 +54,7 @@ export default async function Page({ params }: Props) {
             name="listIsCreated"
             value={Number(listIsCreated)}
           />
+          <h1 className="text-2xl mb-4">Asistencias</h1>
           {listIsCreated
             ? attendances.map((a) => {
               return (
@@ -75,6 +76,10 @@ export default async function Page({ params }: Props) {
                 />
               );
             })}
+          <div className="flex flex-col h-full">
+            <label htmlFor="notes" className="mt-5 text-2xl mb-4">Notas</label>
+            <textarea defaultValue={lectureCourse.lecture.notes} name="notes" id="notes" className="w-full border border-grey rounded pb-5 resize-y" />
+          </div>
           <div className="fixed bottom-2 right-5 flex flex-row gap-5">
             <UndoButton lectureID={lectureID} />
             <Modal
