@@ -4,7 +4,7 @@ import { es } from "date-fns/locale";
 
 import Modal from "@/components/modal";
 import { updateAssistances } from "./update-assistances";
-import { getAttendances, getLectureCourses, getStudents } from "./queries";
+import { getAttendances, getLectureCourses, getStudents } from "../utils";
 import AssistanceRow from "./assistance-row";
 import LecturePicker from "./lecture-picker";
 import UndoButton from "./undo-button";
