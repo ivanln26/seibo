@@ -27,7 +27,7 @@ export default async function Page({ params }: Props) {
 
   const lectureCourse = await getLectureCourses(lectureID);
 
-  if(lectureCourse.instance.professorId !== 1){
+  if (lectureCourse.instance.professorId !== 1) {
     throw new Error("Profesor no valido");
   }
 

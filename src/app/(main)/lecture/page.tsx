@@ -1,6 +1,6 @@
- import { redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 
-import { eq, and, between } from "drizzle-orm";
+import { and, between, eq } from "drizzle-orm";
 
 import { db } from "@/db/db";
 import { course, grade, instance, lecture, schedule } from "@/db/schema";
@@ -8,18 +8,20 @@ import { course, grade, instance, lecture, schedule } from "@/db/schema";
 function getMonday(d: Date) {
   d = new Date(d);
   var day = d.getDay(),
-      diff = d.getDate() - day + (day == 0 ? -6:1); // adjust when day is sunday
+    diff = d.getDate() - day + (day == 0 ? -6 : 1); // adjust when day is sunday
   const newDate = new Date(d.setDate(diff));
-  return new Date(newDate.setUTCHours(0,0,0,0));
+  return new Date(newDate.setUTCHours(0, 0, 0, 0));
 }
 
 function getFriday(d: Date) {
   d = new Date(d);
   var day = d.getDay(),
-      diff = d.getDate() - day + (day <= 5 ? (5 - day) : (12 - day)); // adjust when day is after Friday
+    diff = d.getDate() - day + (day <= 5 ? (5 - day) : (12 - day)); // adjust when day is after Friday
   const newDate = new Date(d.setDate(diff));
-  return new Date(newDate.setUTCHours(23,59,59)); 
+  return new Date(newDate.setUTCHours(23, 59, 59));
 }
+
+export const revalidate = 0;
 
 export default async function Page() {
   const today = new Date();
@@ -32,7 +34,7 @@ export default async function Page() {
     .innerJoin(grade, eq(instance.gradeId, grade.id))
     .where(and(
       eq(instance.professorId, 1),
-      between(lecture.date, getMonday(today), getFriday(today))
+      between(lecture.date, getMonday(today), getFriday(today)),
     ));
 
   let closerLecture = lectures[0].lecture.id;

@@ -12,13 +12,13 @@ import {
 } from "@/db/schema";
 
 export async function getLectureCourses(lectureID: number) {
-  const aux =  await db.select()
+  const aux = await db.select()
     .from(lecture)
     .innerJoin(schedule, eq(lecture.scheduleId, schedule.id))
     .innerJoin(instance, eq(schedule.instanceId, instance.id))
     .where(eq(lecture.id, lectureID));
 
-    return aux[0];
+  return aux[0];
 }
 
 export async function getAttendances(lectureID: number) {
