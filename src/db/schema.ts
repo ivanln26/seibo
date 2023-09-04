@@ -14,19 +14,10 @@ import {
   varchar,
 } from "drizzle-orm/mysql-core";
 
-export const todo = mysqlTable("todo", {
-  id: int("id").autoincrement().primaryKey(),
-  content: varchar("content", { length: 256 }).notNull(),
-});
-
-export type Todo = InferModel<typeof todo>;
-export type NewTodo = InferModel<typeof todo, "insert">;
-
 export const user = mysqlTable("user", {
   id: int("id").autoincrement().primaryKey(),
   email: varchar("email", { length: 320 }).notNull(),
-  firstName: varchar("first_name", { length: 128 }).notNull(),
-  lastName: varchar("last_name", { length: 128 }).notNull(),
+  name: varchar("name", { length: 128 }).notNull(),
 }, (user) => ({
   emailIndex: uniqueIndex("user_email_idx").on(user.email),
 }));
