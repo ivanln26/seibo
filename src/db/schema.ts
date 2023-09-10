@@ -1,4 +1,4 @@
-import { InferModel, relations } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 import {
   boolean,
   date,
@@ -119,9 +119,6 @@ export const course = mysqlTable("course", {
     course.name,
   ),
 }));
-
-export type Course = InferModel<typeof course>;
-export type NewCourse = InferModel<typeof course, "insert">;
 
 export const courseProfessor = mysqlTable("course_professor", {
   id: int("id").autoincrement().primaryKey(),

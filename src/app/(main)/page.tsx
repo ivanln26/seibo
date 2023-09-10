@@ -1,21 +1,18 @@
-import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-import Button from "@/components/button";
 import TextField from "@/components/text-field";
 import Table from "@/components/table";
 import type { TableRow } from "@/components/table";
 import Modal from "@/components/modal";
-import Switch from "@/components/switch";
 import { db } from "@/db/db";
 import { course } from "@/db/schema";
-import { revalidatePath } from "next/cache";
 
 export const revalidate = 0;
 
 export default async function Home() {
   const courses = await db.select().from(course);
-  const columnNames = Object.keys(courses[0]);
+  const columnNames = ["id", "schoolId", "name", "topics"];
 
   const create = async (formData: FormData) => {
     "use server";
