@@ -15,6 +15,17 @@ type Props = {
   };
 };
 
+type Attendance = {
+  id: number | null,
+  name: string,
+  surname: string,
+  isPresent: boolean,
+  studentId: number,
+  lectureId: number,
+}
+
+export const revalidate = 0;
+
 export default async function Page({ params }: Props) {
   const lectureID = Number(params.id);
 
@@ -34,9 +45,33 @@ export default async function Page({ params }: Props) {
   const attendances = await getAttendances(lectureID);
   const students = await getStudents(lectureCourse.instance.courseId);
 
-  // TODO: Añadir logica en caso de que añada un NUEVO alumno
-  // al curso y la lista ya este creada.
-  const listIsCreated = students.length === attendances.length;
+  const attendanceStudentsIds = attendances.map((a) => a.attendance.studentId);
+  const list: Attendance[] = [];
+
+  students.forEach((s) => {
+    if (attendanceStudentsIds.includes(s.student.id)) {
+      const att = attendances[attendanceStudentsIds.indexOf(s.student.id)]
+      list.push({
+        id: att.attendance.id,
+        name: att.student.firstName,
+        surname: att.student.lastName,
+        isPresent: att.attendance.isPresent,
+        lectureId: att.attendance.lectureId,
+        studentId: att.attendance.studentId,
+      })
+    }
+    else {
+      list.push({
+        id: null,
+        name: s.student.firstName,
+        surname: s.student.lastName,
+        isPresent: false,
+        lectureId: lectureID,
+        studentId: s.student.id,
+      })
+    }
+  })
+
   return (
     <div className="flex flex-col gap-5 h-screen mx-2">
       <h1 className="text-4xl">
@@ -49,33 +84,18 @@ export default async function Page({ params }: Props) {
       <section className="flex px-4 flex-col gap-2 mt-2 w-screen md:w-[1080px] ">
         <form action={updateAssistances}>
           <input type="hidden" name="lectureID" value={lectureID} />
-          <input
-            type="hidden"
-            name="listIsCreated"
-            value={Number(listIsCreated)}
-          />
-          <h1 className="text-2xl mb-4">Asistencias</h1>
-          {listIsCreated
-            ? attendances.map((a) => {
-              return (
-                <AssistanceRow
-                  firstName={a.student.firstName}
-                  lastName={a.student.lastName}
-                  id={String(a.attendance.id)}
-                  isPresent={a.attendance.isPresent}
-                />
-              );
+          {
+            list.map((l) => {
+              return <AssistanceRow
+                firstName={l.name}
+                lastName={l.surname}
+                id={String(l.id)}
+                isPresent={l.isPresent}
+                studentId={l.studentId}
+              />
             })
-            : students.map((s) => {
-              return (
-                <AssistanceRow
-                  firstName={s.student.firstName}
-                  lastName={s.student.lastName}
-                  id={String(s.student.id)}
-                  isPresent={false}
-                />
-              );
-            })}
+          }
+
           <div className="flex flex-col h-full">
             <label htmlFor="notes" className="mt-5 text-2xl mb-4">Notas</label>
             <textarea

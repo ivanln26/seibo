@@ -7,49 +7,36 @@ import { redirect } from "next/navigation";
 
 export async function updateAssistances(formData: FormData) {
   const data = Array.from(formData.entries());
+  // Nose porq pasa esto.
+  if (data[0][0].startsWith("$ACTION_ID")) data.shift();
+  console.log(data)
 
-  const notes = data.pop();
   const lectureID = data.shift();
-  const placeholder = data.shift();
+  const notes = data.pop();
   if (
-    placeholder === undefined ||
-    notes === undefined ||
-    lectureID === undefined
+    notes === undefined
+    || lectureID === undefined
   ) return;
-
-  const listIsCreated = placeholder[1] === "1";
-
-  if (listIsCreated) {
-    await updateList(data);
-  } else {
-    await createList(data, Number(lectureID));
+  for (let pair of data) {
+    if (pair[0].split(":")[0] === "student") {
+      await db.insert(attendance)
+        .values({
+          lectureId: Number(lectureID[1]),
+          studentId: Number(pair[0].split(":")[1]),
+          isPresent: pair[1] === "on",
+        });
+    }
+    else {
+      await db.update(attendance)
+        .set({ isPresent: pair[1] === "on" })
+        .where(eq(attendance.id, Number(pair[0].split(":")[1])));
+    }
   }
+
   await db.update(lecture)
     .set({ notes: String(notes[1]) })
-    .where(eq(lecture.id, Number(lectureID[1])));
+    .where(eq(lecture.id, Number(lectureID[1])))
+
   redirect(`lecture/${Number(lectureID[1])}`);
 }
 
-async function createList(
-  data: Array<[string, FormDataEntryValue]>,
-  lectureID: number,
-) {
-  for (let pair of data) {
-    await db.insert(attendance)
-      .values({
-        lectureId: lectureID,
-        studentId: Number(pair[0]),
-        isPresent: pair[1] === "on",
-      });
-  }
-}
-
-async function updateList(
-  data: Array<[string, FormDataEntryValue]>,
-) {
-  for (let pair of data) {
-    await db.update(attendance)
-      .set({ isPresent: pair[1] === "on" })
-      .where(eq(attendance.id, Number(pair[0])));
-  }
-}
