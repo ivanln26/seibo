@@ -1,4 +1,4 @@
-import { InferModel } from "drizzle-orm";
+import { InferModel, relations } from "drizzle-orm";
 import {
   boolean,
   date,
@@ -26,6 +26,10 @@ type SchoolSettings = {
   primaryColor: number;
 };
 
+export const userRelations = relations(user, ({ many }) => ({
+  profiles: many(schoolUser),
+}));
+
 export const school = mysqlTable("school", {
   id: int("id").autoincrement().primaryKey(),
   name: varchar("name", { length: 100 }).notNull(),
@@ -44,6 +48,13 @@ export const schoolUser = mysqlTable("school_user", {
     table.userId,
     table.role,
   ),
+}));
+
+export const schoolUserRelations = relations(schoolUser, ({ one }) => ({
+  user: one(user, {
+    fields: [schoolUser.userId],
+    references: [user.id],
+  }),
 }));
 
 export const student = mysqlTable("student", {
