@@ -12,9 +12,9 @@ export async function updateAssistances(formData: FormData) {
   const lectureID = data.shift();
   const placeholder = data.shift();
   if (
-    placeholder === undefined
-    || notes === undefined
-    || lectureID === undefined
+    placeholder === undefined ||
+    notes === undefined ||
+    lectureID === undefined
   ) return;
 
   const listIsCreated = placeholder[1] === "1";
@@ -26,7 +26,7 @@ export async function updateAssistances(formData: FormData) {
   }
   await db.update(lecture)
     .set({ notes: String(notes[1]) })
-    .where(eq(lecture.id, Number(lectureID[1])))
+    .where(eq(lecture.id, Number(lectureID[1])));
   redirect(`lecture/${Number(lectureID[1])}`);
 }
 
