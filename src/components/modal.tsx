@@ -56,7 +56,9 @@ export default function Modal(
             >
               Cancelar
             </Button>
-            <Button type={confirmButton.type} kind="tonal" color="tertiary">
+            <Button type={confirmButton.type} kind="tonal" onClick={() => {
+                setHidden(true);
+              }} color="tertiary">
               {confirmButton.text}
             </Button>
           </div>
