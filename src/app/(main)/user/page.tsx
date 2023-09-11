@@ -11,7 +11,10 @@ export default function Page() {
     <>
       <h1>Usuario</h1>
       <h2>Email: {session?.user?.email}</h2>
-      <h2>Roles: {session?.user?.roles.map((r) => <>{r},</>)}</h2>
+      <h2>Roles:</h2>
+      <ul>
+        {session?.user?.roles?.map((r) => <li>{r}</li>)}
+      </ul>
       <Button onClick={() => signOut()}>
         Log Out
       </Button>
