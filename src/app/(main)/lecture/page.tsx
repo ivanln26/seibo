@@ -37,27 +37,44 @@ export default async function Page() {
       between(lecture.date, getMonday(today), getFriday(today)),
     ));
 
-  let closerLecture = lectures[0].lecture.id;
-  let closerDateDiff = lectures[0].lecture.date.getUTCDate() -
-    today.getUTCDate();
-  let closerTimeDiff =
-    new Date("1970-01-01T" + lectures[0].schedule.startTime).getTime() -
-    today.getTime();
-
-  lectures.forEach((lec) => {
-    let dateDiff = lec.lecture.date.getUTCDate() - today.getUTCDate();
-    let timeDiff = new Date("1970-01-01T" + lec.schedule.startTime).getTime() -
+  function getClosestLecture() {
+    let closerLecture = lectures[0].lecture.id;
+    let closerDateDiff = lectures[0].lecture.date.getUTCDate() -
+      today.getUTCDate();
+    let closerTimeDiff =
+      new Date("1970-01-01T" + lectures[0].schedule.startTime).getTime() -
       today.getTime();
 
-    if (dateDiff < closerDateDiff) {
-      closerLecture = lec.lecture.id;
-      closerDateDiff = dateDiff;
-      closerTimeDiff = timeDiff;
-    } else if (dateDiff === closerDateDiff && timeDiff < closerTimeDiff) {
-      closerLecture = lec.lecture.id;
-      closerDateDiff = dateDiff;
-      closerTimeDiff = timeDiff;
-    }
-  });
-  redirect(`/lecture/${String(closerLecture)}`);
+    lectures.forEach((lec) => {
+      let dateDiff = lec.lecture.date.getUTCDate() - today.getUTCDate();
+      let timeDiff =
+        new Date("1970-01-01T" + lec.schedule.startTime).getTime() -
+        today.getTime();
+
+      if (dateDiff < closerDateDiff) {
+        closerLecture = lec.lecture.id;
+        closerDateDiff = dateDiff;
+        closerTimeDiff = timeDiff;
+      } else if (dateDiff === closerDateDiff && timeDiff < closerTimeDiff) {
+        closerLecture = lec.lecture.id;
+        closerDateDiff = dateDiff;
+        closerTimeDiff = timeDiff;
+      }
+    });
+    redirect(`/lecture/${String(closerLecture)}`);
+  }
+
+  return (
+    <>
+      {lectures.length === 0
+        ? (
+          <section className="flex flex-row justify-center items-center w-full h-full">
+            <div className="text-4xl p-4 bg-primary-100 rounded shadow">
+              No tenés clases para dictar.
+            </div>
+          </section>
+        )
+        : getClosestLecture()}
+    </>
+  );
 }
