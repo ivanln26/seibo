@@ -3,13 +3,13 @@ import { eq } from "drizzle-orm";
 
 import { db } from "@/db/db";
 import { attendance, lecture } from "@/db/schema";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export async function updateAssistances(formData: FormData) {
   const data = Array.from(formData.entries());
   // Nose porq pasa esto.
   if (data[0][0].startsWith("$ACTION_ID")) data.shift();
-  console.log(data)
 
   const lectureID = data.shift();
   const notes = data.pop();
@@ -37,6 +37,6 @@ export async function updateAssistances(formData: FormData) {
     .set({ notes: String(notes[1]) })
     .where(eq(lecture.id, Number(lectureID[1])))
 
-  redirect(`lecture/${Number(lectureID[1])}`);
+  revalidatePath(`lecture/${Number(lectureID[1])}`, );
 }
 
