@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 
 import { db } from "@/db/db";
+import LogOutButton from "./logout-button";
 
 export const revalidate = 0;
 
@@ -30,6 +31,7 @@ export default async function Page() {
       <ul>
         {u.profiles.map((p) => <li>{p.role}</li>)}
       </ul>
+      <LogOutButton />
     </>
   );
 }
