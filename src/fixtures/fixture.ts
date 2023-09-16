@@ -46,28 +46,23 @@ const schools = [
 const users = [
   {
     email: "mateocetti2000@gmail.com",
-    firstName: "Mateo",
-    lastName: "Cetti",
+    name: "Cetti Mateo",
   },
   {
     email: "ramiroghilino@gmail.com",
-    firstName: "Ramiro",
-    lastName: "Ghilino",
+    name: "Ghilino Ramiro",
   },
   {
     email: "manuelbobadilla@gmail.com",
-    firstName: "Manuel",
-    lastName: "Bobadilla",
+    name: "Bobadilla Manuel",
   },
   {
     email: "ivannunez@gmail.com",
-    firstName: "Ivan",
-    lastName: "Nuñez",
+    name: "Nuñez Ivan",
   },
   {
     email: "juanvillareal@gmail.com",
-    firstName: "Juan",
-    lastName: "Villareal",
+    name: "Villareal Juan",
   },
 ];
 

@@ -1,13 +1,11 @@
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
-
 import { z } from "zod";
-import { db, findUnique } from "@/db/db";
 
 import Button from "@/components/button";
-import { course } from "@/db/schema";
-
 import TextField from "@/components/text-field";
+import { db } from "@/db/db";
+import { course } from "@/db/schema";
 
 type Props = {
   params: {
@@ -16,7 +14,13 @@ type Props = {
 };
 
 export default async function Page({ params }: Props) {
-  const t = await findUnique(params.id);
+  const t = await db.query.course.findFirst({
+    where: (course, { eq }) => eq(course.id, Number(params.id)),
+  });
+
+  if (!t) {
+    redirect("/");
+  }
 
   const update = async (formData: FormData) => {
     "use server";

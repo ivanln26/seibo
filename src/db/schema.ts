@@ -1,4 +1,4 @@
-import { InferModel } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 import {
   boolean,
   date,
@@ -14,19 +14,10 @@ import {
   varchar,
 } from "drizzle-orm/mysql-core";
 
-export const todo = mysqlTable("todo", {
-  id: int("id").autoincrement().primaryKey(),
-  content: varchar("content", { length: 256 }).notNull(),
-});
-
-export type Todo = InferModel<typeof todo>;
-export type NewTodo = InferModel<typeof todo, "insert">;
-
 export const user = mysqlTable("user", {
   id: int("id").autoincrement().primaryKey(),
   email: varchar("email", { length: 320 }).notNull(),
-  firstName: varchar("first_name", { length: 128 }).notNull(),
-  lastName: varchar("last_name", { length: 128 }).notNull(),
+  name: varchar("name", { length: 128 }).notNull(),
 }, (user) => ({
   emailIndex: uniqueIndex("user_email_idx").on(user.email),
 }));
@@ -34,6 +25,10 @@ export const user = mysqlTable("user", {
 type SchoolSettings = {
   primaryColor: number;
 };
+
+export const userRelations = relations(user, ({ many }) => ({
+  profiles: many(schoolUser),
+}));
 
 export const school = mysqlTable("school", {
   id: int("id").autoincrement().primaryKey(),
@@ -53,6 +48,13 @@ export const schoolUser = mysqlTable("school_user", {
     table.userId,
     table.role,
   ),
+}));
+
+export const schoolUserRelations = relations(schoolUser, ({ one }) => ({
+  user: one(user, {
+    fields: [schoolUser.userId],
+    references: [user.id],
+  }),
 }));
 
 export const student = mysqlTable("student", {
@@ -117,9 +119,6 @@ export const course = mysqlTable("course", {
     course.name,
   ),
 }));
-
-export type Course = InferModel<typeof course>;
-export type NewCourse = InferModel<typeof course, "insert">;
 
 export const courseProfessor = mysqlTable("course_professor", {
   id: int("id").autoincrement().primaryKey(),
