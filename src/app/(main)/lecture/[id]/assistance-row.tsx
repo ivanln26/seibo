@@ -5,7 +5,7 @@ type props = {
   lastName: string;
   id: string | null;
   isPresent: boolean | undefined;
-  studentId: number
+  studentId: number;
 };
 
 export default async function AssistanceRow(
@@ -14,10 +14,12 @@ export default async function AssistanceRow(
     lastName,
     id,
     isPresent = false,
-    studentId
+    studentId,
   }: props,
 ) {
-  const attendanceId = id !== "null" ? `attendance:${id}` : `student:${studentId}`;
+  const attendanceId = id !== "null"
+    ? `attendance:${id}`
+    : `student:${studentId}`;
   return (
     <div className="flex  flex-row gap-2 pb-1 border-b w-full justify-between">
       <p className="text-xl">{lastName}, {firstName}</p>

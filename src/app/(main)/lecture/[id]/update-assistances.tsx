@@ -14,8 +14,8 @@ export async function updateAssistances(formData: FormData) {
   const lectureID = data.shift();
   const notes = data.pop();
   if (
-    notes === undefined
-    || lectureID === undefined
+    notes === undefined ||
+    lectureID === undefined
   ) return;
   for (let pair of data) {
     if (pair[0].split(":")[0] === "student") {
@@ -25,8 +25,7 @@ export async function updateAssistances(formData: FormData) {
           studentId: Number(pair[0].split(":")[1]),
           isPresent: pair[1] === "on",
         });
-    }
-    else {
+    } else {
       await db.update(attendance)
         .set({ isPresent: pair[1] === "on" })
         .where(eq(attendance.id, Number(pair[0].split(":")[1])));
@@ -35,8 +34,7 @@ export async function updateAssistances(formData: FormData) {
 
   await db.update(lecture)
     .set({ notes: String(notes[1]) })
-    .where(eq(lecture.id, Number(lectureID[1])))
+    .where(eq(lecture.id, Number(lectureID[1])));
 
-  revalidatePath(`lecture/${Number(lectureID[1])}`, );
+  revalidatePath(`lecture/${Number(lectureID[1])}`);
 }
-

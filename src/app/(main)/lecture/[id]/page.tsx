@@ -16,13 +16,13 @@ type Props = {
 };
 
 type Attendance = {
-  id: number | null,
-  name: string,
-  surname: string,
-  isPresent: boolean,
-  studentId: number,
-  lectureId: number,
-}
+  id: number | null;
+  name: string;
+  surname: string;
+  isPresent: boolean;
+  studentId: number;
+  lectureId: number;
+};
 
 export const revalidate = 0;
 
@@ -50,7 +50,7 @@ export default async function Page({ params }: Props) {
 
   students.forEach((s) => {
     if (attendanceStudentsIds.includes(s.student.id)) {
-      const att = attendances[attendanceStudentsIds.indexOf(s.student.id)]
+      const att = attendances[attendanceStudentsIds.indexOf(s.student.id)];
       list.push({
         id: att.attendance.id,
         name: att.student.firstName,
@@ -58,9 +58,8 @@ export default async function Page({ params }: Props) {
         isPresent: att.attendance.isPresent,
         lectureId: att.attendance.lectureId,
         studentId: att.attendance.studentId,
-      })
-    }
-    else {
+      });
+    } else {
       list.push({
         id: null,
         name: s.student.firstName,
@@ -68,9 +67,9 @@ export default async function Page({ params }: Props) {
         isPresent: false,
         lectureId: lectureID,
         studentId: s.student.id,
-      })
+      });
     }
-  })
+  });
 
   return (
     <div className="flex flex-col gap-5 h-screen mx-2">
@@ -84,17 +83,17 @@ export default async function Page({ params }: Props) {
       <section className="flex px-4 flex-col gap-2 mt-2 w-screen md:w-[1080px] ">
         <form action={updateAssistances}>
           <input type="hidden" name="lectureID" value={lectureID} />
-          {
-            list.map((l) => {
-              return <AssistanceRow
+          {list.map((l) => {
+            return (
+              <AssistanceRow
                 firstName={l.name}
                 lastName={l.surname}
                 id={String(l.id)}
                 isPresent={l.isPresent}
                 studentId={l.studentId}
               />
-            })
-          }
+            );
+          })}
 
           <div className="flex flex-col h-full">
             <label htmlFor="notes" className="mt-5 text-2xl mb-4">Notas</label>
