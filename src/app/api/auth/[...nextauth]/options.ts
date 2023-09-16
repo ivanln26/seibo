@@ -1,5 +1,4 @@
 import type { DefaultSession, NextAuthOptions } from "next-auth";
-import type { DefaultJWT } from "next-auth/jwt";
 import GoogleProvider from "next-auth/providers/google";
 import { z } from "zod";
 
@@ -9,14 +8,8 @@ import { user } from "@/db/schema";
 declare module "next-auth" {
   interface Session {
     user: {
-      roles: string[];
+      email: string;
     } & DefaultSession["user"];
-  }
-}
-
-declare module "next-auth/jwt" {
-  interface JWT extends DefaultJWT {
-    roles: string[];
   }
 }
 
@@ -37,21 +30,8 @@ export const authOptions: NextAuthOptions = {
         await db.insert(user).values({ email, name }).onDuplicateKeyUpdate({
           set: { name },
         });
-
-        const u = await db.query.user.findFirst({
-          where: (user, { eq }) => eq(user.email, email),
-          with: { profiles: true },
-        });
-
-        if (!u) throw new Error("user not in db");
-
-        token.roles = u.profiles.map((p) => p.role);
       }
       return token;
-    },
-    async session({ session, token }) {
-      session.user.roles = token.roles;
-      return session;
     },
   },
   providers: [
