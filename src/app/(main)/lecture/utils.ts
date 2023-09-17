@@ -10,6 +10,7 @@ import {
   student,
   studentGrade,
 } from "@/db/schema";
+import { Session } from "next-auth";
 
 export async function getLectureCourses(lectureID: number) {
   const aux = await db.select()
@@ -34,4 +35,13 @@ export async function getStudents(courseID: number) {
     .innerJoin(courseGrade, eq(studentGrade.gradeId, courseGrade.gradeId))
     .innerJoin(student, eq(studentGrade.studentId, student.id))
     .where(eq(courseGrade.courseId, courseID));
+}
+
+export async function getUser(session: Session){
+  return await db.query.user.findFirst({
+    where: (user, { eq }) => eq(user.email, session.user.email),
+    with: {
+      profiles: { where: (profile, { eq }) => eq(profile.isActive, true) },
+    },
+  });
 }
