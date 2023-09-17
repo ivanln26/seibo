@@ -1,41 +1,24 @@
 import Link from "next/link";
-import { and, between, eq } from "drizzle-orm";
+import { getServerSession } from "next-auth";
 
-import { db } from "@/db/db";
-import { course, grade, instance, lecture, schedule } from "@/db/schema";
-
+import { getUser, getWeeklyLectures } from "../utils";
 type props = {
   lectureID: number;
 };
 
-function getMonday(d: Date) {
-  d = new Date(d);
-  var day = d.getDay(),
-    diff = d.getDate() - day + (day == 0 ? -6 : 1); // adjust when day is sunday
-  const newDate = new Date(d.setDate(diff));
-  return new Date(newDate.setUTCHours(0, 0, 0, 0));
-}
-
-function getFriday(d: Date) {
-  d = new Date(d);
-  var day = d.getDay(),
-    diff = d.getDate() - day + (day <= 5 ? (5 - day) : (12 - day)); // adjust when day is after Friday
-  const newDate = new Date(d.setDate(diff));
-  return new Date(newDate.setUTCHours(23, 59, 59));
-}
-
 export default async function LecturePicker({ lectureID }: props) {
-  const d = new Date();
-  const lectures = await db.select().from(lecture)
-    .innerJoin(schedule, eq(lecture.scheduleId, schedule.id))
-    .innerJoin(instance, eq(schedule.instanceId, instance.id))
-    .innerJoin(course, eq(instance.courseId, course.id))
-    .innerJoin(grade, eq(instance.gradeId, grade.id))
-    .where(and(
-      eq(instance.professorId, 1),
-      between(lecture.date, getMonday(d), getFriday(d)),
-    ))
-    .orderBy(schedule.weekday, schedule.startTime);
+  const session = await getServerSession();
+
+  if (!session) {
+    return <>Error al obtener la sesión.</>;
+  }
+  const user = await getUser(session);
+
+  if (!user) {
+    return <>Error al obtener el usuario de la base de datos.</>;
+  }
+  const today = new Date();
+  const lectures = await getWeeklyLectures(user.id, today);
   return lectures.map((l) => {
     return (
       <Link href={`/lecture/${l.lecture.id}`}>

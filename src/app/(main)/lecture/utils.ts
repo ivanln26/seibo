@@ -39,7 +39,7 @@ export async function getStudents(courseID: number) {
     .where(eq(courseGrade.courseId, courseID));
 }
 
-export async function getUser(session: Session){
+export async function getUser(session: Session) {
   return await db.query.user.findFirst({
     where: (user, { eq }) => eq(user.email, session.user.email),
     with: {
@@ -64,7 +64,7 @@ export function getFriday(d: Date) {
   return new Date(newDate.setUTCHours(23, 59, 59));
 }
 
-export async function getweeklyLectures(professorId: number, date: Date){
+export async function getWeeklyLectures(professorId: number, date: Date) {
   return await db.select().from(lecture)
     .innerJoin(schedule, eq(lecture.scheduleId, schedule.id))
     .innerJoin(instance, eq(schedule.instanceId, instance.id))

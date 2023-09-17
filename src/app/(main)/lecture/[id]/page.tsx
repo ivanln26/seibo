@@ -5,7 +5,12 @@ import { es } from "date-fns/locale";
 
 import Modal from "@/components/modal";
 import { updateAssistances } from "./update-assistances";
-import { getAttendances, getLectureCourses, getStudents, getUser } from "../utils";
+import {
+  getAttendances,
+  getLectureCourses,
+  getStudents,
+  getUser,
+} from "../utils";
 import AssistanceRow from "./assistance-row";
 import LecturePicker from "./lecture-picker";
 import UndoButton from "./undo-button";
@@ -51,11 +56,13 @@ export default async function Page({ params }: Props) {
   const lectureCourse = await getLectureCourses(lectureID);
 
   if (lectureCourse.instance.professorId !== user.id) {
-    return <section className="flex flex-row justify-center items-center w-full h-full">
-      <div className="text-4xl p-4 bg-primary-100 rounded shadow">
-        Usted no da esta clase.
-      </div>
-    </section>
+    return (
+      <section className="flex flex-row justify-center items-center w-full h-full">
+        <div className="text-4xl p-4 bg-primary-100 rounded shadow">
+          Usted no da esta clase.
+        </div>
+      </section>
+    );
   }
 
   const attendances = await getAttendances(lectureID);
