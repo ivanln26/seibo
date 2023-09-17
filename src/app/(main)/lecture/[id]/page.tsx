@@ -1,10 +1,11 @@
+import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
 import Modal from "@/components/modal";
 import { updateAssistances } from "./update-assistances";
-import { getAttendances, getLectureCourses, getStudents } from "../utils";
+import { getAttendances, getLectureCourses, getStudents, getUser } from "../utils";
 import AssistanceRow from "./assistance-row";
 import LecturePicker from "./lecture-picker";
 import UndoButton from "./undo-button";
@@ -27,6 +28,17 @@ type Attendance = {
 export const revalidate = 0;
 
 export default async function Page({ params }: Props) {
+  const session = await getServerSession();
+
+  if (!session) {
+    return <>Error al obtener la sesión.</>;
+  }
+  const user = await getUser(session);
+
+  if (!user) {
+    return <>Error al obtener el usuario de la base de datos.</>;
+  }
+
   const lectureID = Number(params.id);
 
   if (Number.isNaN(lectureID)) {
@@ -38,8 +50,12 @@ export default async function Page({ params }: Props) {
 
   const lectureCourse = await getLectureCourses(lectureID);
 
-  if (lectureCourse.instance.professorId !== 1) {
-    throw new Error("Profesor no valido");
+  if (lectureCourse.instance.professorId !== user.id) {
+    return <section className="flex flex-row justify-center items-center w-full h-full">
+      <div className="text-4xl p-4 bg-primary-100 rounded shadow">
+        Usted no da esta clase.
+      </div>
+    </section>
   }
 
   const attendances = await getAttendances(lectureID);
