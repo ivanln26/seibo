@@ -18,6 +18,7 @@ import {
   test,
   user,
 } from "@/db/schema";
+import type { NewSchool } from "@/db/schema";
 
 const envSchema = z.object({
   databaseURL: z.string(),
@@ -32,13 +33,15 @@ const env = envSchema.parse({
 const poolConnection = mysql.createPool(env.databaseURL);
 const db = drizzle(poolConnection);
 
-const schools = [
+const schools: NewSchool[] = [
   {
     name: "ITS Villada",
+    slug: "itsv",
     settings: { primaryColor: 1 },
   },
   {
     name: "La Salle",
+    slug: "la-salle",
     settings: { primaryColor: 1 },
   },
 ];
