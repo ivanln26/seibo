@@ -10,11 +10,12 @@ export type TableCell = {
 };
 
 type TableProps = {
+  slug: string;
   cols: String[];
   rows: TableRow[];
 };
 
-export default function Table({ cols, rows }: TableProps) {
+export default function Table({ slug, cols, rows }: TableProps) {
   return (
     <table className="w-full table-auto border-collapse">
       <thead>
@@ -37,7 +38,7 @@ export default function Table({ cols, rows }: TableProps) {
                 key={j}
                 className="text-center border border-neutral-variant-50 dark:border-neutral-variant-60"
               >
-                <Link href={cell.href}>{cell.text}</Link>
+                <Link href={`/${slug}${cell.href}`}>{cell.text}</Link>
               </td>
             ))}
           </tr>
