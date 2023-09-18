@@ -33,8 +33,11 @@ export const userRelations = relations(user, ({ many }) => ({
 export const school = mysqlTable("school", {
   id: int("id").autoincrement().primaryKey(),
   name: varchar("name", { length: 100 }).notNull(),
+  slug: varchar("slug", { length: 20 }).notNull(),
   settings: json("settings").$type<SchoolSettings>(),
 });
+
+export type NewSchool = typeof school.$inferInsert;
 
 export const schoolUser = mysqlTable("school_user", {
   id: int("id").autoincrement().primaryKey(),
