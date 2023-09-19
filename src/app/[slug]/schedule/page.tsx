@@ -1,8 +1,12 @@
 import { db } from "@/db/db";
-import { course, grade, instance, schedule } from "@/db/schema";
+import { course, grade, instance, schedule, user as User } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import { getServerSession } from "next-auth";
 import { getUser } from "../lecture/utils";
+import Modal from "@/components/modal";
+import TextField from "@/components/text-field";
+import { z } from "zod";
+import { revalidatePath } from "next/cache";
 
 export default async function Page() {
   const session = await getServerSession();
@@ -15,9 +19,42 @@ export default async function Page() {
     .innerJoin(course, eq(instance.courseId, course.id))
     .innerJoin(grade, eq(instance.gradeId, grade.id))
     .where(and(
-      eq(instance.professorId, user.id)
+      eq(course.schoolId, 1)
     ))
-  console.log(schedules)
+
+  async function createSchedule(data: FormData) {
+    "use server"
+    const t = z.object({
+      instanceID: z.number(),
+      weekday: z.enum(["monday", "tuesday","wednesday", "thursday", "friday"]),
+      startTime: z.string(),
+      endTime: z.string(),
+    });
+    const newSchedule = t.safeParse({
+      instanceID: Number(data.get("instanceID")),
+      weekday: data.get("weekday"),
+      startTime: data.get("startTime"),
+      endTime: data.get("endTime"),
+    });
+    if (!newSchedule.success) {
+      console.log("error", newSchedule.error)
+      return;
+    }
+
+    await db.insert(schedule).values({
+      instanceId: newSchedule.data.instanceID,
+      weekday: newSchedule.data.weekday,
+      startTime:newSchedule.data.startTime,
+      endTime: newSchedule.data.endTime
+    })
+    revalidatePath("/schedule");
+  }
+
+  const instances = await db.select().from(instance)
+    .innerJoin(course, eq(instance.courseId, course.id))
+    .innerJoin(grade, eq(instance.gradeId, grade.id))
+    .innerJoin(User, eq(instance.professorId, User.id))
+    .where(eq(course.schoolId, 1))
   return (
     <section className="flex flex-col gap-5 ml-2">
       <h1 className="text-4xl">Horarios</h1>
@@ -38,6 +75,29 @@ export default async function Page() {
             </tr>)}
           </tbody>
         </table>
+      </div>
+      <div className="fixed bottom-5 right-10">
+        <form action={createSchedule}>
+          <Modal buttonText="Crear" confirmButton={{ text: "sape", type: "submit" }}>
+            <h1 className="text-2xl">Crear horario</h1>
+            <label htmlFor="">Clase</label>
+            <select name="instanceID">
+              {instances.map((i) => <option value={Number(i.instance.id)}>{i.course.name} | {i.grade.name} | {i.user.name}</option>)}
+            </select>
+            <label htmlFor="">Dia de la semana</label>
+            <select name="weekday">
+              <option value="monday">Lunes</option>
+              <option value="tuesday">Martes</option>
+              <option value="wednesday">Miercoles</option>
+              <option value="thursday">Jueves</option>
+              <option value="friday">Viernes</option>
+            </select>
+            <label htmlFor="">Hora de inicio</label>
+            <TextField id="" name="startTime"></TextField>
+            <label htmlFor="">Hora de fin</label>
+            <TextField id="" name="endTime"></TextField>
+          </Modal>
+        </form>
       </div>
     </section>
   );
