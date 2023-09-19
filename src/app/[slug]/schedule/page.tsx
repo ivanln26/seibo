@@ -4,7 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { getServerSession } from "next-auth";
 import { getUser } from "../lecture/utils";
 import Modal from "@/components/modal";
-import TextField from "@/components/text-field";
+import Link from "next/link";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import TimeInput from "./time-input";
@@ -69,10 +69,10 @@ export default async function Page() {
               <td className="border border-black">Curso</td>
             </tr>
             {schedules.map((s) => <tr>
-              <td className="border border-black">{s.course.name}</td>
-              <td className="border border-black">{s.schedule.weekday}</td>
-              <td className="border border-black">{s.schedule.startTime} - {s.schedule.endTime}</td>
-              <td className="border border-black">{s.grade.name}</td>
+              <td className="border border-black"><Link href={`/schedule/${s.schedule.id}`}>{s.course.name}</Link></td>
+              <td className="border border-black"><Link href={`/schedule/${s.schedule.id}`}>{s.schedule.weekday}</Link></td>
+              <td className="border border-black"><Link href={`/schedule/${s.schedule.id}`}>{s.schedule.startTime} - {s.schedule.endTime}</Link></td>
+              <td className="border border-black"><Link href={`/schedule/${s.schedule.id}`}>{s.grade.name}</Link></td>
             </tr>)}
           </tbody>
         </table>
