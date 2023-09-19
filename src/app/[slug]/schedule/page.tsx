@@ -7,6 +7,7 @@ import Modal from "@/components/modal";
 import TextField from "@/components/text-field";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
+import TimeInput from "./time-input";
 
 export default async function Page() {
   const session = await getServerSession();
@@ -81,11 +82,11 @@ export default async function Page() {
           <Modal buttonText="Crear" confirmButton={{ text: "sape", type: "submit" }}>
             <h1 className="text-2xl">Crear horario</h1>
             <label htmlFor="">Clase</label>
-            <select name="instanceID">
+            <select name="instanceID" className="py-4 outline outline-1 rounded bg-white outline-outline">
               {instances.map((i) => <option value={Number(i.instance.id)}>{i.course.name} | {i.grade.name} | {i.user.name}</option>)}
             </select>
             <label htmlFor="">Dia de la semana</label>
-            <select name="weekday">
+            <select name="weekday" className="py-4 outline outline-1 rounded bg-white outline-outline">
               <option value="monday">Lunes</option>
               <option value="tuesday">Martes</option>
               <option value="wednesday">Miercoles</option>
@@ -93,9 +94,9 @@ export default async function Page() {
               <option value="friday">Viernes</option>
             </select>
             <label htmlFor="">Hora de inicio</label>
-            <TextField id="" name="startTime"></TextField>
+            <TimeInput name="startTime" />
             <label htmlFor="">Hora de fin</label>
-            <TextField id="" name="endTime"></TextField>
+            <TimeInput name="endTime" />
           </Modal>
         </form>
       </div>
