@@ -20,34 +20,6 @@ export default async function Page() {
             eq(schoolUser.schoolId, 1) // getear mediante el slug
         ))
 
-    async function createSchedule(data: FormData) {
-        "use server"
-        const t = z.object({
-            instanceID: z.number(),
-            weekday: z.enum(["monday", "tuesday", "wednesday", "thursday", "friday"]),
-            startTime: z.string(),
-            endTime: z.string(),
-        });
-        const newSchedule = t.safeParse({
-            instanceID: Number(data.get("instanceID")),
-            weekday: data.get("weekday"),
-            startTime: data.get("startTime"),
-            endTime: data.get("endTime"),
-        });
-        if (!newSchedule.success) {
-            console.log("error", newSchedule.error)
-            return;
-        }
-
-        await db.insert(schedule).values({
-            instanceId: newSchedule.data.instanceID,
-            weekday: newSchedule.data.weekday,
-            startTime: newSchedule.data.startTime,
-            endTime: newSchedule.data.endTime
-        })
-        revalidatePath("/schedule");
-    }
-
     return (
         <section className="flex flex-col gap-5 ml-2">
             <h1 className="text-4xl">Usuarios</h1>
@@ -70,21 +42,6 @@ export default async function Page() {
                 </table>
             </div>
             <div className="fixed bottom-5 right-10">
-                <form action={createSchedule}>
-                    <Modal buttonText="Crear" confirmButton={{ text: "sape", type: "submit" }}>
-                        <h1 className="text-2xl">Crear horario</h1>
-                        <label htmlFor="">Clase</label>
-                        <label htmlFor="">Dia de la semana</label>
-                        <select name="weekday" className="py-4 outline outline-1 rounded bg-white outline-outline">
-                            <option value="monday">Lunes</option>
-                            <option value="tuesday">Martes</option>
-                            <option value="wednesday">Miercoles</option>
-                            <option value="thursday">Jueves</option>
-                            <option value="friday">Viernes</option>
-                        </select>
-                        <label htmlFor="">Hora de inicio</label>
-                    </Modal>
-                </form>
             </div>
         </section>
     );
