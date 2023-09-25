@@ -17,6 +17,7 @@ export default async function Page({ params }: Props) {
     const selectedUser = (await db.select().from(user)
     .innerJoin(schoolUser, eq(user.id, schoolUser.userId))
     .where(eq(user.id, params.id)))[0]
+
     async function update(data: FormData) {
         "use server"
         const userType = z.object({
@@ -77,9 +78,6 @@ export default async function Page({ params }: Props) {
                     </div>
                     <Button color="tertiary" type="submit">Guardar</Button>
                 </form>
-                {/* <form action={del}>
-                    <Button color="error" type="submit">Borrar</Button>
-                </form> */}
             </div>
         </>
     )
