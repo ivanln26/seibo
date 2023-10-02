@@ -95,7 +95,7 @@ export default async function Page() {
             </div>
             <div className="fixed bottom-5 right-10">
                 <form action={create}>
-                    <Modal buttonText="Crear" confirmButton={{ text: "sape", type: "submit" }}>
+                    <Modal buttonText="Crear" confirmButton={{ text: "Guardar", type: "submit" }}>
                         <div className="grid grid-cols-2 gap-4">
                             <TextField id="" name="studentFirstName" label="Nombre" required />
                             <TextField id="" name="studentLastName" label="Apellido" required />
