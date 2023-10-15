@@ -17,7 +17,7 @@ export default withAuth(
     }
     const slug = arr[1];
 
-    const res = await fetch(`${req.nextUrl.origin}/api/t`, {
+    const res = await fetch(`${req.nextUrl.origin}/api/profile/schoolRoles`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
