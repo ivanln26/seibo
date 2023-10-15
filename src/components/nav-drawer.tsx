@@ -49,15 +49,21 @@ function DrawerButton({ name, icon, href, isActive }: DrawerButton) {
 }
 
 type NavigationDrawerProps = {
+  slug: string;
   isOpen: boolean;
   close: () => void;
 };
 
 export default function NavigationDrawer(
-  { isOpen, close }: NavigationDrawerProps,
+  { slug, isOpen, close }: NavigationDrawerProps,
 ) {
   const pathname = usePathname();
   const ref = useRef<HTMLDivElement>(null);
+
+  const btns = buttons.map((button) => ({
+    ...button,
+    href: `/${slug}${button.href}`,
+  }));
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -79,7 +85,7 @@ export default function NavigationDrawer(
       ref={ref}
     >
       <ul>
-        {buttons.map((button, i) => {
+        {btns.map((button, i) => {
           const isActive = pathname.startsWith(button.href);
 
           return (

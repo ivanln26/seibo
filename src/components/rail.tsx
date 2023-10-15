@@ -61,15 +61,21 @@ const buttons: RailButton[] = [
 ];
 
 type NavigationRailProps = {
+  slug: string;
   open: () => void;
 };
 
-export default function NavigationRail({ open }: NavigationRailProps) {
+export default function NavigationRail({ slug, open }: NavigationRailProps) {
   const pathname = usePathname();
+
+  const btns = buttons.map((button) => ({
+    ...button,
+    href: `/${slug}${button.href}`,
+  }));
 
   return (
     <nav className="hidden md:flex md:flex-col w-20 h-screen">
-      <Link className="" href="/">
+      <Link className="" href={`/${slug}`}>
         <Image src={Logo} alt="Seibo Logo" />
       </Link>
       <button
@@ -80,7 +86,7 @@ export default function NavigationRail({ open }: NavigationRailProps) {
         <span>Menu</span>
       </button>
       <ul className="flex flex-col gap-y-3 grow mt-6">
-        {buttons.map((props, i) => {
+        {btns.map((props, i) => {
           const isActive = pathname.startsWith(props.href);
 
           return (
@@ -93,7 +99,7 @@ export default function NavigationRail({ open }: NavigationRailProps) {
       <RailButton
         name="Usuario"
         icon="person"
-        href="/user"
+        href={`/${slug}/user`}
         isActive={pathname.startsWith("/user")}
       />
     </nav>

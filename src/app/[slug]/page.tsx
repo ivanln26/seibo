@@ -10,7 +10,21 @@ import { course } from "@/db/schema";
 
 export const revalidate = 0;
 
-export default async function Home() {
+type Props = {
+  params: {
+    slug: string;
+  };
+};
+
+export default async function Home({ params }: Props) {
+  const school = await db.query.school.findFirst({
+    where: (school, { eq }) => eq(school.slug, params.slug),
+  });
+
+  if (!school) {
+    return <>No se encontró la escuela.</>;
+  }
+
   const courses = await db.select().from(course);
   const columnNames = ["id", "schoolId", "name", "topics"];
 
@@ -49,10 +63,11 @@ export default async function Home() {
   return (
     <>
       <section>
+        <h1 className="text-4xl">{school.name}</h1>
         <h1 className="text-4xl">Courses</h1>
       </section>
       <section>
-        <Table cols={columnNames} rows={createTableRows()}></Table>
+        <Table slug={params.slug} cols={columnNames} rows={createTableRows()} />
       </section>
       <div className="fixed bottom-5 right-10">
         <form action={create}>

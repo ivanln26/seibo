@@ -6,7 +6,7 @@ import NavigationDrawer from "@/components/nav-drawer";
 import NavigationRail from "@/components/rail";
 import TopBar from "@/components/top-bar";
 
-export default function Navigation() {
+export default function Navigation({ slug }: { slug: string }) {
   const [isOpen, setIsOpen] = useState(false);
 
   const open = () => {
@@ -19,8 +19,8 @@ export default function Navigation() {
   return (
     <>
       <TopBar open={open} />
-      <NavigationDrawer isOpen={isOpen} close={close} />
-      <NavigationRail open={open} />
+      <NavigationDrawer slug={slug} isOpen={isOpen} close={close} />
+      <NavigationRail slug={slug} open={open} />
     </>
   );
 }

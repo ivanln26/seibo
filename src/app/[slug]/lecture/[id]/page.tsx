@@ -18,6 +18,7 @@ import UndoButton from "./undo-button";
 type Props = {
   params: {
     id: string;
+    slug: string;
   };
 };
 
@@ -101,7 +102,7 @@ export default async function Page({ params }: Props) {
       </h1>
       <h2 className="text-2xl">Clases</h2>
       <section className="flex flex-row gap-5 overflow-x-auto w-screen md:w-max text-center">
-        <LecturePicker lectureID={Number(lectureID)} />
+        <LecturePicker slug={params.slug} lectureID={Number(lectureID)} />
       </section>
       <section className="flex px-4 flex-col gap-2 mt-2 w-screen md:w-[1080px] ">
         <form action={updateAssistances}>

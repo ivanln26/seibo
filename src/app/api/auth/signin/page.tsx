@@ -13,7 +13,7 @@ export default async function SignIn() {
   const providers = await getProviders();
 
   if (session) {
-    return redirect("/user");
+    return redirect("/");
   }
 
   if (!providers) {
