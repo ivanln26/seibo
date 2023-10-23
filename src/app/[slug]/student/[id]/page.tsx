@@ -5,31 +5,30 @@ import { z } from "zod";
 import Button from "@/components/button";
 import TextField from "@/components/text-field";
 import { db } from "@/db/db";
-import { grade, student, studentContact, studentGrade } from "@/db/schema";
+import { grade, school, student, studentContact, studentGrade } from "@/db/schema";
 
 type Props = {
     params: {
-        id: string;
+        slug: string
+        id: number;
     };
 };
 
 export default async function Page({ params }: Props) {
+    const currentSchool = (await db.select().from(school).where(eq(school.slug, params.slug)))[0]
+    if (!currentSchool) return (<>Error al obtener la institución.</>)
     const currentStudent = (
         await db.select()
             .from(student)
             .innerJoin(studentContact, eq(student.id, studentContact.studentId))
             .innerJoin(studentGrade, eq(student.id, studentGrade.studentId))
-            .where(eq(student.id, Number(params.id)))
+            .where(eq(student.id, params.id))
     )[0]
-
-    if (!currentStudent) {
-        redirect("/");
-    }
-
-    console.log(currentStudent)
+    if (!currentStudent) redirect("/");
 
     const grades = await db.select()
-        .from(grade) // filtrar según colegio
+        .from(grade)
+        .where(eq(grade.schoolId, currentSchool.id))
 
     const update = async (data: FormData) => {
         "use server";
@@ -53,7 +52,7 @@ export default async function Page({ params }: Props) {
             firstName: data.get("studentFirstName"),
             lastName: data.get("studentLastName"),
             email: data.get("studentEmail"),
-            schoolId: 1, // TODO change
+            schoolId: currentSchool.id,
             studentCode: data.get("studentCode"),
         });
         const newContact = contactType.safeParse({
@@ -85,7 +84,7 @@ export default async function Page({ params }: Props) {
         }).where(
             eq(studentGrade.id, currentStudent.student_grade.id)
         )
-        redirect("/abm/student");
+        redirect(`/${params.slug}/student`);
     };
 
     const del = async () => {
@@ -101,7 +100,7 @@ export default async function Page({ params }: Props) {
         await db.delete(studentGrade).where(
             eq(studentGrade.id, currentStudent.student_grade.id),
         );
-        redirect("/");
+        redirect(`/${params.slug}/student`);
     };
 
     return (

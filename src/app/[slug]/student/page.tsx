@@ -1,25 +1,35 @@
 import { db } from "@/db/db";
-import { grade, student, studentContact, studentGrade } from "@/db/schema";
+import { grade, school, student, studentContact, studentGrade } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import { getServerSession } from "next-auth";
-import { getUser } from "../../lecture/utils";
+import { getUser } from "../lecture/utils";
 import Link from "next/link";
 import Modal from "@/components/modal";
 import TextField from "@/components/text-field";
-import { number, z } from "zod";
+import { z } from "zod";
 import { revalidatePath } from "next/cache";
 
-export default async function Page() {
+type Props = {
+    params: {
+        slug: string;
+    };
+};
+
+export default async function Page({params}: Props) {
+    const currentSchool = (await db.select().from(school).where(eq(school.slug, params.slug)))[0]
+    if (!currentSchool) return (<>Error al obtener la institución.</>)
     const session = await getServerSession();
     if (!session) return (<>Error al obtener la sesión.</>)
     const currentUser = await getUser(session);
     if (!currentUser) return <>Error al obtener el usuario.</>
 
     const grades = await db.select()
-        .from(grade) // filtrar según colegio
+        .from(grade)
+        .where(eq(grade.schoolId, currentSchool.id))
 
     const users = await db.select()
-        .from(student) // filtrar según colegio
+        .from(student)
+        .where(eq(student.schoolId, currentSchool.id))
 
     async function create(data: FormData) {
         "use server"
@@ -72,7 +82,7 @@ export default async function Page() {
             gradeId: newGradeId.data.id
         })
 
-        revalidatePath("/");
+        revalidatePath(`/${params.slug}/student`);
     }
     return (
         <section className="flex flex-col gap-5 ml-2">
@@ -86,9 +96,9 @@ export default async function Page() {
                             <td className="border border-black">Legajo</td>
                         </tr>
                         {users.map((u) => <tr>
-                            <td className="border border-black"><Link href={`/abm/student/${u.id}`}>{u.firstName} {u.lastName}</Link></td>
-                            <td className="border border-black"><Link href={`/abm/student/${u.id}`}>{u.email}</Link></td>
-                            <td className="border border-black"><Link href={`/abm/student/${u.id}`}>{u.studentCode}</Link></td>
+                            <td className="border border-black"><Link href={`/${params.slug}/student/${u.id}`}>{u.firstName} {u.lastName}</Link></td>
+                            <td className="border border-black"><Link href={`/${params.slug}/student/${u.id}`}>{u.email}</Link></td>
+                            <td className="border border-black"><Link href={`/${params.slug}/student/${u.id}`}>{u.studentCode}</Link></td>
                         </tr>)}
                     </tbody>
                 </table>
