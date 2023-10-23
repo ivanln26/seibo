@@ -1,5 +1,5 @@
 import { db } from "@/db/db";
-import { course, grade, instance, schedule, user } from "@/db/schema";
+import { course, grade, instance, schedule, school, user } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import TextField from "@/components/text-field";
 import Button from "@/components/button";
@@ -9,6 +9,7 @@ import { redirect } from "next/navigation";
 
 type Props = {
   params: {
+    slug: string;
     id: number;
   };
 };
@@ -22,13 +23,15 @@ const weekdays = [
 ]
 
 export default async function Page({ params }: Props) {
+  const actualSchool = (await db.select().from(school).where(eq(school.slug, params.slug)))[0]
+  if (!actualSchool) return <>Error al obtener el usuario.</>
 
   const sched = await db.select().from(schedule).where(eq(schedule.id, params.id))
   const instances = await db.select().from(instance)
     .innerJoin(course, eq(instance.courseId, course.id))
     .innerJoin(grade, eq(instance.gradeId, grade.id))
     .innerJoin(user, eq(instance.professorId, user.id))
-    .where(eq(course.schoolId, 1))
+    .where(eq(course.schoolId, actualSchool.id))
 
   async function save(data: FormData) {
     "use server"
@@ -55,13 +58,13 @@ export default async function Page({ params }: Props) {
       startTime: newSchedule.data.startTime,
       endTime: newSchedule.data.endTime
     }).where(eq(schedule.id, newSchedule.data.instanceID))
-    revalidatePath("/schedule");
+    redirect(`${params.slug}/schedule`);
   }
   async function deleteSchedule() {
     "use server"
     await db.delete(schedule)
       .where(eq(schedule.id, sched[0].id))
-    redirect("/schedule")
+    redirect(`${params.slug}/schedule`)
   }
   return (
     <>

@@ -1,5 +1,5 @@
 import { db } from "@/db/db";
-import { course, grade, instance, schedule, user as User } from "@/db/schema";
+import { course, grade, instance, schedule, school, user as User } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import { getServerSession } from "next-auth";
 import { getUser } from "../lecture/utils";
@@ -9,18 +9,27 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import TimeInput from "./time-input";
 
-export default async function Page() {
+type Props = {
+  params: {
+      slug: string;
+  };
+};
+
+export default async function Page({params}: Props) {
   const session = await getServerSession();
   if (!session) return (<>Error al obtener la sesión.</>)
   const user = await getUser(session);
   if (!user) return <>Error al obtener el usuario.</>
+  const actualSchool = (await db.select().from(school).where(eq(school.slug, params.slug)))[0]
+  if (!actualSchool) return <>Error al obtener el usuario.</>
+
   const schedules = await db.select()
     .from(schedule)
     .innerJoin(instance, eq(schedule.instanceId, instance.id))
     .innerJoin(course, eq(instance.courseId, course.id))
     .innerJoin(grade, eq(instance.gradeId, grade.id))
     .where(and(
-      eq(course.schoolId, 1)
+      eq(course.schoolId, actualSchool.id)
     ))
 
   async function createSchedule(data: FormData) {
@@ -48,14 +57,14 @@ export default async function Page() {
       startTime:newSchedule.data.startTime,
       endTime: newSchedule.data.endTime
     })
-    revalidatePath("/schedule");
+    revalidatePath(`${params.slug}/schedule`);
   }
 
   const instances = await db.select().from(instance)
     .innerJoin(course, eq(instance.courseId, course.id))
     .innerJoin(grade, eq(instance.gradeId, grade.id))
     .innerJoin(User, eq(instance.professorId, User.id))
-    .where(eq(course.schoolId, 1))
+    .where(eq(course.schoolId, actualSchool.id))
   return (
     <section className="flex flex-col gap-5 ml-2">
       <h1 className="text-4xl">Horarios</h1>
@@ -69,10 +78,10 @@ export default async function Page() {
               <td className="border border-black">Curso</td>
             </tr>
             {schedules.map((s) => <tr>
-              <td className="border border-black"><Link href={`/schedule/${s.schedule.id}`}>{s.course.name}</Link></td>
-              <td className="border border-black"><Link href={`/schedule/${s.schedule.id}`}>{s.schedule.weekday}</Link></td>
-              <td className="border border-black"><Link href={`/schedule/${s.schedule.id}`}>{s.schedule.startTime} - {s.schedule.endTime}</Link></td>
-              <td className="border border-black"><Link href={`/schedule/${s.schedule.id}`}>{s.grade.name}</Link></td>
+              <td className="border border-black"><Link href={`/${params.slug}/schedule/${s.schedule.id}`}>{s.course.name}</Link></td>
+              <td className="border border-black"><Link href={`/${params.slug}/schedule/${s.schedule.id}`}>{s.schedule.weekday}</Link></td>
+              <td className="border border-black"><Link href={`/${params.slug}/schedule/${s.schedule.id}`}>{s.schedule.startTime} - {s.schedule.endTime}</Link></td>
+              <td className="border border-black"><Link href={`/${params.slug}/schedule/${s.schedule.id}`}>{s.grade.name}</Link></td>
             </tr>)}
           </tbody>
         </table>
