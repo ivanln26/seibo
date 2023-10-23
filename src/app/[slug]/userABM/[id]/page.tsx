@@ -9,6 +9,7 @@ import { redirect } from "next/navigation";
 
 type Props = {
     params: {
+        slug: string;
         id: number;
     };
 };
@@ -20,6 +21,7 @@ export default async function Page({ params }: Props) {
 
     async function update(data: FormData) {
         "use server"
+        console.log("sape: ", data.get("isActive"))
         const userType = z.object({
             name: z.string(),
             email: z.string(),
@@ -30,7 +32,7 @@ export default async function Page({ params }: Props) {
             name: data.get("name"),
             email: data.get("email"),
             role: data.get("role"),
-            isActive: data.get("isActive")
+            isActive: data.get("isActive") === "on" ? true : false
           });
           if (!res.success) {
             console.log(res.error)
@@ -46,7 +48,7 @@ export default async function Page({ params }: Props) {
             role: res.data.role,
             isActive: res.data.isActive ? res.data.isActive : false
           }).where(eq(schoolUser.userId, params.id))
-          redirect("/abm/user");
+          redirect(`/${params.slug}/userABM`);
     }
 
     return (
