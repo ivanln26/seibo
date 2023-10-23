@@ -36,9 +36,10 @@ export default async function Page({ params }: Props) {
         if (!newClassroom.success) {
             return;
         }
+        console.log("El cacha se la come", newClassroom.data)
         await db.update(classroom).set({
-            name: newClassroom.data.name,
-        });
+            name: newClassroom.data.name
+        }).where(eq(classroom.id, Number(params.id)));
         redirect(`/${params.slug}/classroom`);
     };
 
