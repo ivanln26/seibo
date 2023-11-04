@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 
 import Icon from "@/components/icons/icon";
 import type { Icon as IconType } from "@/components/icons/icon";
+import type { Role } from "@/db/schema";
 
 import Logo from "@public/logo.png";
 
@@ -14,6 +15,7 @@ type RailButton = {
   icon: IconType;
   href: string;
   isActive?: boolean;
+  roles: Role[];
 };
 
 function RailButton({ name, icon, href, isActive }: RailButton) {
@@ -47,25 +49,31 @@ const buttons: RailButton[] = [
     name: "Asistencia",
     icon: "checklist",
     href: "/lecture",
+    roles: ["teacher"],
   },
   {
     name: "Notas",
     icon: "description",
     href: "/test",
+    roles: ["teacher"],
   },
   {
     name: "Horarios",
     icon: "clock",
     href: "/schedule",
+    roles: ["teacher", "tutor", "principal", "admin"],
   },
 ];
 
 type NavigationRailProps = {
   slug: string;
+  roles: Role[];
   open: () => void;
 };
 
-export default function NavigationRail({ slug, open }: NavigationRailProps) {
+export default function NavigationRail(
+  { slug, roles, open }: NavigationRailProps,
+) {
   const pathname = usePathname();
 
   const btns = buttons.map((button) => ({
@@ -86,12 +94,18 @@ export default function NavigationRail({ slug, open }: NavigationRailProps) {
         <span>Menu</span>
       </button>
       <ul className="flex flex-col gap-y-3 grow mt-6">
-        {btns.map((props, i) => {
-          const isActive = pathname.startsWith(props.href);
+        {btns.map((button, i) => {
+          const isActive = pathname.startsWith(button.href);
+
+          if (
+            roles.filter((role) => button.roles.includes(role)).length === 0
+          ) {
+            return null;
+          }
 
           return (
             <li key={i}>
-              <RailButton isActive={isActive} {...props} />
+              <RailButton isActive={isActive} {...button} />
             </li>
           );
         })}
@@ -101,6 +115,7 @@ export default function NavigationRail({ slug, open }: NavigationRailProps) {
         icon="person"
         href={`/${slug}/user`}
         isActive={pathname.startsWith("/user")}
+        roles={[]}
       />
     </nav>
   );
