@@ -5,6 +5,8 @@ import { getServerSession } from "next-auth";
 import Link from "next/link";
 import Modal from "@/components/modal";
 import TextField from "@/components/text-field";
+import { z } from "zod";
+import { revalidatePath } from "next/cache";
 
 type Props = {
     params: {
@@ -68,6 +70,28 @@ export default async function Page({ params }: Props) {
         }
         return dividedTests;
     }
+    async function createTest(data: FormData) {
+        "use server"
+        const testType = z.object({
+            title: z.string(),
+            topics: z.string(),
+            instanceId: z.number(),
+            date: z.string(),
+        });
+
+        const newTest = testType.safeParse({
+            title: data.get("title"),
+            topics: data.get("topics"),
+            instanceId: Number(data.get("instanceId")),
+            date: data.get("date"),
+        });
+
+        if (!newTest.success) {
+            return;
+        }
+        await db.insert(test).values({ ...newTest.data, date: new Date(newTest.data.date) });
+        revalidatePath(`/${params.slug}/student`);
+    }
     const dividedTests = divideTests();
     return (
         <>
@@ -119,17 +143,18 @@ export default async function Page({ params }: Props) {
                     </div>
                 </div>
             </div>
-            <form className="fixed bottom-10 right-10" action="">
+            <form className="fixed bottom-10 right-10" action={createTest}>
                 <Modal confirmButton={{ text: "Guardar", type: "submit" }} buttonText="Crear" >
                     <div className="flex flex-col gap-2">
-                        <TextField id="title" name="Titulo" label="Titulo"></TextField>
+                        <TextField id="title" name="title" label="Titulo"></TextField>
                         <label className="mt-1">Clase</label>
-                        <select className="bg-transparent py-4 outline outline-1 outline-outline rounded" name="class">
-                            {instances.map((i) => (<option>{i.course.name} | {i.grade.name}</option>))}
+                        <select className="bg-transparent py-4 outline outline-1 outline-outline rounded" name="instanceId">
+                            <option value="--">---</option>
+                            {instances.map((i) => (<option value={Number(i.instance.id)}>{i.course.name} | {i.grade.name}</option>))}
                         </select>
-                        <TextField id="topics" name="Temas" label="Temas"></TextField>
+                        <TextField id="topics" name="topics" label="Temas"></TextField>
                         <label className="mt-1">Fecha</label>
-                        <input className="bg-transparent py-3 outline outline-1 outline-outline rounded" type="date" placeholder="dd-mm-yyyy" />
+                        <input name="date" className="bg-transparent py-3 outline outline-1 outline-outline rounded" type="date" placeholder="dd-mm-yyyy" />
                     </div>
                 </Modal>
             </form>
