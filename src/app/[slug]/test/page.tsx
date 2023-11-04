@@ -17,7 +17,9 @@ type Props = {
 type testCardData = {
     id: number,
     title: string,
-    date: Date
+    date: Date,
+    subject: string,
+    course: string
 }
 
 export default async function Page({ params }: Props) {
@@ -42,7 +44,9 @@ export default async function Page({ params }: Props) {
     const tests = await db.select().from(test)
         .innerJoin(instance, eq(test.instanceId, instance.id))
         .innerJoin(user, eq(instance.professorId, user.id))
+        .innerJoin(course, eq(instance.courseId, course.id))
         .innerJoin(schoolUser, eq(user.id, schoolUser.userId))
+        .innerJoin(grade, eq(instance.gradeId, grade.id))
         .innerJoin(school, eq(schoolUser.schoolId, school.id))
         .where(and(eq(user.id, u.id), eq(school.slug, params.slug)))
 
@@ -60,13 +64,13 @@ export default async function Page({ params }: Props) {
         const dividedTests: testCardData[][] = [[], [], []]
         for (let t of tests) {
             if (t.test.date.getMonth() <= 4) {
-                dividedTests[0].push(t.test);
+                dividedTests[0].push({...t.test, subject: t.course.name, course: t.grade.name});
                 continue;
             } else if (t.test.date.getMonth() <= 8 && t.test.date.getMonth()) {
-                dividedTests[1].push(t.test);
+                dividedTests[1].push({...t.test, subject: t.course.name, course: t.grade.name});
                 continue;
             }
-            dividedTests[2].push(t.test);
+            dividedTests[2].push({...t.test, subject: t.course.name, course: t.grade.name});
         }
         return dividedTests;
     }
@@ -105,7 +109,7 @@ export default async function Page({ params }: Props) {
                         {dividedTests[0].map((t) => (
                             <Link href={`/${params.slug}/test/${t.id}`}>
                                 <div className="flex flex-col hover:bg-primary-200">
-                                    <p className="font-bold text-xl">{t.title}</p>
+                                    <p className="font-bold text-xl">{t.title} | {t.subject} | {t.course}</p>
                                     <p>{t.date.toLocaleDateString()}</p>
                                 </div>
                             </Link>
@@ -120,7 +124,7 @@ export default async function Page({ params }: Props) {
                         {dividedTests[1].map((t) => (
                             <Link href={`/${params.slug}/test/${t.id}`}>
                                 <div className="flex flex-col hover:bg-primary-200">
-                                    <p className="font-bold text-xl">{t.title}</p>
+                                    <p className="font-bold text-xl">{t.title} | {t.subject} | {t.course}</p>
                                     <p>{t.date.toLocaleDateString()}</p>
                                 </div>
                             </Link>
@@ -135,7 +139,7 @@ export default async function Page({ params }: Props) {
                         {dividedTests[2].map((t) => (
                             <Link href={`/${params.slug}/test/${t.id}`}>
                                 <div className="flex flex-col hover:bg-primary-200">
-                                    <p className="font-bold text-xl">{t.title}</p>
+                                    <p className="font-bold text-xl">{t.title} | {t.subject} | {t.course}</p>
                                     <p>{t.date.toLocaleDateString()}</p>
                                 </div>
                             </Link>
