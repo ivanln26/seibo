@@ -2,6 +2,7 @@ import { db } from "@/db/db";
 import { instance, school, schoolUser, test, user } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import { getServerSession } from "next-auth";
+import Link from "next/link";
 import { tokenToString } from "typescript";
 
 type Props = {
@@ -67,10 +68,13 @@ export default async function Page({ params }: Props) {
                     </div>
                     <div className="flex flex-col gap-2 px-2 my-5 divide-y divide-black bg-primary-100 rounded-xl border text-center justify-center">
                         {dividedTests[0].map((t) => (
-                            <div className="flex flex-col hover:bg-primary-200">
-                                <p className="font-bold text-xl">{t.title}</p>
-                                <p>{t.date.toLocaleDateString()}</p>
-                            </div>))}
+                            <Link href={`/${params.slug}/test/${t.id}`}>
+                                <div className="flex flex-col hover:bg-primary-200">
+                                    <p className="font-bold text-xl">{t.title}</p>
+                                    <p>{t.date.toLocaleDateString()}</p>
+                                </div>
+                            </Link>
+                        ))}
                     </div>
                 </div>
                 <div className="basis-full lg:basis-1/3">
@@ -79,10 +83,12 @@ export default async function Page({ params }: Props) {
                     </div>
                     <div className="flex flex-col gap-2 px-2 my-5 divide-y divide-black bg-primary-100 rounded-xl border text-center justify-center">
                         {dividedTests[1].map((t) => (
-                            <div className="flex flex-col hover:bg-primary-200">
-                                <p className="font-bold text-xl">{t.title}</p>
-                                <p>{t.date.toLocaleDateString()}</p>
-                            </div>
+                            <Link href={`/${params.slug}/test/${t.id}`}>
+                                <div className="flex flex-col hover:bg-primary-200">
+                                    <p className="font-bold text-xl">{t.title}</p>
+                                    <p>{t.date.toLocaleDateString()}</p>
+                                </div>
+                            </Link>
                         ))}
                     </div>
                 </div>
@@ -92,10 +98,12 @@ export default async function Page({ params }: Props) {
                     </div>
                     <div className="flex flex-col gap-2 px-2 my-5 divide-y divide-black bg-primary-100 rounded-xl border text-center justify-center">
                         {dividedTests[2].map((t) => (
-                            <div className="flex flex-col hover:bg-primary-200">
-                                <p className="font-bold text-xl">{t.title}</p>
-                                <p>{t.date.toLocaleDateString()}</p>
-                            </div>
+                            <Link href={`/${params.slug}/test/${t.id}`}>
+                                <div className="flex flex-col hover:bg-primary-200">
+                                    <p className="font-bold text-xl">{t.title}</p>
+                                    <p>{t.date.toLocaleDateString()}</p>
+                                </div>
+                            </Link>
                         ))}
                     </div>
                 </div>
