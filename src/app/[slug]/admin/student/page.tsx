@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import { z } from "zod";
 
-import { getUser } from "../lecture/utils";
+import { getUser } from "../../lecture/utils";
 import Modal from "@/components/modal";
 import TextField from "@/components/text-field";
 import { db } from "@/db/db";

@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth";
 import { z } from "zod";
 
 import TimeInput from "./time-input";
-import { getUser } from "../lecture/utils";
+import { getUser } from "../../lecture/utils";
 import Modal from "@/components/modal";
 import { db } from "@/db/db";
 import {
