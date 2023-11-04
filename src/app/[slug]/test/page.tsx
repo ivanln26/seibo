@@ -1,15 +1,17 @@
 import { db } from "@/db/db";
-import { instance, school, schoolUser, test, user } from "@/db/schema";
+import { course, grade, instance, school, schoolUser, test, user } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
-import { tokenToString } from "typescript";
+import Modal from "@/components/modal";
+import TextField from "@/components/text-field";
 
 type Props = {
     params: {
         slug: string
     }
 }
+
 type testCardData = {
     id: number,
     title: string,
@@ -42,9 +44,18 @@ export default async function Page({ params }: Props) {
         .innerJoin(school, eq(schoolUser.schoolId, school.id))
         .where(and(eq(user.id, u.id), eq(school.slug, params.slug)))
 
+    const instances = await db.select().from(instance)
+        .innerJoin(user, eq(instance.professorId, user.id))
+        .innerJoin(schoolUser, eq(user.id, schoolUser.userId))
+        .innerJoin(school, eq(schoolUser.schoolId, school.id))
+        .innerJoin(grade, eq(instance.gradeId, grade.id))
+        .innerJoin(course, eq(instance.courseId, course.id))
+        .where(and(eq(school.slug, params.slug), eq(user.id, u.id)));
+
+    console.log(instances)
+
     function divideTests() {
         const dividedTests: testCardData[][] = [[], [], []]
-        console.log(tests)
         for (let t of tests) {
             if (t.test.date.getMonth() <= 4) {
                 dividedTests[0].push(t.test);
@@ -108,11 +119,20 @@ export default async function Page({ params }: Props) {
                     </div>
                 </div>
             </div>
-            <button className="bg-tertiary-200 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg hover:bg-tertiary-600 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-tertiary-400 focus:ring-opacity-75 fixed bottom-10 right-10" aria-label="Botón Flotante">
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-            </button>
+            <form className="fixed bottom-10 right-10" action="">
+                <Modal confirmButton={{ text: "Guardar", type: "submit" }} buttonText="Crear" >
+                    <div className="flex flex-col gap-2">
+                        <TextField id="title" name="Titulo" label="Titulo"></TextField>
+                        <label className="mt-1">Clase</label>
+                        <select className="bg-transparent py-4 outline outline-1 outline-outline rounded" name="class">
+                            {instances.map((i) => (<option>{i.course.name} | {i.grade.name}</option>))}
+                        </select>
+                        <TextField id="topics" name="Temas" label="Temas"></TextField>
+                        <label className="mt-1">Fecha</label>
+                        <input className="bg-transparent py-3 outline outline-1 outline-outline rounded" type="date" placeholder="dd-mm-yyyy" />
+                    </div>
+                </Modal>
+            </form>
         </>
     );
 }
