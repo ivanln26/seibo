@@ -35,6 +35,12 @@ const buttons: DrawerButton[] = [
     href: "/schedule",
     roles: ["teacher", "tutor", "principal", "admin"],
   },
+  {
+    name: "Admin",
+    icon: "person",
+    href: "/admin",
+    roles: ["admin"],
+  },
 ];
 
 function DrawerButton({ name, icon, href, isActive }: DrawerButton) {

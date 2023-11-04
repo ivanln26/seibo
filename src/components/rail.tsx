@@ -63,6 +63,12 @@ const buttons: RailButton[] = [
     href: "/schedule",
     roles: ["teacher", "tutor", "principal", "admin"],
   },
+  {
+    name: "Admin",
+    icon: "person",
+    href: "/admin",
+    roles: ["admin"],
+  },
 ];
 
 type NavigationRailProps = {
