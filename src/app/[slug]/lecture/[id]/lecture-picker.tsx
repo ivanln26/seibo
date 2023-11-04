@@ -23,7 +23,7 @@ export default async function LecturePicker({ slug, lectureID }: props) {
   const lectures = await getWeeklyLectures(user.id, today);
   return lectures.map((l) => {
     return (
-      <Link href={`${slug}/lecture/${l.lecture.id}`}>
+      <Link href={`/${slug}/lecture/${l.lecture.id}`}>
         <div
           className={`p-5 px-6 m-2 border rounded-xl w-max flex flex-col font-bold ${
             lectureID === Number(l.lecture.id) ? "bg-secondary-100" : ""
