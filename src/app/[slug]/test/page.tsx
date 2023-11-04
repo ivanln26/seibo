@@ -108,7 +108,7 @@ export default async function Page({ params }: Props) {
                     </div>
                 </div>
             </div>
-            <button className="bg-tertiary-500 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg hover:bg-red-600 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 fixed bottom-10 right-10" aria-label="Botón Flotante">
+            <button className="bg-tertiary-200 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg hover:bg-tertiary-600 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-tertiary-400 focus:ring-opacity-75 fixed bottom-10 right-10" aria-label="Botón Flotante">
                 <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
