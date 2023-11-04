@@ -6,12 +6,14 @@ import { usePathname } from "next/navigation";
 
 import Icon from "@/components/icons/icon";
 import type { Icon as IconType } from "@/components/icons/icon";
+import type { Role } from "@/db/schema";
 
 type DrawerButton = {
   name: string;
   icon: IconType;
   href: string;
   isActive?: boolean;
+  roles: Role[];
 };
 
 const buttons: DrawerButton[] = [
@@ -19,16 +21,25 @@ const buttons: DrawerButton[] = [
     name: "Asistencia",
     icon: "checklist",
     href: "/lecture",
+    roles: ["teacher"],
   },
   {
     name: "Notas",
     icon: "description",
     href: "/test",
+    roles: ["teacher"],
   },
   {
     name: "Horarios",
     icon: "clock",
     href: "/schedule",
+    roles: ["teacher", "tutor", "principal", "admin"],
+  },
+  {
+    name: "Admin",
+    icon: "person",
+    href: "/admin",
+    roles: ["admin"],
   },
 ];
 
@@ -50,12 +61,13 @@ function DrawerButton({ name, icon, href, isActive }: DrawerButton) {
 
 type NavigationDrawerProps = {
   slug: string;
+  roles: Role[];
   isOpen: boolean;
   close: () => void;
 };
 
 export default function NavigationDrawer(
-  { slug, isOpen, close }: NavigationDrawerProps,
+  { slug, roles, isOpen, close }: NavigationDrawerProps,
 ) {
   const pathname = usePathname();
   const ref = useRef<HTMLDivElement>(null);
@@ -87,6 +99,12 @@ export default function NavigationDrawer(
       <ul>
         {btns.map((button, i) => {
           const isActive = pathname.startsWith(button.href);
+
+          if (
+            roles.filter((role) => button.roles.includes(role)).length === 0
+          ) {
+            return null;
+          }
 
           return (
             <li key={i}>
