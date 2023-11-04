@@ -58,10 +58,14 @@ export function getMonday(d: Date) {
 
 export function getFriday(d: Date) {
   d = new Date(d);
-  var day = d.getDay(),
-    diff = d.getDate() - day + (day <= 5 ? (5 - day) : (12 - day)); // adjust when day is after Friday
-  const newDate = new Date(d.setDate(diff));
-  return new Date(newDate.setUTCHours(23, 59, 59));
+  const day = d.getDay();
+  const daysUntilFriday = day <= 5 ? 5 - day : 5 + (7 - day);
+  d.setDate(d.getDate() + daysUntilFriday);
+
+  // Ajustamos la hora a las 23:59:59
+  d.setHours(23, 59, 59);
+
+  return d;
 }
 
 export async function getWeeklyLectures(professorId: number, date: Date) {
@@ -71,7 +75,7 @@ export async function getWeeklyLectures(professorId: number, date: Date) {
     .innerJoin(course, eq(instance.courseId, course.id))
     .innerJoin(grade, eq(instance.gradeId, grade.id))
     .where(and(
-      eq(instance.professorId, 1),
+      eq(instance.professorId, professorId),
       between(lecture.date, getMonday(date), getFriday(date)),
     ))
     .orderBy(schedule.weekday, schedule.startTime);
