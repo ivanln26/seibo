@@ -39,6 +39,8 @@ export const school = mysqlTable("school", {
 
 export type NewSchool = typeof school.$inferInsert;
 
+export type Role = "teacher" | "tutor" | "principal" | "admin";
+
 export const schoolUser = mysqlTable("school_user", {
   id: int("id").autoincrement().primaryKey(),
   schoolId: int("school_id").notNull(),
