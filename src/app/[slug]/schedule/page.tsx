@@ -1,27 +1,37 @@
-import { db } from "@/db/db";
-import { course, grade, instance, schedule, school, user as User } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
+import Link from "next/link";
 import { getServerSession } from "next-auth";
+import { z } from "zod";
+
+import TimeInput from "./time-input";
 import { getUser } from "../lecture/utils";
 import Modal from "@/components/modal";
-import Link from "next/link";
-import { z } from "zod";
-import { revalidatePath } from "next/cache";
-import TimeInput from "./time-input";
+import { db } from "@/db/db";
+import {
+  course,
+  grade,
+  instance,
+  schedule,
+  school,
+  user as User,
+} from "@/db/schema";
 
 type Props = {
   params: {
-      slug: string;
+    slug: string;
   };
 };
 
-export default async function Page({params}: Props) {
+export default async function Page({ params }: Props) {
   const session = await getServerSession();
-  if (!session) return (<>Error al obtener la sesión.</>)
+  if (!session) return <>Error al obtener la sesión.</>;
   const user = await getUser(session);
-  if (!user) return <>Error al obtener el usuario.</>
-  const actualSchool = (await db.select().from(school).where(eq(school.slug, params.slug)))[0]
-  if (!actualSchool) return <>Error al obtener el usuario.</>
+  if (!user) return <>Error al obtener el usuario.</>;
+  const actualSchool = await db.query.school.findFirst({
+    where: (school, { eq }) => eq(school.slug, params.slug),
+  });
+  if (!actualSchool) return <>Error al obtener el usuario.</>;
 
   const schedules = await db.select()
     .from(schedule)
@@ -29,14 +39,14 @@ export default async function Page({params}: Props) {
     .innerJoin(course, eq(instance.courseId, course.id))
     .innerJoin(grade, eq(instance.gradeId, grade.id))
     .where(and(
-      eq(course.schoolId, actualSchool.id)
-    ))
+      eq(course.schoolId, actualSchool.id),
+    ));
 
   async function createSchedule(data: FormData) {
-    "use server"
+    "use server";
     const t = z.object({
       instanceID: z.number(),
-      weekday: z.enum(["monday", "tuesday","wednesday", "thursday", "friday"]),
+      weekday: z.enum(["monday", "tuesday", "wednesday", "thursday", "friday"]),
       startTime: z.string(),
       endTime: z.string(),
     });
@@ -47,16 +57,15 @@ export default async function Page({params}: Props) {
       endTime: data.get("endTime"),
     });
     if (!newSchedule.success) {
-      console.log("error", newSchedule.error)
       return;
     }
 
     await db.insert(schedule).values({
       instanceId: newSchedule.data.instanceID,
       weekday: newSchedule.data.weekday,
-      startTime:newSchedule.data.startTime,
-      endTime: newSchedule.data.endTime
-    })
+      startTime: newSchedule.data.startTime,
+      endTime: newSchedule.data.endTime,
+    });
     revalidatePath(`${params.slug}/schedule`);
   }
 
@@ -64,7 +73,7 @@ export default async function Page({params}: Props) {
     .innerJoin(course, eq(instance.courseId, course.id))
     .innerJoin(grade, eq(instance.gradeId, grade.id))
     .innerJoin(User, eq(instance.professorId, User.id))
-    .where(eq(course.schoolId, actualSchool.id))
+    .where(eq(course.schoolId, actualSchool.id));
   return (
     <section className="flex flex-col gap-5 ml-2">
       <h1 className="text-4xl">Horarios</h1>
@@ -77,25 +86,56 @@ export default async function Page({params}: Props) {
               <td className="border border-black">Hora</td>
               <td className="border border-black">Curso</td>
             </tr>
-            {schedules.map((s) => <tr>
-              <td className="border border-black"><Link href={`/${params.slug}/schedule/${s.schedule.id}`}>{s.course.name}</Link></td>
-              <td className="border border-black"><Link href={`/${params.slug}/schedule/${s.schedule.id}`}>{s.schedule.weekday}</Link></td>
-              <td className="border border-black"><Link href={`/${params.slug}/schedule/${s.schedule.id}`}>{s.schedule.startTime} - {s.schedule.endTime}</Link></td>
-              <td className="border border-black"><Link href={`/${params.slug}/schedule/${s.schedule.id}`}>{s.grade.name}</Link></td>
-            </tr>)}
+            {schedules.map((s) => (
+              <tr>
+                <td className="border border-black">
+                  <Link href={`/${params.slug}/schedule/${s.schedule.id}`}>
+                    {s.course.name}
+                  </Link>
+                </td>
+                <td className="border border-black">
+                  <Link href={`/${params.slug}/schedule/${s.schedule.id}`}>
+                    {s.schedule.weekday}
+                  </Link>
+                </td>
+                <td className="border border-black">
+                  <Link href={`/${params.slug}/schedule/${s.schedule.id}`}>
+                    {s.schedule.startTime} - {s.schedule.endTime}
+                  </Link>
+                </td>
+                <td className="border border-black">
+                  <Link href={`/${params.slug}/schedule/${s.schedule.id}`}>
+                    {s.grade.name}
+                  </Link>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
       <div className="fixed bottom-5 right-10">
         <form action={createSchedule}>
-          <Modal buttonText="Crear" confirmButton={{ text: "sape", type: "submit" }}>
+          <Modal
+            buttonText="Crear"
+            confirmButton={{ text: "sape", type: "submit" }}
+          >
             <h1 className="text-2xl">Crear horario</h1>
             <label htmlFor="">Clase</label>
-            <select name="instanceID" className="py-4 outline outline-1 rounded bg-white outline-outline">
-              {instances.map((i) => <option value={Number(i.instance.id)}>{i.course.name} | {i.grade.name} | {i.user.name}</option>)}
+            <select
+              name="instanceID"
+              className="py-4 outline outline-1 rounded bg-white outline-outline"
+            >
+              {instances.map((i) => (
+                <option value={Number(i.instance.id)}>
+                  {i.course.name} | {i.grade.name} | {i.user.name}
+                </option>
+              ))}
             </select>
             <label htmlFor="">Dia de la semana</label>
-            <select name="weekday" className="py-4 outline outline-1 rounded bg-white outline-outline">
+            <select
+              name="weekday"
+              className="py-4 outline outline-1 rounded bg-white outline-outline"
+            >
               <option value="monday">Lunes</option>
               <option value="tuesday">Martes</option>
               <option value="wednesday">Miercoles</option>
