@@ -18,7 +18,9 @@ type RailButton = {
   roles: Role[];
 };
 
-function RailButton({ name, icon, href, isActive }: RailButton) {
+function RailButton({ name, icon, href, isActive, roles }: RailButton) {
+  const isAdmin = roles.includes("admin");
+
   return (
     <Link
       className="flex flex-col justify-center items-center gap-y-1 h-16"
@@ -27,15 +29,19 @@ function RailButton({ name, icon, href, isActive }: RailButton) {
       <div
         className={`flex justify-center items-center h-8 w-14 rounded-full ${
           isActive
-            ? "fill-primary-900 bg-primary-100 dark:fill-primary-100 dark:bg-primary-700"
+            ? (isAdmin
+              ? "fill-secondary-900 bg-secondary-100 dark:fill-secondary-100 dark:bg-secondary-700"
+              : "fill-primary-900 bg-primary-100 dark:fill-primary-100 dark:bg-primary-700")
             : "fill-black dark:fill-white"
         }`}
       >
         <Icon icon={icon} height={24} width={24} />
       </div>
       <span
-        className={`text-sm ${
-          isActive && "font-bold text-primary-900 dark:text-primary-100"
+        className={`text-sm ${isActive && "font-bold"} ${
+          isActive && (isAdmin
+            ? "text-secondary-900 dark:text-secondary-100"
+            : "text-primary-900 dark:text-primary-100")
         }`}
       >
         {name}
@@ -111,7 +117,7 @@ export default function NavigationRail(
 
           return (
             <li key={i}>
-              <RailButton isActive={isActive} {...button} />
+              <RailButton isActive={isActive} {...button} roles={roles} />
             </li>
           );
         })}
@@ -120,8 +126,8 @@ export default function NavigationRail(
         name="Usuario"
         icon="person"
         href={`/${slug}/user`}
-        isActive={pathname.startsWith("/user")}
-        roles={[]}
+        isActive={pathname.startsWith(`/${slug}/user`)}
+        roles={roles}
       />
     </nav>
   );
