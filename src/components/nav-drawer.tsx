@@ -93,7 +93,7 @@ export default function NavigationDrawer(
     <nav
       className={`${
         isOpen ? "absolute" : "hidden"
-      } h-[100svh] px-1 py-2 bg-neutral-98 dark:bg-neutral-5 z-50`}
+      } h-[100svh] px-1 py-2 bg-neutral-98 dark:bg-neutral-5 z-50 fixed top-0`}
       ref={ref}
     >
       <ul>

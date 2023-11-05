@@ -88,7 +88,7 @@ export default function NavigationRail(
   }));
 
   return (
-    <nav className="hidden md:flex md:flex-col w-20 h-screen">
+    <nav className="hidden md:flex md:flex-col w-20 h-screen sticky top-0">
       <Link className="" href={`/${slug}`}>
         <Image src={Logo} alt="Seibo Logo" />
       </Link>
