@@ -12,6 +12,7 @@ const adminNavButtons: AdminNavigationButtonProps[] = [
   { name: "Materia", href: "course" },
   { name: "Estudiante", href: "student" },
   { name: "Usuario", href: "user" },
+  { name: "Curso", href: "grade" },
 ];
 
 export default function AdminNavigation({ slug }: Props) {
