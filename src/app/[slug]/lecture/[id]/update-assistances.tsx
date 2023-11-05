@@ -35,6 +35,6 @@ export async function updateAssistances(formData: FormData) {
   await db.update(lecture)
     .set({ notes: String(notes[1]) })
     .where(eq(lecture.id, Number(lectureID[1])));
-
+  //TODO: falta lo del slug
   revalidatePath(`lecture/${Number(lectureID[1])}`);
 }

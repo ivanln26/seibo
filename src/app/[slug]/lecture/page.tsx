@@ -5,7 +5,13 @@ import { getServerSession } from "next-auth";
 
 export const revalidate = 0;
 
-export default async function Page() {
+type Props = {
+  params: {
+    slug: string;
+  };
+};
+
+export default async function Page({params}: Props) {
   const session = await getServerSession();
   if (!session) {
     return <>Error al obtener la sesión.</>;
@@ -43,7 +49,7 @@ export default async function Page() {
         closerTimeDiff = timeDiff;
       }
     });
-    redirect(`/lecture/${String(closerLecture)}`);
+    redirect(`/${params.slug}/lecture/${String(closerLecture)}`);
   }
 
   return (
