@@ -63,7 +63,7 @@ export default async function Page({ params }: Props) {
                   key={i}
                   className="text-center border border-neutral-variant-50 dark:border-neutral-variant-60"
                 >
-                  <Link href={`/${params.slug}/classroom/${cr.id}`}>
+                  <Link href={`/${params.slug}/admin/classroom/${cr.id}`}>
                     {cr.name}
                   </Link>
                 </td>

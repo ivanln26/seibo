@@ -2,11 +2,10 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import TextField from "@/components/text-field";
-import Table from "@/components/table";
-import type { TableRow } from "@/components/table";
 import Modal from "@/components/modal";
 import { db } from "@/db/db";
 import { course } from "@/db/schema";
+import Link from "next/link";
 
 export const revalidate = 0;
 
@@ -18,7 +17,6 @@ type Props = {
 
 export default async function Page({ params }: Props) {
   const courses = await db.select().from(course);
-  const columnNames = ["id", "schoolId", "name", "topics"];
 
   const create = async (formData: FormData) => {
     "use server";
@@ -41,24 +39,30 @@ export default async function Page({ params }: Props) {
     revalidatePath("/");
   };
 
-  const createTableRows = (): TableRow[] => {
-    return courses.map((course) => (
-      {
-        cells: Object.values(course).map((attribute) => ({
-          text: String(attribute),
-          href: `/course/${course.id}`,
-        })),
-      }
-    ));
-  };
-
   return (
     <>
       <section>
         <h1 className="text-4xl">Courses</h1>
       </section>
       <section>
-        <Table slug={params.slug} cols={columnNames} rows={createTableRows()} />
+        <table className="w-full table-auto border-collapse">
+          <thead>
+            <tr>
+              {["Nombre", "Temas"].map((c) => (<th className="py-1 text-primary-900 border border-neutral-variant-50 bg-primary-100 dark:text-primary-100 dark:border-neutral-variant-60 dark:bg-primary-700">{c}</th>))}
+            </tr>
+          </thead>
+          <tbody>
+            {courses.map((c) => (
+              <tr>
+                <td className="text-center border border-neutral-variant-50 dark:border-neutral-variant-60">
+                  <Link href={`/${params.slug}/admin/course/${c.id}`}>{c.name}</Link>
+                </td>
+                <td className="text-center border border-neutral-variant-50 dark:border-neutral-variant-60">
+                  <Link href={`/${params.slug}/admin/course/${c.id}`}>{c.topics}</Link>
+                </td>
+              </tr>))}
+          </tbody>
+        </table>
       </section>
       <div className="fixed bottom-5 right-10">
         <form action={create}>

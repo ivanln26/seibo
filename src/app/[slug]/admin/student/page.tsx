@@ -105,17 +105,17 @@ export default async function Page({ params }: Props) {
             {users.map((u) => (
               <tr>
                 <td className="border border-black">
-                  <Link href={`/${params.slug}/student/${u.id}`}>
+                  <Link href={`/${params.slug}/admin/student/${u.id}`}>
                     {u.firstName} {u.lastName}
                   </Link>
                 </td>
                 <td className="border border-black">
-                  <Link href={`/${params.slug}/student/${u.id}`}>
+                  <Link href={`/${params.slug}/admin/student/${u.id}`}>
                     {u.email}
                   </Link>
                 </td>
                 <td className="border border-black">
-                  <Link href={`/${params.slug}/student/${u.id}`}>
+                  <Link href={`/${params.slug}/admin/student/${u.id}`}>
                     {u.studentCode}
                   </Link>
                 </td>

@@ -61,13 +61,13 @@ export default async function Page({ params }: Props) {
       startTime: newSchedule.data.startTime,
       endTime: newSchedule.data.endTime,
     }).where(eq(schedule.id, newSchedule.data.instanceID));
-    redirect(`${params.slug}/schedule`);
+    redirect(`${params.slug}/admin/schedule`);
   }
   async function deleteSchedule() {
     "use server";
     await db.delete(schedule)
       .where(eq(schedule.id, sched[0].id));
-    redirect(`${params.slug}/schedule`);
+    redirect(`${params.slug}/admin/schedule`);
   }
   return (
     <>
