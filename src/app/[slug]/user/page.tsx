@@ -29,6 +29,12 @@ export default async function Page({ params }: Props) {
     return <>Error al obtener la escuela de la base de datos.</>;
   }
 
+  const courses = await db.query.courseProfessor.findMany({
+    where: (courseProfessor, { eq }) =>
+      eq(courseProfessor.professorId, user.id),
+    with: { course: true },
+  });
+
   return (
     <div className="flex flex-col md:flex-row gap-x-6 gap-y-4">
       <section className="flex flex-col gap-y-3 p-4 rounded outline outline-1 md:outline-0 outline-outline">
@@ -46,8 +52,7 @@ export default async function Page({ params }: Props) {
         </ul>
         <h1 className="text-2xl">Materias</h1>
         <ul className="list-disc list-inside text-lg">
-          <li className="ml-4">Lengua</li>
-          <li className="ml-4">Matemática</li>
+          {courses.map((c) => <li className="ml-4">{c.course.name}</li>)}
         </ul>
       </section>
     </div>

@@ -125,6 +125,10 @@ export const course = mysqlTable("course", {
   ),
 }));
 
+export const courseRelations = relations(course, ({ many }) => ({
+  courseToProfessor: many(courseProfessor),
+}));
+
 export const courseProfessor = mysqlTable("course_professor", {
   id: int("id").autoincrement().primaryKey(),
   courseId: int("course_id").notNull(),
@@ -135,6 +139,20 @@ export const courseProfessor = mysqlTable("course_professor", {
     table.professorId,
   ),
 }));
+
+export const courseProfessorRelations = relations(
+  courseProfessor,
+  ({ one }) => ({
+    course: one(course, {
+      fields: [courseProfessor.courseId],
+      references: [course.id],
+    }),
+    professor: one(user, {
+      fields: [courseProfessor.professorId],
+      references: [user.id],
+    }),
+  }),
+);
 
 export const courseGrade = mysqlTable("course_grade", {
   id: int("id").autoincrement().primaryKey(),
