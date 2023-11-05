@@ -2,7 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
 
-import { getUser } from "../lecture/utils";
+import { getUser } from "../../lecture/utils";
 import { db } from "@/db/db";
 import { schoolUser, user } from "@/db/schema";
 

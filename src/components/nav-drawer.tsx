@@ -43,12 +43,16 @@ const buttons: DrawerButton[] = [
   },
 ];
 
-function DrawerButton({ name, icon, href, isActive }: DrawerButton) {
+function DrawerButton({ name, icon, href, isActive, roles }: DrawerButton) {
+  const isAdmin = roles.includes("admin");
+
   return (
     <Link
       className={`flex items-center gap-x-3 w-[300px] h-12 px-4 rounded-full ${
         isActive
-          ? "text-primary-900 fill-primary-900 bg-primary-100 dark:text-primary-100 dark:fill-primary-100 dark:bg-primary-700"
+          ? (isAdmin
+            ? "text-secondary-900 fill-secondary-900 bg-secondary-100 dark:text-secondary-100 dark:fill-secondary-100 dark:bg-secondary-700"
+            : "text-primary-900 fill-primary-900 bg-primary-100 dark:text-primary-100 dark:fill-primary-100 dark:bg-primary-700")
           : "fill-black dark:fill-white"
       }`}
       href={href}
@@ -93,7 +97,7 @@ export default function NavigationDrawer(
     <nav
       className={`${
         isOpen ? "absolute" : "hidden"
-      } h-[100svh] px-1 py-2 bg-neutral-98 dark:bg-neutral-5 z-50`}
+      } h-[100svh] px-1 py-2 bg-neutral-98 dark:bg-neutral-5 z-50 fixed top-0`}
       ref={ref}
     >
       <ul>
@@ -108,7 +112,7 @@ export default function NavigationDrawer(
 
           return (
             <li key={i}>
-              <DrawerButton isActive={isActive} {...button} />
+              <DrawerButton isActive={isActive} {...button} roles={roles} />
             </li>
           );
         })}
