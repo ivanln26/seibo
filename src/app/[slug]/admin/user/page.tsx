@@ -45,22 +45,22 @@ export default async function Page({ params }: Props) {
             {users.map((u) => (
               <tr>
                 <td className="border border-black">
-                  <Link href={`/${params.slug}/userABM/${u.user.id}`}>
+                  <Link href={`/${params.slug}/admin/user/${u.user.id}`}>
                     {u.user.name}
                   </Link>
                 </td>
                 <td className="border border-black">
-                  <Link href={`/${params.slug}/userABM/${u.user.id}`}>
+                  <Link href={`/${params.slug}/admin/user/${u.user.id}`}>
                     {u.user.email}
                   </Link>
                 </td>
                 <td className="border border-black">
-                  <Link href={`/${params.slug}/userABM/${u.user.id}`}>
+                  <Link href={`/${params.slug}/admin/user/${u.user.id}`}>
                     {u.school_user.role}
                   </Link>
                 </td>
                 <td className="border border-black">
-                  <Link href={`/${params.slug}/userABM/${u.user.id}`}>
+                  <Link href={`/${params.slug}/admin/user/${u.user.id}`}>
                     {u.school_user.isActive ? "alta" : "baja"}
                   </Link>
                 </td>

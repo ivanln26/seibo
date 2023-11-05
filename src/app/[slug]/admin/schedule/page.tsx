@@ -89,22 +89,22 @@ export default async function Page({ params }: Props) {
             {schedules.map((s) => (
               <tr>
                 <td className="border border-black">
-                  <Link href={`/${params.slug}/schedule/${s.schedule.id}`}>
+                  <Link href={`/${params.slug}/admin/schedule/${s.schedule.id}`}>
                     {s.course.name}
                   </Link>
                 </td>
                 <td className="border border-black">
-                  <Link href={`/${params.slug}/schedule/${s.schedule.id}`}>
+                  <Link href={`/${params.slug}/admin/schedule/${s.schedule.id}`}>
                     {s.schedule.weekday}
                   </Link>
                 </td>
                 <td className="border border-black">
-                  <Link href={`/${params.slug}/schedule/${s.schedule.id}`}>
+                  <Link href={`/${params.slug}/admin/schedule/${s.schedule.id}`}>
                     {s.schedule.startTime} - {s.schedule.endTime}
                   </Link>
                 </td>
                 <td className="border border-black">
-                  <Link href={`/${params.slug}/schedule/${s.schedule.id}`}>
+                  <Link href={`/${params.slug}/admin/schedule/${s.schedule.id}`}>
                     {s.grade.name}
                   </Link>
                 </td>
