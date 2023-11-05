@@ -67,7 +67,6 @@ export default async function Home({ params }: Props) {
         <h1 className="text-4xl">Courses</h1>
       </section>
       <section>
-        <Table slug={params.slug} cols={columnNames} rows={createTableRows()} />
       </section>
       <div className="fixed bottom-5 right-10">
         <form action={create}>
