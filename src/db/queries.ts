@@ -1,6 +1,8 @@
+import { and, eq, gt, sql } from "drizzle-orm";
 import { getServerSession } from "next-auth";
 
 import { db } from "./db";
+import { school, schoolUser, user } from "./schema";
 
 /**
  * Server-side
@@ -40,4 +42,29 @@ export async function getUserProfile({ slug }: { slug: string }) {
   }
 
   return u;
+}
+
+export async function getUserSchools() {
+  const session = await getServerSession();
+
+  if (!session) {
+    throw new Error("Error al obtener la sesión del usuario.");
+  }
+
+  return await db
+    .select({
+      id: school.id,
+      name: school.name,
+      slug: school.slug,
+      count: sql<number>`count(${school.id})`,
+    })
+    .from(school)
+    .innerJoin(schoolUser, eq(school.id, schoolUser.schoolId))
+    .innerJoin(user, eq(schoolUser.userId, user.id))
+    .where(and(
+      eq(user.email, session.user.email),
+      eq(schoolUser.isActive, true),
+    ))
+    .groupBy(({ id }) => id)
+    .having(({ count }) => gt(count, 0));
 }

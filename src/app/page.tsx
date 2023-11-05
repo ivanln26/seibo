@@ -1,12 +1,12 @@
 import Link from "next/link";
 
-import { db } from "@/db/db";
+import { getUserSchools } from "@/db/queries";
 import Button from "@/components/button";
 
 export const revalidate = 0;
 
 export default async function Page() {
-  const schools = await db.query.school.findMany();
+  const schools = await getUserSchools();
 
   return (
     <main className="flex justify-center items-center w-full h-[100svh]">
