@@ -47,17 +47,6 @@ export default async function Home({ params }: Props) {
     revalidatePath("/");
   };
 
-  const createTableRows = (): TableRow[] => {
-    return courses.map((course) => (
-      {
-        cells: Object.values(course).map((attribute) => ({
-          text: String(attribute),
-          href: `/course/${course.id}`,
-        })),
-      }
-    ));
-  };
-
   return (
     <>
       <section>
