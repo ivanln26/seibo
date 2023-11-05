@@ -2,8 +2,6 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import TextField from "@/components/text-field";
-import Table from "@/components/table";
-import type { TableRow } from "@/components/table";
 import Modal from "@/components/modal";
 import { db } from "@/db/db";
 import { course } from "@/db/schema";
