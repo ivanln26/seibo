@@ -18,6 +18,18 @@ type DrawerButton = {
 
 const buttons: DrawerButton[] = [
   {
+    name: "Admin",
+    icon: "person",
+    href: "/admin",
+    roles: ["admin"],
+  },
+  {
+    name: "Reporte",
+    icon: "menu",
+    href: "/dashboard",
+    roles: ["principal", "admin"],
+  },
+  {
     name: "Asistencia",
     icon: "checklist",
     href: "/lecture",
@@ -40,12 +52,6 @@ const buttons: DrawerButton[] = [
     icon: "mail",
     href: "/notification",
     roles: ["teacher", "tutor", "principal", "admin"],
-  },
-  {
-    name: "Admin",
-    icon: "person",
-    href: "/admin",
-    roles: ["admin"],
   },
 ];
 
