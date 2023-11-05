@@ -11,7 +11,7 @@ export type TableCell = {
 
 type TableProps = {
   slug: string;
-  cols: String[];
+  cols: string[];
   rows: TableRow[];
 };
 

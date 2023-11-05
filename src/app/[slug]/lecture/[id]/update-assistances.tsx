@@ -17,7 +17,7 @@ export async function updateAssistances(formData: FormData) {
     notes === undefined ||
     lectureID === undefined
   ) return;
-  for (let pair of data) {
+  for (const pair of data) {
     if (pair[0].split(":")[0] === "student") {
       await db.insert(attendance)
         .values({

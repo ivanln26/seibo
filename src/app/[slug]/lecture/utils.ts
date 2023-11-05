@@ -50,8 +50,8 @@ export async function getUser(session: Session) {
 
 export function getMonday(d: Date) {
   d = new Date(d);
-  var day = d.getDay(),
-    diff = d.getDate() - day + (day == 0 ? -6 : 1); // adjust when day is sunday
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day == 0 ? -6 : 1); // adjust when day is sunday
   const newDate = new Date(d.setDate(diff));
   return new Date(newDate.setUTCHours(0, 0, 0, 0));
 }

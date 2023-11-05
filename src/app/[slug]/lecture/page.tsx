@@ -11,7 +11,7 @@ type Props = {
   };
 };
 
-export default async function Page({params}: Props) {
+export default async function Page({ params }: Props) {
   const session = await getServerSession();
   if (!session) {
     return <>Error al obtener la sesión.</>;
@@ -34,8 +34,8 @@ export default async function Page({params}: Props) {
       today.getTime();
 
     lectures.forEach((lec) => {
-      let dateDiff = lec.lecture.date.getUTCDate() - today.getUTCDate();
-      let timeDiff =
+      const dateDiff = lec.lecture.date.getUTCDate() - today.getUTCDate();
+      const timeDiff =
         new Date("1970-01-01T" + lec.schedule.startTime).getTime() -
         today.getTime();
 

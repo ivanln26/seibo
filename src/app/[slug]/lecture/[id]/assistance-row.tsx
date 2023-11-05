@@ -8,7 +8,7 @@ type props = {
   studentId: number;
 };
 
-export default async function AssistanceRow(
+export default function AssistanceRow(
   {
     firstName,
     lastName,
