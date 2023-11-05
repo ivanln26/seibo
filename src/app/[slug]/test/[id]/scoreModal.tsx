@@ -18,7 +18,7 @@ export default function ScoreModal(
                     setHidden(false);
                 }}
             >
-                Nueva calificación.
+                Nueva calificación
             </p>
             <div
                 className={`fixed inset-0 flex justify-center items-center transition-opacity bg-black bg-opacity-50 ${hidden && "hidden"

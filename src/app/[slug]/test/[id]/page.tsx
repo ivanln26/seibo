@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth";
 import TextField from "@/components/text-field";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
+import Button from "@/components/button";
 
 type Props = {
     params: {
@@ -99,7 +100,7 @@ export default async function Page({ params }: Props) {
             studentId: Number(data.get("studentId")),
             score: Number(data.get("score"))
         })
-        if (!newScore.success){
+        if (!newScore.success) {
             console.log(newScore.error);
             return;
         }
@@ -110,25 +111,57 @@ export default async function Page({ params }: Props) {
         });
         revalidatePath(`/${params.slug}/test/${params.id}`)
     }
-    console.log(students.length, scores.length)
+    async function updateScores(data: FormData) {
+        "use server"
+        const scoreType = z.object({
+            testId: z.number(),
+            id: z.number(),
+            score: z.number()
+        })
+        scoreType._type
+        const newScores: typeof scoreType._type[] = [];
+
+        for (let row of data){
+            if(!Number.isNaN(Number(row[0]))){
+                const newScore = scoreType.safeParse({
+                    testId: Number(params.id),
+                    id: Number(row[0]),
+                    score: Number(row[1])
+                })
+                if(!newScore.success) return;
+                newScores.push(newScore.data)
+            }
+        }
+
+        for (let sc of newScores){
+            await db.update(score).set({
+                score: sc.score,
+                testId: sc.testId
+            }).where(eq(score.id, sc.id));
+        }
+        revalidatePath(`/${params.slug}/test/${params.id}`)
+    }
 
     return (
         <>
             <h1 className="text-4xl">Calificaciones | Examen: {exam.title} | {exam.date.toLocaleDateString()}</h1>
             <div className="flex flex-col divide-y divide-solid divide-black bg-primary-100 rounded rounded-xl p-3">
-            <form action={"dsda"} className="divide-y divide-solid divide-black">
-                {scores.map((s) => (<div className="py-3 px-2 hover:bg-primary-400">{s.name} <input name={String(s.id)} className="bg-transparent" type="number" defaultValue={s.score} /></div>))}
-            </form>
-            {students.length != 0 ? <form action={createScore} className="py-3 px-2 hover:bg-primary-400">
-                <ScoreModal>
-                    <select className="bg-transparent py-4 outline outline-1 outline-outline rounded focus:outline-primary-500 focus:outline-2" name="studentId" id="">
-                        <option value="">---</option>
-                        {
-                            students.map((m) => (<option value={Number(m.id)}>{m.lastName} {m.fistName}</option>))
-                        }
-                    </select>
-                    <input className="bg-transparent py-3 outline outline-1 outline-outline rounded focus:outline-primary-500 focus:outline-2" type="number" name="score" id="" />
-                </ScoreModal></form> : <></>}
+                <form action={updateScores} className="divide-y divide-solid divide-black">
+                    {scores.map((s) => (<div className="py-3 px-2 hover:bg-primary-400">{s.name} <input name={String(s.id)} className="bg-transparent" type="number" defaultValue={s.score} /></div>))}
+                    <div className="fixed bottom-10 right-10 bg-tertiary-300 rounded-full">
+                        <Button color="tertiary" type="submit">Guardar</Button>
+                    </div>
+                </form>
+                {students.length != 0 ? <form action={createScore} className="py-3 px-2 hover:bg-primary-400">
+                    <ScoreModal>
+                        <select className="bg-transparent py-4 outline outline-1 outline-outline rounded focus:outline-primary-500 focus:outline-2" name="studentId" id="">
+                            <option value="">---</option>
+                            {
+                                students.map((m) => (<option value={Number(m.id)}>{m.lastName} {m.fistName}</option>))
+                            }
+                        </select>
+                        <input className="bg-transparent py-3 outline outline-1 outline-outline rounded focus:outline-primary-500 focus:outline-2" type="number" name="score" id="" />
+                    </ScoreModal></form> : <></>}
             </div>
         </>
     )
