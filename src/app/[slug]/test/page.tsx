@@ -105,10 +105,10 @@ export default async function Page({ params }: Props) {
                     <div className="text-center">
                         <h2 className="text-2xl">1° Trimestre</h2>
                     </div>
-                    <div className="flex flex-col gap-2 px-2 my-5 divide-y divide-black bg-primary-100 rounded-xl border text-center justify-center">
+                    <div className="flex flex-col my-5 divide-y divide-black bg-primary-100 rounded-xl border text-center justify-center">
                         {dividedTests[0].map((t) => (
                             <Link href={`/${params.slug}/test/${t.id}`}>
-                                <div className="flex flex-col hover:bg-primary-200">
+                                <div className="flex flex-col hover:bg-primary-200 rounded-xl">
                                     <p className="font-bold text-xl">{t.title} | {t.subject} | {t.course}</p>
                                     <p>{t.date.toLocaleDateString()}</p>
                                 </div>
@@ -120,10 +120,10 @@ export default async function Page({ params }: Props) {
                     <div className="text-center">
                         <h2 className="text-2xl">2° Trimestre</h2>
                     </div>
-                    <div className="flex flex-col gap-2 px-2 my-5 divide-y divide-black bg-primary-100 rounded-xl border text-center justify-center">
+                    <div className="flex flex-col my-5 divide-y divide-black bg-primary-100 rounded-xl border text-center justify-center">
                         {dividedTests[1].map((t) => (
                             <Link href={`/${params.slug}/test/${t.id}`}>
-                                <div className="flex flex-col hover:bg-primary-200">
+                                <div className="flex flex-col hover:bg-primary-200 rounded-xl">
                                     <p className="font-bold text-xl">{t.title} | {t.subject} | {t.course}</p>
                                     <p>{t.date.toLocaleDateString()}</p>
                                 </div>
@@ -135,10 +135,10 @@ export default async function Page({ params }: Props) {
                     <div className="text-center">
                         <h2 className="text-2xl">3° Trimestre</h2>
                     </div>
-                    <div className="flex flex-col gap-2 px-2 my-5 divide-y divide-black bg-primary-100 rounded-xl border text-center justify-center">
+                    <div className="flex flex-col my-5 divide-y divide-black bg-primary-100 rounded-xl border text-center justify-center">
                         {dividedTests[2].map((t) => (
                             <Link href={`/${params.slug}/test/${t.id}`}>
-                                <div className="flex flex-col hover:bg-primary-200">
+                                <div className="flex flex-col hover:bg-primary-200 rounded-xl">
                                     <p className="font-bold text-xl">{t.title} | {t.subject} | {t.course}</p>
                                     <p>{t.date.toLocaleDateString()}</p>
                                 </div>
