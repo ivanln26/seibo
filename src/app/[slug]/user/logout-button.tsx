@@ -6,8 +6,10 @@ import Button from "@/components/button";
 
 export default function LogOutButton() {
   return (
-    <Button onClick={() => signOut()}>
-      Cerrar Sesión
-    </Button>
+    <div>
+      <Button onClick={() => signOut()}>
+        Cerrar Sesión
+      </Button>
+    </div>
   );
 }
