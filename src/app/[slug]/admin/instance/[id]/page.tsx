@@ -1,6 +1,6 @@
 import { db } from "@/db/db"
 import { getUserProfile } from "@/db/queries"
-import { instance, course, grade, user, classroom, schoolUser } from "@/db/schema"
+import { instance, course, grade, user, classroom, schoolUser, courseProfessor } from "@/db/schema"
 import { eq, and } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
@@ -19,9 +19,12 @@ export default async function Page({ params }: Props) {
     const school = await db.query.school.findFirst({
         where: (school, { eq }) => eq(school.slug, params.slug)
     })
-
+    
     const actualInstance = await db.query.instance.findFirst({
         where: (instance, { eq }) => eq(instance.id, params.id)
+    })
+    const actualCourseProfessor = await db.query.courseProfessor.findFirst({
+        where: (cp, {eq}) => and(eq(cp.courseId, instance.courseId), eq(cp.professorId, instance.professorId))
     })
     if (!profile || !school || !actualInstance) return <>Error</>
 
@@ -52,13 +55,22 @@ export default async function Page({ params }: Props) {
             classroomId: Number(data.get("classroomId")),
             professorId: Number(data.get("professorId"))
         });
-        if (!newInstance.success) {
-            console.log(newInstance.error)
-            return;
-        }
+        const newCourseProfessor = z.object({
+            id: z.number(),
+            professorId: z.number(),
+            courseId: z.number()
+        }).safeParse({
+            id: actualCourseProfessor?.id,
+            professorId: Number(data.get("professorId")),
+            courseId: Number(data.get("courseId")),
+        })
+        if (!newInstance.success || !newCourseProfessor.success) return;
 
         await db.update(instance).set(newInstance.data)
             .where(eq(instance.id, newInstance.data.id));
+
+        await db.update(courseProfessor).set(newCourseProfessor.data)
+            .where(eq(courseProfessor.id, newCourseProfessor.data.id));
 
         redirect(`/${params.slug}/admin/instance`)
     }
