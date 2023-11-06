@@ -78,8 +78,11 @@ export default async function Page({ params }: Props) {
     async function deleteInstance() {
         "use server"
         const id = z.number().safeParse(Number(params.id));
-        if (!id.success) return;
+        const cpId = z.number().safeParse(Number(actualCourseProfessor?.id));
+        if (!id.success || !cpId.success) return;
+        
         await db.delete(instance).where(eq(instance.id, id.data));
+        await db.delete(courseProfessor).where(eq(courseProfessor.id, cpId.data));
         redirect(`/${params.slug}/admin/instance`);
     }
 
