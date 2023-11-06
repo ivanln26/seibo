@@ -2,7 +2,7 @@
 import Modal from "@/components/modal"
 import { db } from "@/db/db"
 import { getUserProfile } from "@/db/queries"
-import { classroom, course, grade, instance, schoolUser, user } from "@/db/schema"
+import { classroom, course, grade, instance, schoolUser, user, courseProfessor } from "@/db/schema"
 import { and, eq } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 import Link from "next/link"
@@ -51,9 +51,19 @@ export default async function Page({ params }: Props) {
             classroomId: Number(data.get("classroomId")),
             professorId: Number(data.get("professorId"))
         });
-        if (!newInstance.success) return;
+        
+        const newCourseProfessor = z.object({
+            professorId: z.number(),
+            courseId: z.number()
+        }).safeParse({
+            professorId: Number(data.get("professorId")),
+            courseId: Number(data.get("courseId")),
+        })
+        if (!newInstance.success || !newCourseProfessor.success) return;
+
 
         await db.insert(instance).values(newInstance.data);
+        await db.insert(courseProfessor).values(newCourseProfessor.data);
         revalidatePath(`/${params.slug}/admin/instance`)
     }
 
