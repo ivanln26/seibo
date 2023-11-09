@@ -8,14 +8,7 @@ import TimeInput from "./time-input";
 import { getUser } from "../../lecture/utils";
 import Modal from "@/components/modal";
 import { db } from "@/db/db";
-import {
-  course,
-  grade,
-  instance,
-  schedule,
-  school,
-  user as User,
-} from "@/db/schema";
+import { course, grade, instance, schedule, user as User } from "@/db/schema";
 
 type Props = {
   params: {
@@ -89,22 +82,30 @@ export default async function Page({ params }: Props) {
             {schedules.map((s) => (
               <tr>
                 <td className="border border-black">
-                  <Link href={`/${params.slug}/admin/schedule/${s.schedule.id}`}>
+                  <Link
+                    href={`/${params.slug}/admin/schedule/${s.schedule.id}`}
+                  >
                     {s.course.name}
                   </Link>
                 </td>
                 <td className="border border-black">
-                  <Link href={`/${params.slug}/admin/schedule/${s.schedule.id}`}>
+                  <Link
+                    href={`/${params.slug}/admin/schedule/${s.schedule.id}`}
+                  >
                     {s.schedule.weekday}
                   </Link>
                 </td>
                 <td className="border border-black">
-                  <Link href={`/${params.slug}/admin/schedule/${s.schedule.id}`}>
+                  <Link
+                    href={`/${params.slug}/admin/schedule/${s.schedule.id}`}
+                  >
                     {s.schedule.startTime} - {s.schedule.endTime}
                   </Link>
                 </td>
                 <td className="border border-black">
-                  <Link href={`/${params.slug}/admin/schedule/${s.schedule.id}`}>
+                  <Link
+                    href={`/${params.slug}/admin/schedule/${s.schedule.id}`}
+                  >
                     {s.grade.name}
                   </Link>
                 </td>

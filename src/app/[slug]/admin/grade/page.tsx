@@ -1,14 +1,14 @@
 import { and, eq } from "drizzle-orm";
+import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import Link from "next/link";
-import { getServerSession } from "next-auth";
 import { z } from "zod";
 
-import TextField from "@/components/text-field";
 import { getUser } from "../../lecture/utils";
 import Modal from "@/components/modal";
+import TextField from "@/components/text-field";
 import { db } from "@/db/db";
-import {grade} from "@/db/schema";
+import { grade } from "@/db/schema";
 
 type Props = {
   params: {
@@ -19,10 +19,10 @@ type Props = {
 export default async function Page({ params }: Props) {
   const session = await getServerSession();
   if (!session) return <>Error al obtener la sesión.</>;
-  
+
   const user = await getUser(session);
   if (!user) return <>Error al obtener el usuario.</>;
-  
+
   const actualSchool = await db.query.school.findFirst({
     where: (school, { eq }) => eq(school.slug, params.slug),
   });
@@ -38,7 +38,7 @@ export default async function Page({ params }: Props) {
     "use server";
     const gradeType = z.object({
       name: z.string(),
-      schoolId: z.number()
+      schoolId: z.number(),
     });
     const newGrade = gradeType.safeParse({
       name: data.get("name"),
@@ -50,7 +50,7 @@ export default async function Page({ params }: Props) {
 
     await db.insert(grade).values({
       name: newGrade.data.name,
-      schoolId: newGrade.data.schoolId
+      schoolId: newGrade.data.schoolId,
     });
     revalidatePath(`${params.slug}/admin/grade`);
   }

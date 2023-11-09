@@ -48,19 +48,28 @@ export default async function Page({ params }: Props) {
         <table className="w-full table-auto border-collapse">
           <thead>
             <tr>
-              {["Nombre", "Temas"].map((c) => (<th className="py-1 text-primary-900 border border-neutral-variant-50 bg-primary-100 dark:text-primary-100 dark:border-neutral-variant-60 dark:bg-primary-700">{c}</th>))}
+              {["Nombre", "Temas"].map((c) => (
+                <th className="py-1 text-primary-900 border border-neutral-variant-50 bg-primary-100 dark:text-primary-100 dark:border-neutral-variant-60 dark:bg-primary-700">
+                  {c}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
             {courses.map((c) => (
               <tr>
                 <td className="text-center border border-neutral-variant-50 dark:border-neutral-variant-60">
-                  <Link href={`/${params.slug}/admin/course/${c.id}`}>{c.name}</Link>
+                  <Link href={`/${params.slug}/admin/course/${c.id}`}>
+                    {c.name}
+                  </Link>
                 </td>
                 <td className="text-center border border-neutral-variant-50 dark:border-neutral-variant-60">
-                  <Link href={`/${params.slug}/admin/course/${c.id}`}>{c.topics}</Link>
+                  <Link href={`/${params.slug}/admin/course/${c.id}`}>
+                    {c.topics}
+                  </Link>
                 </td>
-              </tr>))}
+              </tr>
+            ))}
           </tbody>
         </table>
       </section>

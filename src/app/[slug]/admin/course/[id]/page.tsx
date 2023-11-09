@@ -11,13 +11,14 @@ import TextField from "@/components/text-field";
 
 type Props = {
   params: {
-    slug: string,
+    slug: string;
     id: number;
   };
 };
 
 export default async function Page({ params }: Props) {
-  const actualCourse = (await db.select().from(course).where(eq(course.id, params.id)))[0];
+  const actualCourse =
+    (await db.select().from(course).where(eq(course.id, params.id)))[0];
 
   const update = async (formData: FormData) => {
     "use server";
