@@ -1,4 +1,15 @@
 import Link from "next/link";
+import { z } from "zod";
+
+export const querySchema = z.object({
+  page: z.coerce.number()
+    .min(1, { message: "El número no puede ser menor a 1." })
+    .default(1),
+  limit: z.coerce.number()
+    .min(1, { message: "El número no puede ser menor a 1." })
+    .max(100, { message: "El número no puede ser mayor a 100." })
+    .default(50),
+});
 
 type TableProps<TData> = {
   title: string;

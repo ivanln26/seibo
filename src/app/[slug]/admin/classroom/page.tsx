@@ -2,7 +2,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import Modal from "@/components/modal";
-import Table from "@/components/table";
+import Table, { querySchema } from "@/components/table";
 import TextField from "@/components/text-field";
 import { db } from "@/db/db";
 import { classroom } from "@/db/schema";
@@ -19,6 +19,8 @@ type Props = {
 export const revalidate = 0;
 
 export default async function Page({ params, searchParams }: Props) {
+  const query = querySchema.parse(searchParams);
+
   const school = await db.query.school.findFirst({
     where: (school, { eq }) => eq(school.slug, params.slug),
   });
@@ -27,6 +29,8 @@ export default async function Page({ params, searchParams }: Props) {
 
   const classrooms = await db.query.classroom.findMany({
     where: (classroom, { eq }) => eq(classroom.schoolId, school.id),
+    limit: query.limit,
+    offset: (query.page - 1) * query.limit,
   });
 
   const create = async (formData: FormData) => {
@@ -58,7 +62,7 @@ export default async function Page({ params, searchParams }: Props) {
         ]}
         href={`/${params.slug}/admin/classroom`}
         detail="id"
-        page={Number(searchParams["page"]) || 1}
+        page={query.page}
       />
       <div className="fixed bottom-5 right-10">
         <form action={create}>
