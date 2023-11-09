@@ -21,6 +21,7 @@ type TableProps<TData> = {
   href: string;
   detail: keyof TData;
   page: number;
+  limit: number;
 };
 
 export default function Table<TData,>({
@@ -30,6 +31,7 @@ export default function Table<TData,>({
   href,
   detail,
   page,
+  limit,
 }: TableProps<TData>) {
   return (
     <div className="flex flex-col gap-y-2 p-4 rounded-lg outline outline-1 outline-outline">
@@ -67,9 +69,37 @@ export default function Table<TData,>({
           ))}
         </tbody>
       </table>
+      <div className="flex justify-end gap-x-2">
+        <p className="py-1">Elementos:</p>
+        <ul className="flex gap-x-2">
+          {[10, 25, 50, 100].map((n) => (
+            <li className={`px-3 py-1 rounded-full ${limit === n ? "bg-primary-100 text-primary-900 dark:bg-primary-700 dark:text-primary-100" : "outline outline-1 outline-outline"} `}>
+              <Link
+                href={{
+                  pathname: href,
+                  query: {
+                    page: page,
+                    limit: n,
+                  },
+                }}
+              >
+                {n}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
       <ul className="flex gap-x-4 px-2 justify-end">
         <li className="py-1">
-          <Link href={`${href}?page=${page - 1}`}>
+          <Link
+            href={{
+              pathname: href,
+              query: {
+                page: page === 1 ? page : page - 1,
+                limit: limit,
+              },
+            }}
+          >
             Prev
           </Link>
         </li>
@@ -77,7 +107,15 @@ export default function Table<TData,>({
           {page}
         </li>
         <li className="py-1">
-          <Link href={`${href}?page=${page + 1}`}>
+          <Link
+            href={{
+              pathname: href,
+              query: {
+                page: page + 1,
+                limit: limit,
+              },
+            }}
+          >
             Next
           </Link>
         </li>

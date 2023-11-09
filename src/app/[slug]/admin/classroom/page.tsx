@@ -63,6 +63,7 @@ export default async function Page({ params, searchParams }: Props) {
         href={`/${params.slug}/admin/classroom`}
         detail="id"
         page={query.page}
+        limit={query.limit}
       />
       <div className="fixed bottom-5 right-10">
         <form action={create}>
