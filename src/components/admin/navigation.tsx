@@ -7,6 +7,7 @@ type Props = {
 
 const adminNavButtons: AdminNavigationButtonProps[] = [
   { name: "Aula", href: "classroom" },
+  { name: "Clase", href: "instance" },
   { name: "Horario", href: "schedule" },
   { name: "Materia", href: "course" },
   { name: "Estudiante", href: "student" },
