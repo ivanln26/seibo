@@ -5,6 +5,7 @@ import Description from "./description";
 import Home from "./home";
 import Menu from "./menu";
 import Person from "./person";
+import Search from "./search";
 
 export type Icon =
   | "add"
@@ -13,7 +14,8 @@ export type Icon =
   | "description"
   | "home"
   | "menu"
-  | "person";
+  | "person"
+  | "search";
 
 export type IconProps = {
   height: number;
@@ -38,6 +40,8 @@ export default function Icon({ icon, ...props }: IconPickerProps) {
       return <Menu {...props} />;
     case "person":
       return <Person {...props} />;
+    case "search":
+      return <Search {...props} />;
     default:
       return <Add {...props} />;
   }

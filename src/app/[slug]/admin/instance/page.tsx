@@ -1,9 +1,9 @@
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import Link from "next/link";
 import { z } from "zod";
 
 import Modal from "@/components/modal";
+import Table, { querySchema } from "@/components/table";
 import { db } from "@/db/db";
 import {
   classroom,
@@ -20,15 +20,31 @@ type Props = {
   params: {
     slug: string;
   };
+  searchParams: {
+    page?: string;
+    limit?: string;
+    query?: string;
+  };
 };
-export default async function Page({ params }: Props) {
+
+export default async function Page({ params, searchParams }: Props) {
+  const query = querySchema.parse(searchParams);
+
   const profile = await getUserProfile({ slug: params.slug });
   const school = await db.query.school.findFirst({
     where: (school, { eq }) => eq(school.slug, params.slug),
   });
   if (!profile || !school) return <>Error</>;
 
-  const instances = await db.select().from(instance)
+  const instances = await db
+    .select({
+      id: instance.id,
+      course: course.name,
+      grade: grade.name,
+      professor: user.name,
+      classroom: classroom.name,
+    })
+    .from(instance)
     .innerJoin(course, eq(instance.courseId, course.id))
     .innerJoin(grade, eq(instance.gradeId, grade.id))
     .innerJoin(user, eq(instance.professorId, user.id))
@@ -82,41 +98,21 @@ export default async function Page({ params }: Props) {
 
   return (
     <>
-      <h1 className="text-4xl">Clases</h1>
-      <table>
-        <tbody>
-          <tr className="bg-primary-100">
-            <td className="border border-black">Materia</td>
-            <td className="border border-black">Curso</td>
-            <td className="border border-black">Profesor</td>
-            <td className="border border-black">Aula</td>
-          </tr>
-          {instances.map((i) => (
-            <tr>
-              <td className="border border-black">
-                <Link href={`/${params.slug}/admin/instance/${i.instance.id}`}>
-                  {i.course.name}
-                </Link>
-              </td>
-              <td className="border border-black">
-                <Link href={`/${params.slug}/admin/instance/${i.instance.id}`}>
-                  {i.grade.name}
-                </Link>
-              </td>
-              <td className="border border-black">
-                <Link href={`/${params.slug}/admin/instance/${i.instance.id}`}>
-                  {i.user.name}
-                </Link>
-              </td>
-              <td className="border border-black">
-                <Link href={`/${params.slug}/admin/instance/${i.instance.id}`}>
-                  {i.classroom.name}
-                </Link>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <Table
+        title="Clases"
+        data={instances}
+        columns={[
+          { attr: "id", name: "ID" },
+          { attr: "course", name: "Materia" },
+          { attr: "grade", name: "Curso" },
+          { attr: "professor", name: "Profesor" },
+          { attr: "classroom", name: "Aula" },
+        ]}
+        href={`/${params.slug}/admin/instance`}
+        detail="id"
+        page={query.page}
+        limit={query.limit}
+      />
       <form className="fixed bottom-10 right-10" action={createInstance}>
         <Modal
           buttonText="Crear"

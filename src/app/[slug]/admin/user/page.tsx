@@ -1,8 +1,8 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { getServerSession } from "next-auth";
-import Link from "next/link";
 
 import { getUser } from "../../lecture/utils";
+import Table, { querySchema } from "@/components/table";
 import { db } from "@/db/db";
 import { schoolUser, user } from "@/db/schema";
 
@@ -11,9 +11,16 @@ type Props = {
     slug: string;
     id: string;
   };
+  searchParams: {
+    page?: string;
+    limit?: string;
+    query?: string;
+  };
 };
 
-export default async function Page({ params }: Props) {
+export default async function Page({ params, searchParams }: Props) {
+  const query = querySchema.parse(searchParams);
+
   const currentSchool = await db.query.school.findFirst({
     where: (school, { eq }) => eq(school.slug, params.slug),
   });
@@ -23,7 +30,14 @@ export default async function Page({ params }: Props) {
   const currentUser = await getUser(session);
   if (!currentUser) return <>Error al obtener el usuario.</>;
 
-  const users = await db.select()
+  const users = await db
+    .select({
+      id: schoolUser.id,
+      name: user.name,
+      email: user.email,
+      role: schoolUser.role,
+      isActive: sql<string>`if(${schoolUser.isActive}, "Alta", "Baja")`,
+    })
     .from(user)
     .innerJoin(schoolUser, eq(user.id, schoolUser.userId))
     .where(and(
@@ -31,46 +45,20 @@ export default async function Page({ params }: Props) {
     ));
 
   return (
-    <section className="flex flex-col gap-5 ml-2">
-      <h1 className="text-4xl">Usuarios</h1>
-      <div className="w-full">
-        <table className="w-full">
-          <tbody>
-            <tr className="bg-primary-100">
-              <td className="border border-black">Nombre y apellido</td>
-              <td className="border border-black">email</td>
-              <td className="border border-black">Rol</td>
-              <td className="border border-black">Estado</td>
-            </tr>
-            {users.map((u) => (
-              <tr>
-                <td className="border border-black">
-                  <Link href={`/${params.slug}/admin/user/${u.user.id}`}>
-                    {u.user.name}
-                  </Link>
-                </td>
-                <td className="border border-black">
-                  <Link href={`/${params.slug}/admin/user/${u.user.id}`}>
-                    {u.user.email}
-                  </Link>
-                </td>
-                <td className="border border-black">
-                  <Link href={`/${params.slug}/admin/user/${u.user.id}`}>
-                    {u.school_user.role}
-                  </Link>
-                </td>
-                <td className="border border-black">
-                  <Link href={`/${params.slug}/admin/user/${u.user.id}`}>
-                    {u.school_user.isActive ? "alta" : "baja"}
-                  </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="fixed bottom-5 right-10">
-      </div>
-    </section>
+    <Table
+      title="Usuarios"
+      data={users}
+      columns={[
+        { attr: "id", name: "ID" },
+        { attr: "name", name: "Nombre" },
+        { attr: "email", name: "Email" },
+        { attr: "role", name: "Rol" },
+        { attr: "isActive", name: "Estado" },
+      ]}
+      href={`/${params.slug}/admin/user`}
+      detail="id"
+      page={query.page}
+      limit={query.limit}
+    />
   );
 }
