@@ -12,7 +12,9 @@ type Props = {
     slug: string;
   };
   searchParams: {
-    [key: string]: string | string[] | undefined;
+    page?: string;
+    limit?: string;
+    query?: string;
   };
 };
 

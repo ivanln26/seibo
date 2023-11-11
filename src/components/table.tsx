@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { z } from "zod";
 
-import TableSearch from "@/components/table-search";
+// FIXME: `like` search does not work with drizzle-orm.
+// https://github.com/drizzle-team/drizzle-orm/issues/1141
+// import TableSearch from "@/components/table-search";
 
 export const querySchema = z.object({
   page: z.coerce.number()
@@ -11,6 +13,7 @@ export const querySchema = z.object({
     .min(1, { message: "El número no puede ser menor a 1." })
     .max(100, { message: "El número no puede ser mayor a 100." })
     .default(50),
+  query: z.string().default(""),
 });
 
 type TableProps<TData> = {
@@ -38,7 +41,7 @@ export default function Table<TData,>({
   return (
     <div className="flex flex-col gap-y-2 p-4 rounded-lg outline outline-1 outline-outline">
       <h1 className="text-4xl">{title}</h1>
-      <TableSearch />
+      {/* <TableSearch /> */}
       <table className="table-auto w-full">
         <thead className="bg-primary-100 text-primary-900 dark:bg-primary-700 dark:text-primary-100">
           <tr>
