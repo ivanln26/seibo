@@ -10,6 +10,7 @@ type SwitchProps = {
 
 export default function Switch({ id, name, checked = false }: SwitchProps) {
   const [check, setCheck] = useState(checked);
+
   return (
     <label className="relative" htmlFor={id}>
       <input
