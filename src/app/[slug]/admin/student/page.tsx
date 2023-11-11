@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { getUser } from "../../lecture/utils";
 import Modal from "@/components/modal";
+import Table, { querySchema } from "@/components/table";
 import TextField from "@/components/text-field";
 import { db } from "@/db/db";
 import { grade, student, studentContact, studentGrade } from "@/db/schema";
@@ -14,9 +15,16 @@ type Props = {
   params: {
     slug: string;
   };
+  searchParams: {
+    page?: string;
+    limit?: string;
+    query?: string;
+  };
 };
 
-export default async function Page({ params }: Props) {
+export default async function Page({ params, searchParams }: Props) {
+  const query = querySchema.parse(searchParams);
+
   const currentSchool = await db.query.school.findFirst({
     where: (school, { eq }) => eq(school.slug, params.slug),
   });
@@ -30,7 +38,14 @@ export default async function Page({ params }: Props) {
     .from(grade)
     .where(eq(grade.schoolId, currentSchool.id));
 
-  const users = await db.select()
+  const students = await db
+    .select({
+      id: student.id,
+      lastName: student.lastName,
+      firstName: student.firstName,
+      email: student.email,
+      code: student.studentCode,
+    })
     .from(student)
     .where(eq(student.schoolId, currentSchool.id));
 
@@ -92,100 +107,82 @@ export default async function Page({ params }: Props) {
     revalidatePath(`/${params.slug}/student`);
   }
   return (
-    <section className="flex flex-col gap-5 ml-2">
-      <h1 className="text-4xl">Estudiantes</h1>
-      <div className="w-full">
-        <table className="w-full">
-          <tbody>
-            <tr className="bg-primary-100">
-              <td className="border border-black">Nombre y apellido</td>
-              <td className="border border-black">email</td>
-              <td className="border border-black">Legajo</td>
-            </tr>
-            {users.map((u) => (
-              <tr>
-                <td className="border border-black">
-                  <Link href={`/${params.slug}/admin/student/${u.id}`}>
-                    {u.firstName} {u.lastName}
-                  </Link>
-                </td>
-                <td className="border border-black">
-                  <Link href={`/${params.slug}/admin/student/${u.id}`}>
-                    {u.email}
-                  </Link>
-                </td>
-                <td className="border border-black">
-                  <Link href={`/${params.slug}/admin/student/${u.id}`}>
-                    {u.studentCode}
-                  </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="fixed bottom-5 right-10">
-        <form action={create}>
-          <Modal
-            buttonText="Crear"
-            confirmButton={{ text: "Guardar", type: "submit" }}
-          >
-            <div className="grid grid-cols-2 gap-4">
-              <TextField
-                id=""
-                name="studentFirstName"
-                label="Nombre"
-                required
-              />
-              <TextField
-                id=""
-                name="studentLastName"
-                label="Apellido"
-                required
-              />
-              <TextField id="" name="studentEmail" label="E-mail" required />
-              <TextField id="" name="studentCode" label="Legajo" required />
-              <div className="flex-none basis-1/2 grow w-full">
-                <label htmlFor="" className="mt-4">Curso*</label>
-                <select
-                  name="studentGrade"
-                  className=" outline outline-1 outline-outline rounded p-4 w-full"
-                >
-                  <option value="">----</option>
-                  {grades.map((c) => <option value={c.id}>{c.name}</option>)}
-                </select>
-              </div>
-            </div>
-            <label htmlFor="" className="text-xl basis-full">
-              Padre/Madre/Tutor
-            </label>
-            <input
-              type="hidden"
-              name="studentSchool"
-              value={1} // TODO: Cambiar por colegio
+    <>
+      <Table
+        title="Estudiantes"
+        data={students}
+        columns={[
+          { attr: "id", name: "ID" },
+          { attr: "code", name: "Legajo" },
+          { attr: "lastName", name: "Apellido" },
+          { attr: "firstName", name: "Nombre" },
+          { attr: "email", name: "Email" },
+        ]}
+        href={`/${params.slug}/admin/student`}
+        detail="id"
+        page={query.page}
+        limit={query.limit}
+      />
+      <form className="fixed bottom-5 right-10" action={create}>
+        <Modal
+          buttonText="Crear"
+          confirmButton={{ text: "Guardar", type: "submit" }}
+        >
+          <div className="grid grid-cols-2 gap-4">
+            <TextField
+              id=""
+              name="studentFirstName"
+              label="Nombre"
+              required
             />
-            <div className="grid grid-cols-2 gap-4 border rounded-lg p-2">
-              <TextField label="Nombre y apellido" name="contactName" id="" />
-              <TextField label="E-mail" name="contactEmail" id="" />
-              <TextField label="telefono" name="contactPhone" id="" />
-              <div className="flex flex-col justify-center">
-                <label htmlFor="">Tipo</label>
-                <select
-                  name="contactType"
-                  id=""
-                  className=" outline outline-1 outline-outline rounded p-4 w-full"
-                >
-                  <option value="-">---</option>
-                  <option value="father">Padre</option>
-                  <option value="mother">Madre</option>
-                  <option value="tutor">Tutor</option>
-                  <option value="other">Otro</option>
-                </select>
-              </div>
+            <TextField
+              id=""
+              name="studentLastName"
+              label="Apellido"
+              required
+            />
+            <TextField id="" name="studentEmail" label="E-mail" required />
+            <TextField id="" name="studentCode" label="Legajo" required />
+            <div className="flex-none basis-1/2 grow w-full">
+              <label htmlFor="" className="mt-4">Curso*</label>
+              <select
+                name="studentGrade"
+                className=" outline outline-1 outline-outline rounded p-4 w-full"
+              >
+                <option value="">----</option>
+                {grades.map((c) => <option value={c.id}>{c.name}</option>)}
+              </select>
             </div>
-          </Modal>
-        </form>
-      </div>
-    </section>
+          </div>
+          <label htmlFor="" className="text-xl basis-full">
+            Padre/Madre/Tutor
+          </label>
+          <input
+            type="hidden"
+            name="studentSchool"
+            value={1} // TODO: Cambiar por colegio
+          />
+          <div className="grid grid-cols-2 gap-4 border rounded-lg p-2">
+            <TextField label="Nombre y apellido" name="contactName" id="" />
+            <TextField label="E-mail" name="contactEmail" id="" />
+            <TextField label="telefono" name="contactPhone" id="" />
+            <div className="flex flex-col justify-center">
+              <label htmlFor="">Tipo</label>
+              <select
+                name="contactType"
+                id=""
+                className=" outline outline-1 outline-outline rounded p-4 w-full"
+              >
+                <option value="-">---</option>
+                <option value="father">Padre</option>
+                <option value="mother">Madre</option>
+                <option value="tutor">Tutor</option>
+                <option value="other">Otro</option>
+              </select>
+            </div>
+          </div>
+        </Modal>
+      </form>
+    </>
   );
 }
