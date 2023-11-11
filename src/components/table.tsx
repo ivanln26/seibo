@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { z } from "zod";
 
+import TableSearch from "@/components/table-search";
+
 export const querySchema = z.object({
   page: z.coerce.number()
     .min(1, { message: "El número no puede ser menor a 1." })
@@ -36,6 +38,7 @@ export default function Table<TData,>({
   return (
     <div className="flex flex-col gap-y-2 p-4 rounded-lg outline outline-1 outline-outline">
       <h1 className="text-4xl">{title}</h1>
+      <TableSearch />
       <table className="table-auto w-full">
         <thead className="bg-primary-100 text-primary-900 dark:bg-primary-700 dark:text-primary-100">
           <tr>
