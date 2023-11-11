@@ -73,7 +73,13 @@ export default function Table<TData,>({
         <p className="py-1">Elementos:</p>
         <ul className="flex gap-x-2">
           {[10, 25, 50, 100].map((n) => (
-            <li className={`px-3 py-1 rounded-full ${limit === n ? "bg-primary-100 text-primary-900 dark:bg-primary-700 dark:text-primary-100" : "outline outline-1 outline-outline"} `}>
+            <li
+              className={`px-3 py-1 rounded-full ${
+                limit === n
+                  ? "bg-primary-100 text-primary-900 dark:bg-primary-700 dark:text-primary-100"
+                  : "outline outline-1 outline-outline"
+              } `}
+            >
               <Link
                 href={{
                   pathname: href,
@@ -90,35 +96,39 @@ export default function Table<TData,>({
         </ul>
       </div>
       <ul className="flex gap-x-4 px-2 justify-end">
-        <li className="py-1">
-          <Link
-            href={{
-              pathname: href,
-              query: {
-                page: page === 1 ? page : page - 1,
-                limit: limit,
-              },
-            }}
-          >
-            Prev
-          </Link>
-        </li>
+        {page !== 1 && (
+          <li className="py-1">
+            <Link
+              href={{
+                pathname: href,
+                query: {
+                  page: page - 1,
+                  limit: limit,
+                },
+              }}
+            >
+              Anterior
+            </Link>
+          </li>
+        )}
         <li className="px-3 py-1 rounded-full bg-primary-100 text-primary-900 dark:bg-primary-700 dark:text-primary-100">
           {page}
         </li>
-        <li className="py-1">
-          <Link
-            href={{
-              pathname: href,
-              query: {
-                page: page + 1,
-                limit: limit,
-              },
-            }}
-          >
-            Next
-          </Link>
-        </li>
+        {data.length === limit && (
+          <li className="py-1">
+            <Link
+              href={{
+                pathname: href,
+                query: {
+                  page: page + 1,
+                  limit: limit,
+                },
+              }}
+            >
+              Siguiente
+            </Link>
+          </li>
+        )}
       </ul>
     </div>
   );
