@@ -1,14 +1,12 @@
 import { and, eq, sql } from "drizzle-orm";
-import { getServerSession } from "next-auth";
+import { revalidatePath } from "next/cache";
+import { z } from "zod";
 
-import { getUser } from "../../lecture/utils";
+import Modal from "@/components/modal";
 import Table, { querySchema } from "@/components/table";
+import TextField from "@/components/text-field";
 import { db } from "@/db/db";
 import { schoolUser, user } from "@/db/schema";
-import Modal from "@/components/modal";
-import TextField from "@/components/text-field";
-import { z } from "zod";
-import { revalidatePath } from "next/cache";
 
 type Props = {
   params: {
@@ -29,10 +27,6 @@ export default async function Page({ params, searchParams }: Props) {
     where: (school, { eq }) => eq(school.slug, params.slug),
   });
   if (!currentSchool) return <>Error al obtener el colegio.</>;
-  const session = await getServerSession();
-  if (!session) return <>Error al obtener la sesión.</>;
-  const currentUser = await getUser(session);
-  if (!currentUser) return <>Error al obtener el usuario.</>;
 
   const users = await db
     .select({
@@ -49,40 +43,41 @@ export default async function Page({ params, searchParams }: Props) {
     ));
 
   async function createUser(data: FormData) {
-    "use server"
+    "use server";
 
     const newUser = z.object({
       name: z.string(),
-      email: z.string()
+      email: z.string(),
     }).safeParse({
       name: data.get("name"),
-      email: data.get("email")
+      email: data.get("email"),
     });
     if (!newUser.success) return;
     await db.insert(user).values(newUser.data);
     const userId = await db.query.user.findFirst({
       columns: {
-        id: true
+        id: true,
       },
-      where: (u, {eq}) => eq(u.email, newUser.data.email)
-    })
+      where: (u, { eq }) => eq(u.email, newUser.data.email),
+    });
 
     const newSchoolUser = z.object({
       schoolId: z.number(),
       userId: z.number(),
       role: z.enum(["teacher", "tutor", "principal", "admin"]),
-      isActive: z.boolean()
+      isActive: z.boolean(),
     }).safeParse({
       schoolId: currentSchool?.id,
       userId: userId?.id,
       role: data.get("role"),
-      isActive: Boolean(data.get("isActive"))
-    })
-    if(!newSchoolUser.success){
+      isActive: Boolean(data.get("isActive")),
+    });
+    if (!newSchoolUser.success) {
       console.log(newSchoolUser.error);
-      return;}
-    await db.insert(schoolUser).values(newSchoolUser.data)
-    revalidatePath(`/${params.slug}/admin/user`)
+      return;
+    }
+    await db.insert(schoolUser).values(newSchoolUser.data);
+    revalidatePath(`/${params.slug}/admin/user`);
   }
 
   return (

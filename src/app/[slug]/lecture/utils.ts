@@ -39,15 +39,6 @@ export async function getStudents(courseID: number) {
     .where(eq(courseGrade.courseId, courseID));
 }
 
-export async function getUser(session: Session) {
-  return await db.query.user.findFirst({
-    where: (user, { eq }) => eq(user.email, session.user.email),
-    with: {
-      profiles: { where: (profile, { eq }) => eq(profile.isActive, true) },
-    },
-  });
-}
-
 export function getMonday(d: Date) {
   d = new Date(d);
   const day = d.getDay();
