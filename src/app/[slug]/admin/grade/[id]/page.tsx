@@ -73,7 +73,7 @@ export default async function Page({ params }: Props) {
           />
           <Button color="tertiary" type="submit">Guardar</Button>
         </form>
-        <form action={deleteGrade}>
+        <form action={deleteGrade} className="relative -top-[60px] left-28">
           <input type="hidden" value={params.id} name="id" />
           <Button color="error" type="submit">Borrar</Button>
         </form>
