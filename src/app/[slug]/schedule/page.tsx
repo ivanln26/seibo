@@ -17,7 +17,7 @@ export default async function Page({ params }: Props) {
     where: (sc, { eq }) => eq(sc.slug, params.slug),
   });
 
-  const schedules = await db.select().from(schedule)
+  const userSchedules = await db.select().from(schedule)
     .innerJoin(instance, eq(schedule.instanceId, instance.id))
     .innerJoin(course, eq(instance.courseId, course.id))
     .innerJoin(grade, eq(instance.gradeId, grade.id))
@@ -25,8 +25,17 @@ export default async function Page({ params }: Props) {
     .where(eq(instance.professorId, profile.id))
     .orderBy(schedule.weekday, schedule.startTime);
 
-  console.log(schedules);
+  const allSchedules = await db.select().from(schedule)
+    .innerJoin(instance, eq(schedule.instanceId, instance.id))
+    .innerJoin(course, eq(instance.courseId, course.id))
+    .innerJoin(grade, eq(instance.gradeId, grade.id))
+    .innerJoin(classroom, eq(instance.classroomId, classroom.id))
+    .where(eq(grade.schoolId, Number(actualSchool?.id)))
+    .orderBy(schedule.weekday, schedule.startTime);
+
   if (!profile || !actualSchool) return <>Error</>;
+
+  const schedules = profile.profiles.find((r) => r.role === "admin") ? allSchedules : userSchedules
 
   const weekSchedules = {
     monday: schedules.filter((s) => s.schedule.weekday === "monday"),
