@@ -77,7 +77,7 @@ export default async function Page({ params }: Props) {
           <label htmlFor="">Clase</label>
           <select
             name="instanceID"
-            className="py-4 outline outline-1 rounded bg-white outline-outline"
+            className="py-4 outline outline-1 rounded bg-transparent outline-outline"
           >
             {instances.map((i) => (
               <option value={Number(i.instance.id)}>
@@ -88,7 +88,7 @@ export default async function Page({ params }: Props) {
           <label htmlFor="">Dia de la semana</label>
           <select
             name="weekday"
-            className="py-4 outline outline-1 rounded bg-white outline-outline"
+            className="py-4 outline outline-1 rounded bg-transparent outline-outline"
             defaultValue={sched[0].weekday}
           >
             {weekdays.map((w) => <option value={w.value}>{w.name}</option>)}
@@ -105,10 +105,12 @@ export default async function Page({ params }: Props) {
             name="endTime"
             defaultValue={sched[0].endTime}
           />
-          <Button type="submit" color="tertiary">Guardar</Button>
+          <div>
+            <Button type="submit" color="tertiary">Guardar</Button>
+          </div>
         </form>
-        <form action={deleteSchedule} className="flex flex-col my-5">
-          <Button type="submit">Borrar</Button>
+        <form action={deleteSchedule} className="relative -top-[40px] left-28">
+          <Button type="submit" color="error">Borrar</Button>
         </form>
       </div>
     </>
