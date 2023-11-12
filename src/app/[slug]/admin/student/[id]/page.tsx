@@ -88,7 +88,7 @@ export default async function Page({ params }: Props) {
     }).where(
       eq(studentGrade.id, currentStudent.student_grade.id),
     );
-    redirect(`/${params.slug}/admin/student`);
+    redirect(`${params.slug}/admin/student`);
   };
 
   const del = async () => {
@@ -104,7 +104,7 @@ export default async function Page({ params }: Props) {
     await db.delete(studentGrade).where(
       eq(studentGrade.id, currentStudent.student_grade.id),
     );
-    redirect(`/${params.slug}/admin/student`);
+    redirect(`${params.slug}/admin/student`);
   };
 
   return (
