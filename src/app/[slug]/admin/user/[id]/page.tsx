@@ -6,6 +6,7 @@ import { schoolUser, user } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { redirect } from "next/navigation";
+import Checkbox from "@/components/checkbox";
 
 type Props = {
   params: {
@@ -40,13 +41,13 @@ export default async function Page({ params }: Props) {
       name: res.data.name,
       email: res.data.email,
     }).where(
-      eq(user.id, params.id),
+      eq(user.id, selectedUser.user.id),
     );
     await db.update(schoolUser).set({
       role: res.data.role,
       isActive: res.data.isActive ? res.data.isActive : false,
-    }).where(eq(schoolUser.userId, params.id));
-    redirect(`/${params.slug}/admin/user`);
+    }).where(eq(schoolUser.id, params.id));
+    redirect(`${params.slug}/admin/user`);
   }
 
   return (
@@ -66,27 +67,25 @@ export default async function Page({ params }: Props) {
             id="email"
             name="email"
           />
-          <label htmlFor="">Rol</label>
-          <select
-            name="role"
-            id=""
-            className="p-3 border rounded"
-            defaultValue={selectedUser.school_user.role}
-          >
-            <option value="teacher">Profesor/a</option>
-            <option value="tutor">Celador/a</option>
-            <option value="principal">Directiva/o</option>
-          </select>
-          <div>
-            <label htmlFor="" className="mr-5">Esta activo</label>
-            <input
-              name="isActive"
-              type="checkbox"
-              defaultChecked={selectedUser.school_user.isActive}
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-            />
+          <div className="flex flex-col gap-2">
+            <label htmlFor="">Rol</label>
+            <select
+              name="role"
+              id=""
+              className="p-4 bg-transparent outline outline-1 outline-outline rounded"
+            >
+              <option value="teacher">Profesor/a</option>
+              <option value="tutor">Celador/a</option>
+              <option value="principal">Directiva/o</option>
+            </select>
           </div>
-          <Button color="tertiary" type="submit">Guardar</Button>
+          <div className="flex">
+            <label htmlFor="" className="mr-5">Esta activo</label>
+            <Checkbox checked={selectedUser.school_user.isActive} id="active" name="isActive" />
+          </div>
+          <div>
+            <Button color="tertiary" type="submit">Guardar</Button>
+          </div>
         </form>
       </div>
     </>

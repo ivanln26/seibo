@@ -88,7 +88,7 @@ export default async function Page({ params }: Props) {
     }).where(
       eq(studentGrade.id, currentStudent.student_grade.id),
     );
-    redirect(`/${params.slug}/admin/student`);
+    redirect(`${params.slug}/admin/student`);
   };
 
   const del = async () => {
@@ -104,12 +104,12 @@ export default async function Page({ params }: Props) {
     await db.delete(studentGrade).where(
       eq(studentGrade.id, currentStudent.student_grade.id),
     );
-    redirect(`/${params.slug}/admin/student`);
+    redirect(`${params.slug}/admin/student`);
   };
 
   return (
     <section>
-      <h1 className="text-4xl ml-5">Modificar curso</h1>
+      <h1 className="text-4xl ml-5">Modificar alumno</h1>
       <div className="bg-primary-100 flex flex-col gap-5 m-5 p-4 rounded-xl">
         <form action={update}>
           <div className="grid grid-cols-2 gap-4">
@@ -146,7 +146,7 @@ export default async function Page({ params }: Props) {
               <select
                 name="studentGrade"
                 defaultValue={currentStudent.student_grade.gradeId}
-                className="outline outline-1 outline-outline rounded p-4 w-full"
+                className="outline outline-1 outline-outline rounded p-4 w-full bg-transparent"
               >
                 <option value="">----</option>
                 {grades.map((c) => (
@@ -163,7 +163,7 @@ export default async function Page({ params }: Props) {
             name="studentSchool"
             value={1 /* Cambiar por colegio */}
           />
-          <div className="grid grid-cols-2 gap-4 border rounded-lg p-2">
+          <div className="grid grid-cols-2 gap-4 rounded-lg p-2">
             <TextField
               label="Nombre y apellido"
               name="contactName"
@@ -188,7 +188,7 @@ export default async function Page({ params }: Props) {
                 name="contactType"
                 id=""
                 defaultValue={currentStudent.student_contact.type}
-                className=" outline outline-1 outline-outline rounded p-4 w-full"
+                className=" outline outline-1 outline-outline rounded p-4 w-full bg-transparent"
               >
                 <option value="-">---</option>
                 <option value="father">Padre</option>
@@ -200,7 +200,7 @@ export default async function Page({ params }: Props) {
           </div>
           <Button color="tertiary" type="submit">Guardar</Button>
         </form>
-        <form action={del}>
+        <form action={del} className="relative -top-[60px] left-28">
           <Button color="error" type="submit">Borrar</Button>
         </form>
       </div>

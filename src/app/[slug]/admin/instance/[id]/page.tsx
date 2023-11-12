@@ -90,7 +90,7 @@ export default async function Page({ params }: Props) {
     await db.update(courseProfessor).set(newCourseProfessor.data)
       .where(eq(courseProfessor.id, newCourseProfessor.data.id));
 
-    redirect(`/${params.slug}/admin/instance`);
+    redirect(`${params.slug}/admin/instance`);
   }
 
   async function deleteInstance() {
@@ -101,7 +101,7 @@ export default async function Page({ params }: Props) {
 
     await db.delete(instance).where(eq(instance.id, id.data));
     await db.delete(courseProfessor).where(eq(courseProfessor.id, cpId.data));
-    redirect(`/${params.slug}/admin/instance`);
+    redirect(`${params.slug}/admin/instance`);
   }
 
   return (
@@ -153,10 +153,12 @@ export default async function Page({ params }: Props) {
               <option value={c.id}>{c.name}</option>
             ))}
           </select>
-          <Button color="tertiary" type="submit">Guardar</Button>
+          <div>
+            <Button color="tertiary" type="submit">Guardar</Button>
+          </div>
         </form>
-        <form className="flex flex-col" action={deleteInstance}>
-          <Button type="submit">Borrar</Button>
+        <form action={deleteInstance} className="relative -top-[40px] left-28">
+          <Button color="error" type="submit">Borrar</Button>
         </form>
       </div>
     </>

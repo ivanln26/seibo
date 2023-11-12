@@ -20,7 +20,7 @@ export default async function Page({ params }: Props) {
   });
 
   if (!currentClassroom) {
-    redirect(`/${params.slug}/classroom`);
+    redirect(`${params.slug}/admin/classroom`);
   }
 
   const update = async (data: FormData) => {
@@ -37,7 +37,7 @@ export default async function Page({ params }: Props) {
     await db.update(classroom).set({
       name: newClassroom.data.name,
     }).where(eq(classroom.id, Number(params.id)));
-    redirect(`/${params.slug}/admin/classroom`);
+    redirect(`${params.slug}/admin/classroom`);
   };
 
   const del = async () => {
@@ -46,7 +46,7 @@ export default async function Page({ params }: Props) {
       eq(classroom.id, Number(params.id)),
     );
 
-    redirect(`/${params.slug}/admin/classroom`);
+    redirect(`${params.slug}/admin/classroom`);
   };
 
   return (
@@ -63,7 +63,7 @@ export default async function Page({ params }: Props) {
           />
           <Button color="tertiary" type="submit">Guardar</Button>
         </form>
-        <form action={del}>
+        <form action={del} className="relative -top-[60px] left-28">
           <Button color="error" type="submit">Borrar</Button>
         </form>
       </div>

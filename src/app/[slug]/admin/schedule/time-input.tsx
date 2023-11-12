@@ -20,7 +20,7 @@ export default function TimeInput({ name }: { name: string }) {
     <input
       type="text"
       name={name}
-      className={`outline outline-1 ${
+      className={`outline outline-1 bg-transparent ${
         error ? "outline-red-300" : "outline-outline"
       } rounded py-3 px-2`}
       value={data}

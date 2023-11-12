@@ -95,13 +95,13 @@ export default async function Page({ params, searchParams }: Props) {
       <form className="fixed bottom-10 right-10" action={createSchedule}>
         <Modal
           buttonText="Crear"
-          confirmButton={{ text: "sape", type: "submit" }}
+          confirmButton={{ text: "Crear", type: "submit" }}
         >
           <h1 className="text-2xl">Crear horario</h1>
           <label htmlFor="">Clase</label>
           <select
             name="instanceID"
-            className="py-4 outline outline-1 rounded bg-white outline-outline"
+            className="py-4 outline outline-1 rounded outline-outline bg-transparent"
           >
             {instances.map((i) => (
               <option value={Number(i.instance.id)}>
@@ -112,7 +112,7 @@ export default async function Page({ params, searchParams }: Props) {
           <label htmlFor="">Dia de la semana</label>
           <select
             name="weekday"
-            className="py-4 outline outline-1 rounded bg-white outline-outline"
+            className="py-4 outline outline-1 rounded outline-outline bg-transparent"
           >
             <option value="monday">Lunes</option>
             <option value="tuesday">Martes</option>

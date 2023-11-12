@@ -7,6 +7,7 @@ import Table, { querySchema } from "@/components/table";
 import TextField from "@/components/text-field";
 import { db } from "@/db/db";
 import { schoolUser, user } from "@/db/schema";
+import Checkbox from "@/components/checkbox";
 
 type Props = {
   params: {
@@ -112,23 +113,21 @@ export default async function Page({ params, searchParams }: Props) {
             id="email"
             name="email"
           />
-          <label htmlFor="">Rol</label>
-          <select
-            name="role"
-            id=""
-            className="p-3 border rounded"
-          >
-            <option value="teacher">Profesor/a</option>
-            <option value="tutor">Celador/a</option>
-            <option value="principal">Directiva/o</option>
-          </select>
-          <div>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="">Rol</label>
+            <select
+              name="role"
+              id=""
+              className="p-4 bg-transparent outline outline-1 outline-outline rounded"
+            >
+              <option value="teacher">Profesor/a</option>
+              <option value="tutor">Celador/a</option>
+              <option value="principal">Directiva/o</option>
+            </select>
+          </div>
+          <div className="flex">
             <label htmlFor="" className="mr-5">Esta activo</label>
-            <input
-              name="isActive"
-              type="checkbox"
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-            />
+            <Checkbox id="active" name="isActive" />
           </div>
         </Modal>
       </form>

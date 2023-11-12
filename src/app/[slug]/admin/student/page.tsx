@@ -140,7 +140,7 @@ export default async function Page({ params, searchParams }: Props) {
               <label htmlFor="" className="mt-4">Curso*</label>
               <select
                 name="studentGrade"
-                className=" outline outline-1 outline-outline rounded p-4 w-full"
+                className=" outline outline-1 outline-outline rounded p-4 w-full bg-transparent"
               >
                 <option value="">----</option>
                 {grades.map((c) => <option value={c.id}>{c.name}</option>)}
@@ -164,7 +164,7 @@ export default async function Page({ params, searchParams }: Props) {
               <select
                 name="contactType"
                 id=""
-                className=" outline outline-1 outline-outline rounded p-4 w-full"
+                className=" outline outline-1 outline-outline rounded px-4 py-[13px] w-full bg-transparent"
               >
                 <option value="-">---</option>
                 <option value="father">Padre</option>
