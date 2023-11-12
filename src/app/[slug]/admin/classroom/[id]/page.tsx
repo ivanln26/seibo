@@ -20,7 +20,7 @@ export default async function Page({ params }: Props) {
   });
 
   if (!currentClassroom) {
-    redirect(`/${params.slug}/classroom`);
+    redirect(`/${params.slug}/admin/classroom`);
   }
 
   const update = async (data: FormData) => {
