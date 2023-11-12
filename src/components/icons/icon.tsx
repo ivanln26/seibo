@@ -49,7 +49,7 @@ export default function Icon({ icon, ...props }: IconPickerProps) {
     case "search":
       return <Search {...props} />;
     case "mail":
-      return <Mail {...props} />
+      return <Mail {...props} />;
     default:
       return <Add {...props} />;
   }

@@ -1,9 +1,17 @@
-import { db } from "@/db/db";
-import { Role, grade, instance, student, studentContact, studentGrade } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 import EmailSender from "./emailSender";
+import { db } from "@/db/db";
+import {
+  grade,
+  instance,
+  student,
+  studentContact,
+  studentGrade,
+} from "@/db/schema";
 import { getUserProfile } from "@/db/queries";
+
+const nodemailer = require("nodemailer");
 
 enum options {
   all = 1,
@@ -14,14 +22,12 @@ enum options {
 
 type Props = {
   params: {
-    slug: string
-  }
-}
-
-var nodemailer = require("nodemailer");
+    slug: string;
+  };
+};
 
 async function sendMail(subject: string, toEmail: string, otpText: string) {
-  var transporter = nodemailer.createTransport({
+  const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
       user: process.env.NODEMAILER_EMAIL,
@@ -29,7 +35,7 @@ async function sendMail(subject: string, toEmail: string, otpText: string) {
     },
   });
 
-  var mailOptions = {
+  const mailOptions = {
     from: process.env.NODEMAILER_EMAIL,
     to: toEmail,
     subject: subject,
@@ -44,39 +50,37 @@ export const revalidate = 0;
 export default async function Page({ params }: Props) {
   const user = await getUserProfile({ slug: params.slug });
   const actualSchool = await db.query.school.findFirst({
-    where: (sch, { eq }) => eq(sch.slug, params.slug)
-  })
+    where: (sch, { eq }) => eq(sch.slug, params.slug),
+  });
 
   if (!actualSchool) return <>Error</>;
-
 
   const students = await db.select().from(student)
     .innerJoin(studentGrade, eq(student.id, studentGrade.studentId))
     .innerJoin(grade, eq(studentGrade.gradeId, grade.id))
-    .where(eq(student.schoolId, actualSchool.id))
+    .where(eq(student.schoolId, actualSchool.id));
 
   const grades = await db.select().from(grade)
-    .where(eq(grade.schoolId, actualSchool.id))
+    .where(eq(grade.schoolId, actualSchool.id));
 
   const userGrades = await db.select().from(grade)
     .innerJoin(instance, eq(instance.gradeId, grade.id))
-    .where(eq(instance.professorId, user.id))
+    .where(eq(instance.professorId, user.id));
 
   async function sape(data: FormData) {
-    "use server"
-    const option = Number(data.get("option"))
-    const subject = String(data.get("subject"))
-    const optText = String(data.get("optText"))
+    "use server";
+    const option = Number(data.get("option"));
+    const subject = String(data.get("subject"));
+    const optText = String(data.get("optText"));
     let parents;
-
 
     if (option === options.all) {
       parents = await db.select().from(studentContact)
         .innerJoin(student, eq(student.id, studentContact.studentId))
         .where(eq(student.schoolId, Number(actualSchool?.id)));
-      for (let p of parents) {
-        const res = await sendMail(subject, p.student_contact.email, optText)
-        console.log(res)
+      for (const p of parents) {
+        const res = await sendMail(subject, p.student_contact.email, optText);
+        console.log(res);
       }
     } else if (option === options.grade) {
       const actualGrade = Number(data.get("grade"));
@@ -84,17 +88,17 @@ export default async function Page({ params }: Props) {
         .innerJoin(student, eq(studentContact.studentId, student.id))
         .innerJoin(studentGrade, eq(student.id, studentGrade.studentId))
         .where(eq(studentGrade.gradeId, actualGrade));
-      for (let p of parents) {
-        const res = await sendMail(subject, p.student_contact.email, optText)
-        console.log(res)
+      for (const p of parents) {
+        const res = await sendMail(subject, p.student_contact.email, optText);
+        console.log(res);
       }
     } else if (option === options.specific) {
       const student = Number(data.get("student"));
       parents = await db.select().from(studentContact)
         .where(eq(studentContact.studentId, student));
-      for (let p of parents) {
-        const res = await sendMail(subject, p.email, optText)
-        console.log(res)
+      for (const p of parents) {
+        const res = await sendMail(subject, p.email, optText);
+        console.log(res);
       }
     }
   }
@@ -107,10 +111,21 @@ export default async function Page({ params }: Props) {
         </h1>
         <form action={sape}>
           {/* FIXME: Se esta enviando todos los alumnos de la institución al dispositivo cliente. */}
-          {user.profiles.find((e) => e.role === "admin") ?
-            <EmailSender students={students} grades={grades} roles={user.profiles} />
-            :
-            <EmailSender students={students} grades={userGrades.map((g) => g.grade)} roles={user.profiles} />}
+          {user.profiles.find((e) => e.role === "admin")
+            ? (
+              <EmailSender
+                students={students}
+                grades={grades}
+                roles={user.profiles}
+              />
+            )
+            : (
+              <EmailSender
+                students={students}
+                grades={userGrades.map((g) => g.grade)}
+                roles={user.profiles}
+              />
+            )}
         </form>
       </section>
     </main>

@@ -27,20 +27,22 @@ function RailButton({ name, icon, href, isActive, roles }: RailButton) {
       href={href}
     >
       <div
-        className={`flex justify-center items-center h-8 w-14 rounded-full ${isActive
+        className={`flex justify-center items-center h-8 w-14 rounded-full ${
+          isActive
             ? (isAdmin
               ? "fill-secondary-900 bg-secondary-100 dark:fill-secondary-100 dark:bg-secondary-700"
               : "fill-primary-900 bg-primary-100 dark:fill-primary-100 dark:bg-primary-700")
             : "fill-black dark:fill-white"
-          }`}
+        }`}
       >
         <Icon icon={icon} height={24} width={24} />
       </div>
       <span
-        className={`text-sm ${isActive && "font-bold"} ${isActive && (isAdmin
+        className={`text-sm ${isActive && "font-bold"} ${
+          isActive && (isAdmin
             ? "text-secondary-900 dark:text-secondary-100"
             : "text-primary-900 dark:text-primary-100")
-          }`}
+        }`}
       >
         {name}
       </span>
