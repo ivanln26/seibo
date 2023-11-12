@@ -68,16 +68,16 @@ const buttons: RailButton[] = [
     roles: ["teacher", "tutor", "principal", "admin"],
   },
   {
-    name: "Admin",
-    icon: "person",
-    href: "/admin",
-    roles: ["admin"],
-  },
-  {
     name: "Mail",
     icon: "mail",
     href: "/notification",
     roles: ["teacher", "tutor", "principal", "admin"],
+  },
+  {
+    name: "Admin",
+    icon: "person",
+    href: "/admin",
+    roles: ["admin"],
   },
 ];
 
