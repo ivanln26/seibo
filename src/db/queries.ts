@@ -1,8 +1,9 @@
-import { and, eq, gt, sql } from "drizzle-orm";
+import { and, eq, gt, like, sql } from "drizzle-orm";
 import { getServerSession } from "next-auth";
 
 import { db } from "./db";
 import { school, schoolUser, user } from "./schema";
+import type { SchoolUser, User } from "./schema";
 
 /**
  * Server-side
@@ -14,34 +15,28 @@ export async function getUserProfile({ slug }: { slug: string }) {
     throw new Error("Error al obtener la sesión del usuario.");
   }
 
-  const school = await db.query.school.findFirst({
-    columns: { id: true },
-    where: (school, { eq }) => eq(school.slug, slug),
-  });
+  const profiles = await db
+    .select({ user, schoolUser, school })
+    .from(user)
+    .innerJoin(schoolUser, eq(user.id, schoolUser.userId))
+    .innerJoin(school, eq(schoolUser.schoolId, school.id))
+    .where(and(
+      like(user.email, session.user.email),
+      like(school.slug, slug),
+      eq(schoolUser.isActive, true),
+    ));
 
-  if (!school) {
-    throw new Error("Error al obtener la escuela de la base de datos.");
+  if (profiles.length === 0) {
+    throw new Error("No se pudo obtener ningún perfil.");
   }
 
-  const u = await db.query.user.findFirst({
-    where: (user, { eq }) => eq(user.email, session.user.email),
-    with: {
-      profiles: {
-        columns: { role: true },
-        where: (profile, { and, eq }) =>
-          and(
-            eq(profile.isActive, true),
-            eq(profile.schoolId, school.id),
-          ),
-      },
-    },
+  return profiles.reduce<User & { profiles: SchoolUser[] }>((u, row) => {
+    u.profiles.push(row.schoolUser);
+    return u;
+  }, {
+    ...profiles[0].user,
+    profiles: [],
   });
-
-  if (!u) {
-    throw new Error("Error al obtener el usuario de la base de datos.");
-  }
-
-  return u;
 }
 
 export async function getUserSchools() {
