@@ -4,6 +4,7 @@ import CheckList from "./checklist";
 import Clock from "./clock";
 import Description from "./description";
 import Home from "./home";
+import Mail from "./mail";
 import Menu from "./menu";
 import Person from "./person";
 import Search from "./search";
@@ -17,7 +18,8 @@ export type Icon =
   | "home"
   | "menu"
   | "person"
-  | "search";
+  | "search"
+  | "mail";
 
 export type IconProps = {
   height: number;
@@ -46,6 +48,8 @@ export default function Icon({ icon, ...props }: IconPickerProps) {
       return <Person {...props} />;
     case "search":
       return <Search {...props} />;
+    case "mail":
+      return <Mail {...props} />
     default:
       return <Add {...props} />;
   }
