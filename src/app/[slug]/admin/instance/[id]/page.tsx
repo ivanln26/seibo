@@ -90,7 +90,7 @@ export default async function Page({ params }: Props) {
     await db.update(courseProfessor).set(newCourseProfessor.data)
       .where(eq(courseProfessor.id, newCourseProfessor.data.id));
 
-    redirect(`/${params.slug}/admin/instance`);
+    redirect(`${params.slug}/admin/instance`);
   }
 
   async function deleteInstance() {
@@ -101,7 +101,7 @@ export default async function Page({ params }: Props) {
 
     await db.delete(instance).where(eq(instance.id, id.data));
     await db.delete(courseProfessor).where(eq(courseProfessor.id, cpId.data));
-    redirect(`/${params.slug}/admin/instance`);
+    redirect(`${params.slug}/admin/instance`);
   }
 
   return (
