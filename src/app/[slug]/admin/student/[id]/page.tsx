@@ -200,7 +200,7 @@ export default async function Page({ params }: Props) {
           </div>
           <Button color="tertiary" type="submit">Guardar</Button>
         </form>
-        <form action={del}>
+        <form action={del} className="relative -top-[60px] left-28">
           <Button color="error" type="submit">Borrar</Button>
         </form>
       </div>
