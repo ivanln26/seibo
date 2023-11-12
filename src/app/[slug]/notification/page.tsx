@@ -70,7 +70,7 @@ export default async function Page({ params }: Props) {
   async function sape(data: FormData) {
     "use server";
     const option = Number(data.get("option"));
-    const subject = String(data.get("subject"));
+    const subject = String(data.get("subject")).concat(" - ", String(actualSchool?.name));
     const optText = String(data.get("optText"));
     let parents;
 
