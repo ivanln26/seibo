@@ -22,6 +22,8 @@ export const user = mysqlTable("user", {
   emailIndex: uniqueIndex("user_email_idx").on(user.email),
 }));
 
+export type User = typeof user.$inferSelect;
+
 type SchoolSettings = {
   primaryColor: number;
 };
@@ -54,6 +56,8 @@ export const schoolUser = mysqlTable("school_user", {
     table.role,
   ),
 }));
+
+export type SchoolUser = typeof schoolUser.$inferSelect;
 
 export const schoolUserRelations = relations(schoolUser, ({ one }) => ({
   user: one(user, {

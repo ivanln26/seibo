@@ -1,10 +1,8 @@
 import { and, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { getServerSession } from "next-auth";
 import { z } from "zod";
 
 import TimeInput from "./time-input";
-import { getUser } from "../../lecture/utils";
 import Modal from "@/components/modal";
 import Table, { querySchema } from "@/components/table";
 import { db } from "@/db/db";
@@ -24,10 +22,6 @@ type Props = {
 export default async function Page({ params, searchParams }: Props) {
   const query = querySchema.parse(searchParams);
 
-  const session = await getServerSession();
-  if (!session) return <>Error al obtener la sesión.</>;
-  const user = await getUser(session);
-  if (!user) return <>Error al obtener el usuario.</>;
   const actualSchool = await db.query.school.findFirst({
     where: (school, { eq }) => eq(school.slug, params.slug),
   });

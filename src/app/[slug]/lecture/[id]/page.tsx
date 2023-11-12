@@ -1,19 +1,14 @@
-import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
-import Modal from "@/components/modal";
 import { updateAssistances } from "./update-assistances";
-import {
-  getAttendances,
-  getLectureCourses,
-  getStudents,
-  getUser,
-} from "../utils";
+import { getAttendances, getLectureCourses, getStudents } from "../utils";
 import AssistanceRow from "./assistance-row";
 import LecturePicker from "./lecture-picker";
 import UndoButton from "./undo-button";
+import Modal from "@/components/modal";
+import { getUserProfile } from "@/db/queries";
 
 type Props = {
   params: {
@@ -34,16 +29,7 @@ type Attendance = {
 export const revalidate = 0;
 
 export default async function Page({ params }: Props) {
-  const session = await getServerSession();
-
-  if (!session) {
-    return <>Error al obtener la sesión.</>;
-  }
-  const user = await getUser(session);
-
-  if (!user) {
-    return <>Error al obtener el usuario de la base de datos.</>;
-  }
+  const user = await getUserProfile({ slug: params.slug });
 
   const lectureID = Number(params.id);
 

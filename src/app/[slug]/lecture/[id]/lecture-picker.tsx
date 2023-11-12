@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { getServerSession } from "next-auth";
 
-import { getUser, getWeeklyLectures } from "../utils";
+import { getWeeklyLectures } from "../utils";
+import { getUserProfile } from "@/db/queries";
 
 type props = {
   slug: string;
@@ -9,18 +9,11 @@ type props = {
 };
 
 export default async function LecturePicker({ slug, lectureID }: props) {
-  const session = await getServerSession();
+  const user = await getUserProfile({ slug });
 
-  if (!session) {
-    return <>Error al obtener la sesión.</>;
-  }
-  const user = await getUser(session);
-
-  if (!user) {
-    return <>Error al obtener el usuario de la base de datos.</>;
-  }
   const today = new Date();
   const lectures = await getWeeklyLectures(user.id, today);
+
   return lectures.map((l) => {
     return (
       <Link href={`/${slug}/lecture/${l.lecture.id}`}>

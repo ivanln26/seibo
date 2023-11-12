@@ -1,3 +1,10 @@
+import { and, eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
+import Link from "next/link";
+import { z } from "zod";
+
+import Modal from "@/components/modal";
+import TextField from "@/components/text-field";
 import { db } from "@/db/db";
 import {
   course,
@@ -8,13 +15,7 @@ import {
   test,
   user,
 } from "@/db/schema";
-import { and, eq } from "drizzle-orm";
-import { getServerSession } from "next-auth";
-import Link from "next/link";
-import Modal from "@/components/modal";
-import TextField from "@/components/text-field";
-import { z } from "zod";
-import { revalidatePath } from "next/cache";
+import { getUserProfile } from "@/db/queries";
 
 type Props = {
   params: {
@@ -30,23 +31,10 @@ type testCardData = {
   course: string;
 };
 
+export const revalidate = 0;
+
 export default async function Page({ params }: Props) {
-  const session = await getServerSession();
-
-  if (!session) {
-    return <>Error al obtener la sesión.</>;
-  }
-
-  const u = await db.query.user.findFirst({
-    where: (user, { eq }) => eq(user.email, session.user.email),
-    with: {
-      profiles: { where: (profile, { eq }) => eq(profile.isActive, true) },
-    },
-  });
-
-  if (!u) {
-    return <>Error al obtener el usuario de la base de datos.</>;
-  }
+  const u = await getUserProfile({ slug: params.slug });
 
   const tests = await db.select().from(test)
     .innerJoin(instance, eq(test.instanceId, instance.id))

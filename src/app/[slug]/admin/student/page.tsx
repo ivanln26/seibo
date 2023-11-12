@@ -1,10 +1,7 @@
 import { eq } from "drizzle-orm";
-import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
-import Link from "next/link";
 import { z } from "zod";
 
-import { getUser } from "../../lecture/utils";
 import Modal from "@/components/modal";
 import Table, { querySchema } from "@/components/table";
 import TextField from "@/components/text-field";
@@ -29,10 +26,6 @@ export default async function Page({ params, searchParams }: Props) {
     where: (school, { eq }) => eq(school.slug, params.slug),
   });
   if (!currentSchool) return <>Error al obtener la institución.</>;
-  const session = await getServerSession();
-  if (!session) return <>Error al obtener la sesión.</>;
-  const currentUser = await getUser(session);
-  if (!currentUser) return <>Error al obtener el usuario.</>;
 
   const grades = await db.select()
     .from(grade)

@@ -1,4 +1,9 @@
+import { eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
+import { z } from "zod";
+
 import ScoreModal from "./scoreModal";
+import Button from "@/components/button";
 import { db } from "@/db/db";
 import {
   grade,
@@ -8,12 +13,6 @@ import {
   studentGrade,
   test,
 } from "@/db/schema";
-import { eq } from "drizzle-orm";
-import { getServerSession } from "next-auth";
-import TextField from "@/components/text-field";
-import { z } from "zod";
-import { revalidatePath } from "next/cache";
-import Button from "@/components/button";
 
 type Props = {
   params: {
@@ -29,24 +28,9 @@ type scoreRow = {
   studentId: number;
 };
 
+export const revalidate = 0;
+
 export default async function Page({ params }: Props) {
-  const session = await getServerSession();
-
-  if (!session) {
-    return <>Error al obtener la sesión.</>;
-  }
-
-  const u = await db.query.user.findFirst({
-    where: (user, { eq }) => eq(user.email, session.user.email),
-    with: {
-      profiles: { where: (profile, { eq }) => eq(profile.isActive, true) },
-    },
-  });
-
-  if (!u) {
-    return <>Error al obtener el usuario de la base de datos.</>;
-  }
-
   const exam = (await db.select().from(test).where(eq(test.id, params.id)))[0];
 
   async function getScores() {

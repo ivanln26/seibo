@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
-import { getUser, getWeeklyLectures } from "./utils";
-import { getServerSession } from "next-auth";
+import { getWeeklyLectures } from "./utils";
+import { getUserProfile } from "@/db/queries";
 
 export const revalidate = 0;
 
@@ -12,17 +12,9 @@ type Props = {
 };
 
 export default async function Page({ params }: Props) {
-  const session = await getServerSession();
-  if (!session) {
-    return <>Error al obtener la sesión.</>;
-  }
+  const user = await getUserProfile({ slug: params.slug });
 
-  const user = await getUser(session);
-  if (!user) {
-    return <>Error al obtener el usuario de la base de datos.</>;
-  }
   const today = new Date();
-
   const lectures = await getWeeklyLectures(user.id, today);
 
   function getClosestLecture() {
