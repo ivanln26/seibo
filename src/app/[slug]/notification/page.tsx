@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 import EmailSender from "./emailSender";
 import { getUserProfile } from "@/db/queries";
 
-export enum options {
+enum options {
   all = 1,
   specific = 2,
   grade = 3,

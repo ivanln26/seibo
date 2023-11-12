@@ -4,7 +4,7 @@ import Button from "@/components/button";
 import { useEffect, useState } from "react";
 
 
-export enum options {
+enum options {
     all = 1,
     specific = 2,
     grade = 3,
