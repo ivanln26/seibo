@@ -32,7 +32,7 @@ export default function Checkbox({ id, name, checked = false }: CheckboxProps) {
         type="checkbox"
       />
       <span className="block h-5 w-5 cursor-pointer rounded-sm border border-2 border-neutral-variant-50 peer-checked:border-0 peer-checked:bg-primary-600 dark:border-neutral-varialnt-60 peer-checked:dark:bg-primary-200" />
-      <span className="absolute top-[18px] left-0.5 fill-white dark:fill-neutral-4">
+      <span className="absolute top-0.5 left-0.5 fill-transparent peer-checked:fill-white dark:fill-neutral-4">
         <Icon icon="check" height={16} width={16} />
       </span>
     </label>
