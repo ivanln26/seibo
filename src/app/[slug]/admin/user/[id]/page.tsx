@@ -56,7 +56,7 @@ export default async function Page({ params }: Props) {
         <form action={update} className="flex flex-col gap-5">
           <TextField
             defaultValue={selectedUser.user.name}
-            label="Nombre"
+            label="Nombre y apellido"
             id="name"
             name="name"
           />
