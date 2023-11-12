@@ -1,4 +1,5 @@
 import Add from "./add";
+import Check from "./check";
 import CheckList from "./checklist";
 import Clock from "./clock";
 import Description from "./description";
@@ -9,6 +10,7 @@ import Search from "./search";
 
 export type Icon =
   | "add"
+  | "check"
   | "checklist"
   | "clock"
   | "description"
@@ -30,6 +32,8 @@ export default function Icon({ icon, ...props }: IconPickerProps) {
   switch (icon) {
     case "clock":
       return <Clock {...props} />;
+    case "check":
+      return <Check {...props} />;
     case "checklist":
       return <CheckList {...props} />;
     case "description":
