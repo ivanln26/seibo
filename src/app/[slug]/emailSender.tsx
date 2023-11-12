@@ -36,11 +36,14 @@ type Props = {
         name: string;
         id: number;
         schoolId: number;
+    }[],
+    roles: {
+        role: "teacher" | "tutor" | "principal" | "admin";
     }[]
 }
 
 
-export default function EmailSender({ students, grades }: Props) {
+export default function EmailSender({ students, grades, roles }: Props) {
 
     const [option, setOption] = useState<options>(options.null)
     const [grade, setGrade] = useState<number>(0)
@@ -58,11 +61,13 @@ export default function EmailSender({ students, grades }: Props) {
                     <option value={0}>---</option>
                     <option value={options.specific}>Notificar a los tutores de un alumno</option>
                     <option value={options.grade}>Notificar a todos los tutores de un curso</option>
-                    <option value={options.all}>Notificar a todos los tutores</option>
+                    {roles.find((r) => r.role === "admin") &&
+                        <option value={options.all}>Notificar a todos los tutores</option>
+                    }
                 </select>
             </div>
             {
-                option === 1 &&
+                option === options.all &&
                 <>
                     <div className="flex flex-col gap-1">
                         <label htmlFor="">Asunto</label>
@@ -74,7 +79,29 @@ export default function EmailSender({ students, grades }: Props) {
                     </div>
                 </>
             }
-            {option === 2 &&
+            {
+                option == options.grade &&
+                <>
+                    <div className="flex flex-col gap-1">
+                        <label htmlFor="">Curso</label>
+                        <select onChange={(e) => setGrade(Number(e.target.value))} name="grade" className="bg-transparent p-3 rounded-xl outline outline-1 outline-outline">
+                            <option value="">---</option>
+                            {grades.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
+                        </select>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-1">
+                            <label htmlFor="">Asunto</label>
+                            <input name="subject" type="text" className="bg-transparent p-3 rounded-xl outline outline-1 outline-outline" />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                            <label htmlFor="">Texto</label>
+                            <textarea name="optText" id="" className="bg-transparent p-3 rounded-xl outline outline-1 outline-outline"></textarea>
+                        </div>
+                    </div>
+                </>
+            }
+            {option === options.specific &&
                 <>
                     <div className="flex flex-col gap-1">
                         <label htmlFor="">Curso</label>
@@ -96,33 +123,12 @@ export default function EmailSender({ students, grades }: Props) {
                         <label htmlFor="">Texto</label>
                         <textarea name="optText" id="" className="bg-transparent p-3 rounded-xl outline outline-1 outline-outline"></textarea>
                     </div>
-                </>}
-            {
-                option == 3 &&
-                <>
-                    <div className="flex flex-col gap-1">
-                        <label htmlFor="">Curso</label>
-                        <select onChange={(e) => setGrade(Number(e.target.value))} name="grade" className="bg-transparent p-3 rounded-xl outline outline-1 outline-outline">
-                            <option value="">---</option>
-                            {grades.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
-                        </select>
-                    </div>
-                    <div className="flex flex-col gap-1">
-                        <div className="flex flex-col gap-1">
-                            <label htmlFor="">Asunto</label>
-                            <input name="subject" type="text" className="bg-transparent p-3 rounded-xl outline outline-1 outline-outline" />
-                        </div>
-                        <div className="flex flex-col gap-1">
-                            <label htmlFor="">Texto</label>
-                            <textarea name="optText" id="" className="bg-transparent p-3 rounded-xl outline outline-1 outline-outline"></textarea>
-                        </div>
-                    </div>
                 </>
             }
             {option !== 0 &&
-            <div className="flex justify-center">
-                <Button type="submit" color="tertiary">Enviar</Button>
-            </div>
+                <div className="flex justify-center">
+                    <Button type="submit" color="tertiary">Enviar</Button>
+                </div>
             }
         </div>
     )

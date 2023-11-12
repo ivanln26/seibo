@@ -1,8 +1,9 @@
 import { db } from "@/db/db";
-import { grade, student, studentContact, studentGrade } from "@/db/schema";
+import { Role, grade, instance, student, studentContact, studentGrade } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 import EmailSender from "./emailSender";
+import { getUserProfile } from "@/db/queries";
 
 export enum options {
   all = 1,
@@ -41,6 +42,7 @@ async function sendMail(subject: string, toEmail: string, otpText: string) {
 export const revalidate = 0;
 
 export default async function Page({ params }: Props) {
+  const user = await getUserProfile({ slug: params.slug });
   const actualSchool = await db.query.school.findFirst({
     where: (sch, { eq }) => eq(sch.slug, params.slug)
   })
@@ -55,6 +57,10 @@ export default async function Page({ params }: Props) {
 
   const grades = await db.select().from(grade)
     .where(eq(grade.schoolId, actualSchool.id))
+
+  const userGrades = await db.select().from(grade)
+    .innerJoin(instance, eq(instance.gradeId, grade.id))
+    .where(eq(instance.professorId, user.id))
 
   async function sape(data: FormData) {
     "use server"
@@ -100,8 +106,11 @@ export default async function Page({ params }: Props) {
           Notificación a madres y padres
         </h1>
         <form action={sape}>
-          {/* FIXME: Se esta enviando todos los tutores de todos los alumnos de la institución al dispositivo cliente. */}
-          <EmailSender students={students} grades={grades} />
+          {/* FIXME: Se esta enviando todos los alumnos de la institución al dispositivo cliente. */}
+          {user.profiles.find((e) => e.role === "admin") ?
+            <EmailSender students={students} grades={grades} roles={user.profiles} />
+            :
+            <EmailSender students={students} grades={userGrades.map((g) => g.grade)} roles={user.profiles} />}
         </form>
       </section>
     </main>
