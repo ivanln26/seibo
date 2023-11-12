@@ -37,7 +37,7 @@ export default async function Page({ params }: Props) {
     await db.update(classroom).set({
       name: newClassroom.data.name,
     }).where(eq(classroom.id, Number(params.id)));
-    redirect(`/${params.slug}/admin/classroom`);
+    redirect(`${params.slug}/admin/classroom`);
   };
 
   const del = async () => {
@@ -46,7 +46,7 @@ export default async function Page({ params }: Props) {
       eq(classroom.id, Number(params.id)),
     );
 
-    redirect(`/${params.slug}/admin/classroom`);
+    redirect(`${params.slug}/admin/classroom`);
   };
 
   return (
