@@ -17,7 +17,7 @@ type Props = {
 export default async function Page({ params }: Props) {
   const selectedUser = (await db.select().from(user)
     .innerJoin(schoolUser, eq(user.id, schoolUser.userId))
-    .where(eq(user.id, params.id)))[0];
+    .where(eq(schoolUser.id, params.id)))[0];
 
   async function update(data: FormData) {
     "use server";
@@ -56,7 +56,7 @@ export default async function Page({ params }: Props) {
         <form action={update} className="flex flex-col gap-5">
           <TextField
             defaultValue={selectedUser.user.name}
-            label="Nombre"
+            label="Nombre y apellido"
             id="name"
             name="name"
           />
