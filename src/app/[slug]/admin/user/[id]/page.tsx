@@ -47,7 +47,7 @@ export default async function Page({ params }: Props) {
       role: res.data.role,
       isActive: res.data.isActive ? res.data.isActive : false,
     }).where(eq(schoolUser.id, params.id));
-    redirect(`/${params.slug}/admin/user`);
+    redirect(`${params.slug}/admin/user`);
   }
 
   return (
