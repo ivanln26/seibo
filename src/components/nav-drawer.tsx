@@ -25,7 +25,7 @@ const buttons: DrawerButton[] = [
   },
   {
     name: "Reporte",
-    icon: "menu",
+    icon: "chart",
     href: "/dashboard",
     roles: ["principal", "admin"],
   },

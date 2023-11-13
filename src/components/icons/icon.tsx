@@ -8,6 +8,7 @@ import Mail from "./mail";
 import Menu from "./menu";
 import Person from "./person";
 import Search from "./search";
+import Chart from "./chart";
 
 export type Icon =
   | "add"
@@ -19,7 +20,8 @@ export type Icon =
   | "menu"
   | "person"
   | "search"
-  | "mail";
+  | "mail"
+  | "chart";
 
 export type IconProps = {
   height: number;
@@ -50,6 +52,8 @@ export default function Icon({ icon, ...props }: IconPickerProps) {
       return <Search {...props} />;
     case "mail":
       return <Mail {...props} />;
+      case "chart":
+      return <Chart {...props} />;
     default:
       return <Add {...props} />;
   }
