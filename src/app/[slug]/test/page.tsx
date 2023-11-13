@@ -36,7 +36,11 @@ export const revalidate = 0;
 export default async function Page({ params }: Props) {
   const u = await getUserProfile({ slug: params.slug });
 
-  const tests = await db.select().from(test)
+  const tests = await db.selectDistinct({
+    test: test,
+    course: course,
+    grade: grade
+  }).from(test)
     .innerJoin(instance, eq(test.instanceId, instance.id))
     .innerJoin(user, eq(instance.professorId, user.id))
     .innerJoin(course, eq(instance.courseId, course.id))
@@ -45,7 +49,11 @@ export default async function Page({ params }: Props) {
     .innerJoin(school, eq(schoolUser.schoolId, school.id))
     .where(and(eq(user.id, u.id), eq(school.slug, params.slug)));
 
-  const instances = await db.select().from(instance)
+  const instances = await db.selectDistinct({
+    instance: instance,
+    grade: grade,
+    course:course
+  }).from(instance)
     .innerJoin(user, eq(instance.professorId, user.id))
     .innerJoin(schoolUser, eq(user.id, schoolUser.userId))
     .innerJoin(school, eq(schoolUser.schoolId, school.id))
