@@ -53,8 +53,7 @@ export default async function Page({ params }: Props) {
   }
 
   const attendances = await getAttendances(lectureID);
-  const students = await getStudents(lectureCourse.instance.courseId);
-
+  const students = await getStudents(lectureID);
   const attendanceStudentsIds = attendances.map((a) => a.attendance.studentId);
   const list: Attendance[] = [];
 

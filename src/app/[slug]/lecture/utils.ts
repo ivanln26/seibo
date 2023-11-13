@@ -31,12 +31,15 @@ export async function getAttendances(lectureID: number) {
     .where(eq(attendance.lectureId, Number(lectureID)));
 }
 
-export async function getStudents(courseID: number) {
+export async function getStudents(lectureID: number) {
   return await db.select()
-    .from(studentGrade)
-    .innerJoin(courseGrade, eq(studentGrade.gradeId, courseGrade.gradeId))
+    .from(lecture)
+    .innerJoin(schedule, eq(lecture.scheduleId, schedule.id))
+    .innerJoin(instance, eq(schedule.instanceId, instance.id))
+    .innerJoin(grade, eq(instance.gradeId, grade.id))
+    .innerJoin(studentGrade, eq(grade.id, studentGrade.gradeId))
     .innerJoin(student, eq(studentGrade.studentId, student.id))
-    .where(eq(courseGrade.courseId, courseID));
+    .where(eq(lecture.id, lectureID));
 }
 
 export function getMonday(d: Date) {
