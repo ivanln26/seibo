@@ -30,7 +30,7 @@ export default async function Page({ params }: Props) {
 
   return (
     <>
-      <div className="grid grid-cols-4 gap-12">
+      <div className="grid grid-cols-4 gap-12 m-4">
         <div className="col-span-4 lg:col-span-1 flex flex-col justify-center items-center p-2 outline outline-1 outline-outline rounded-xl">
           <h1 className="text-center text-xl">Cantidad de alumnos por curso</h1>
           <Canvas data={studentsByGrade} />
@@ -48,7 +48,7 @@ export default async function Page({ params }: Props) {
           <Attendances data={all} />
         </div>
         <div className="col-span-4 lg:col-span-2 flex flex-col justify-center items-center p-2 outline outline-1 outline-outline rounded-xl">
-          <h1 className="text-center text-xl">Cantidad de asistencias / inasistencias por curso</h1>
+          <h1 className="text-center text-xl">Promedio de resultados de examenes por materia</h1>
           <AvgScoresByCourse data={examsAveragePerSubject} />
         </div>
       </div>

@@ -1,22 +1,19 @@
 import { db } from "@/db/db";
-import { lecture, attendance, schedule, instance, grade, school, studentGrade } from "@/db/schema";
+import { lecture, attendance, schedule, instance, grade, school, studentGrade, score, test, course } from "@/db/schema";
 import { sql, eq, and } from "drizzle-orm";
 
-type Data = {
-    month: number;
-    count: number;
-};
-
 export async function getAtendancesbyMonth(slug: string) {
-    const attendances = await db.execute(sql`SELECT MONTH(lecture.date) AS month, COUNT(attendance.id) AS count FROM attendance 
-        INNER JOIN lecture ON attendance.lecture_id = lecture.id
-        INNER JOIN schedule ON lecture.schedule_id = schedule.id
-        INNER JOIN instance ON schedule.instance_id = instance.id
-        INNER JOIN grade ON instance.grade_id = grade.id
-        INNER JOIN school ON grade.school_id = school.id
-        WHERE attendance.is_present = 1 AND school.slug = ${slug}
-        GROUP BY month`);
-    return attendances[0] as unknown as Data[];
+    return await db.select({
+        month: sql<number>`MONTH(${lecture.date})`,
+        count: sql<number>`COUNT(attendance.id)`
+    }).from(attendance)
+        .innerJoin(lecture, eq(attendance.lectureId, lecture.id))
+        .innerJoin(schedule, eq(lecture.scheduleId, schedule.id))
+        .innerJoin(instance, eq(schedule.instanceId, instance.id))
+        .innerJoin(grade, eq(instance.gradeId, grade.id))
+        .innerJoin(school, eq(grade.schoolId, school.id))
+        .where(and(eq(attendance.isPresent, true), eq(school.slug, slug)))
+        .groupBy(sql<number>`MONTH(${lecture.date})`);
 }
 
 export async function getAttendancesByCourse(slug: string) {
@@ -66,22 +63,25 @@ export async function getStudentsByGrade(slug: string) {
 }
 
 export async function getSchoolAverage(slug: string) {
-    const attendances = await db.execute(sql`SELECT AVG(score.score) as average FROM score
-        INNER JOIN test ON score.test_id = test.id 
-        INNER JOIN instance ON test.instance_id = instance.id
-        INNER JOIN grade ON instance.grade_id = grade.id
-        INNER JOIN school ON grade.school_id = school.id
-        WHERE school.slug = ${slug}`);
-    return attendances[0] as unknown as [{average: string}];
+    return await db.select({
+        average: sql<number>`AVG(${score.score})`
+    }).from(score)
+        .innerJoin(test, eq(score.testId, test.id))
+        .innerJoin(instance, eq(test.instanceId, instance.id))
+        .innerJoin(grade, eq(instance.gradeId, grade.id))
+        .innerJoin(school, eq(grade.schoolId, school.id))
+        .where(eq(school.slug, slug))
 }
 
 export async function getExamsAveragePerSubject(slug: string) {
-    const attendances = await db.execute(sql`SELECT course.name as subject, AVG(score.score) as average FROM score
-        INNER JOIN test ON score.test_id = test.id 
-        INNER JOIN instance ON test.instance_id = instance.id
-        INNER JOIN course ON instance.course_id = course.id
-        INNER JOIN school ON course.school_id = school.id
-        WHERE school.slug = ${slug}
-        GROUP BY subject`);
-    return attendances[0] as unknown as [{subject: string, average: number}];
+    return await db.select({
+        subject: course.name,
+        average: sql<number>`AVG(${score.score})`
+    }).from(score)
+        .innerJoin(test, eq(score.testId, test.id))
+        .innerJoin(instance, eq(test.instanceId, instance.id))
+        .innerJoin(course, eq(instance.courseId, course.id))
+        .innerJoin(school, eq(course.schoolId, school.id))
+        .where(eq(school.slug, slug))
+        .groupBy(course.id)
 }
