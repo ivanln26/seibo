@@ -1,9 +1,10 @@
 import { and, eq, sql } from "drizzle-orm";
 
-import Canvas from "./canvas";
-import { db } from "@/db/db";
-import { attendance, grade, instance, lecture, schedule, school, student, studentGrade } from "@/db/schema";
-import Attendances from "./attendances";
+import Canvas from "./charts/canvas";
+import Attendances from "./charts/attendances";
+import AttendancesByMonth from "./charts/attendancesbyMonth";
+import { getAtendancesbyMonth, getAttendancesByCourse, getExamsAveragePerSubject, getNonAttendancesByCourse, getSchoolAverage, getStudentsByGrade } from "./queries";
+import AvgScoresByCourse from "./charts/avgScoresByCourse";
 
 export const revalidate = 0;
 
@@ -14,70 +15,42 @@ type Props = {
 };
 
 export default async function Page({ params }: Props) {
-  const query = await db
-    .select({
-      gradeId: grade.id,
-      grade: grade.name,
-      count: sql<number>`count(${studentGrade.studentId})`,
-    })
-    .from(studentGrade)
-    .innerJoin(grade, eq(studentGrade.gradeId, grade.id))
-    .innerJoin(school, eq(grade.schoolId, school.id))
-    .where(eq(school.slug, params.slug))
-    .groupBy(({ gradeId }) => gradeId);
+  const studentsByGrade = await getStudentsByGrade(params.slug)
 
-  const attendances = await db.select({
-    gradeId: grade.id,
-    grade: grade.name,
-    isPresent: attendance.isPresent,
-    count: sql<number>`count(${attendance.id})`,
-  }).from(attendance)
-    .innerJoin(lecture, eq(attendance.lectureId, lecture.id))
-    .innerJoin(schedule, eq(lecture.scheduleId, schedule.id))
-    .innerJoin(instance, eq(schedule.instanceId, instance.id))
-    .innerJoin(grade, eq(instance.gradeId, grade.id))
-    .innerJoin(school, eq(grade.schoolId, school.id))
-    .where(and(eq(attendance.isPresent, true), eq(school.slug, params.slug)))
-    .groupBy(grade.id);
+  const attendances = await getAttendancesByCourse(params.slug)
 
-  const notAttendances = await db.select({
-    gradeId: grade.id,
-    grade: grade.name,
-    isPresent: attendance.isPresent,
-    count: sql<number>`count(${attendance.id})`,
-  }).from(attendance)
-    .innerJoin(lecture, eq(attendance.lectureId, lecture.id))
-    .innerJoin(schedule, eq(lecture.scheduleId, schedule.id))
-    .innerJoin(instance, eq(schedule.instanceId, instance.id))
-    .innerJoin(grade, eq(instance.gradeId, grade.id))
-    .innerJoin(school, eq(grade.schoolId, school.id))
-    .where(and(eq(attendance.isPresent, false), eq(school.slug, params.slug)))
-    .groupBy(grade.id);
-
+  const notAttendances = await getNonAttendancesByCourse(params.slug)
   const all = attendances.concat(notAttendances).sort((a, b) => a.gradeId - b.gradeId)
-  console.log(all)
+
+  const attendancesByMonth = await getAtendancesbyMonth(params.slug)
+
+  const schoolAverage = (await getSchoolAverage(params.slug))[0].average;
+
+  const examsAveragePerSubject = await getExamsAveragePerSubject(params.slug);
+  console.log(examsAveragePerSubject)
+
   return (
     <>
-      <div className="grid grid-cols-4 gap-5">
-        <div className="">
+      <div className="grid grid-cols-4 gap-12">
+        <div className="col-span-4 lg:col-span-1 flex flex-col justify-center items-center p-2 outline outline-1 outline-outline rounded-xl">
           <h1 className="text-center text-xl">Cantidad de alumnos por curso</h1>
-          <Canvas data={query} />
+          <Canvas data={studentsByGrade} />
         </div>
-        <div className="">
-          <h1 className="text-center text-xl">Cantidad de alumnos por curso</h1>
-          <Canvas data={query} />
+        <div className="col-span-4 lg:col-span-2 flex flex-col justify-center items-center p-2 outline outline-1 outline-outline rounded-xl ">
+          <h1 className="text-center text-xl">Cantidad de asistencias por mes</h1>
+          <AttendancesByMonth data={attendancesByMonth} />
         </div>
-        <div className="">
-          <h1 className="text-center text-xl">Cantidad de alumnos por curso</h1>
-          <Canvas data={query} />
+        <div className="col-span-4 lg:col-span-1 flex flex-col justify-center items-center p-2 outline outline-1 outline-outline rounded-xl">
+          <h1 className="text-center text-xl">Promedio total de resultados de examenes</h1>
+          <h1 className="text-center text-8xl">{Number(schoolAverage).toPrecision(3)}</h1>
         </div>
-        <div className="">
-          <h1 className="text-center text-xl">Cantidad de alumnos por curso</h1>
-          <Canvas data={query} />
-        </div>
-        <div className="col-span-2 row-span-2 flex flex-col">
+        <div className="col-span-4 lg:col-span-2 flex flex-col justify-center items-center p-2 outline outline-1 outline-outline rounded-xl">
           <h1 className="text-center text-xl">Cantidad de asistencias / inasistencias por curso</h1>
           <Attendances data={all} />
+        </div>
+        <div className="col-span-4 lg:col-span-2 flex flex-col justify-center items-center p-2 outline outline-1 outline-outline rounded-xl">
+          <h1 className="text-center text-xl">Cantidad de asistencias / inasistencias por curso</h1>
+          <AvgScoresByCourse data={examsAveragePerSubject} />
         </div>
       </div>
     </>

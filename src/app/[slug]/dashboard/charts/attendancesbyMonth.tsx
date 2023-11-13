@@ -3,8 +3,9 @@
 import { useEffect, useRef } from "react";
 import Chart from "chart.js/auto";
 
+
 type Data = {
-  grade: string;
+  month: number;
   count: number;
 };
 
@@ -12,7 +13,7 @@ type CanvasProps = {
   data: Data[];
 };
 
-export default function Canvas({ data }: CanvasProps) {
+export default function AttendancesByMonth({ data }: CanvasProps) {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -20,12 +21,19 @@ export default function Canvas({ data }: CanvasProps) {
       new Chart(
         ref.current,
         {
-          type: "bar",
+          type: "line",
+          options: {
+            responsive: true,
+            maintainAspectRatio: true
+          },
           data: {
-            labels: data.map((row) => row.grade),
+            labels: data.map((row) => {
+                const date = new Date(2009, row.month-1, 1);
+                return date.toLocaleString('es-ES', { month: 'long' });
+            }),
             datasets: [
               {
-                label: "Alumnos por curso",
+                label: "Asistencias",
                 data: data.map((row) => row.count),
               },
             ],
@@ -36,8 +44,6 @@ export default function Canvas({ data }: CanvasProps) {
   }, [ref]);
 
   return (
-    <section>
       <canvas ref={ref} />
-    </section>
   );
 }
