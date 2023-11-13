@@ -5,6 +5,7 @@ import Attendances from "./charts/attendances";
 import AttendancesByMonth from "./charts/attendancesbyMonth";
 import { getAtendancesbyMonth, getAttendancesByCourse, getExamsAveragePerSubject, getNonAttendancesByCourse, getSchoolAverage, getStudentsByGrade } from "./queries";
 import AvgScoresByCourse from "./charts/avgScoresByCourse";
+import PrintButton from "./printButton";
 
 export const revalidate = 0;
 
@@ -35,7 +36,7 @@ export default async function Page({ params }: Props) {
           <h1 className="text-center text-xl">Cantidad de alumnos por curso</h1>
           <Canvas data={studentsByGrade} />
         </div>
-        <div className="col-span-4 lg:col-span-2 flex flex-col justify-center items-center p-2 outline outline-1 outline-outline rounded-xl ">
+        <div className="col-span-4 lg:col-span-2 flex flex-col justify-center items-center p-12 outline outline-1 outline-outline rounded-xl ">
           <h1 className="text-center text-xl">Cantidad de asistencias por mes</h1>
           <AttendancesByMonth data={attendancesByMonth} />
         </div>
@@ -52,6 +53,7 @@ export default async function Page({ params }: Props) {
           <AvgScoresByCourse data={examsAveragePerSubject} />
         </div>
       </div>
+      <PrintButton />
     </>
   );
 }

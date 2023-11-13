@@ -49,12 +49,11 @@ export async function getNonAttendancesByCourse(slug: string) {
 }
 
 export async function getStudentsByGrade(slug: string) {
-    return await db
-        .select({
-            gradeId: grade.id,
-            grade: grade.name,
-            count: sql<number>`count(${studentGrade.studentId})`,
-        })
+    return await db.select({
+        gradeId: grade.id,
+        grade: grade.name,
+        count: sql<number>`count(${studentGrade.studentId})`,
+    })
         .from(studentGrade)
         .innerJoin(grade, eq(studentGrade.gradeId, grade.id))
         .innerJoin(school, eq(grade.schoolId, school.id))
