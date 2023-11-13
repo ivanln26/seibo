@@ -10,6 +10,7 @@ import {
   studentGrade,
 } from "@/db/schema";
 import { getUserProfile } from "@/db/queries";
+import { redirect } from "next/navigation";
 
 const nodemailer = require("nodemailer");
 
@@ -67,7 +68,7 @@ export default async function Page({ params }: Props) {
     .innerJoin(instance, eq(instance.gradeId, grade.id))
     .where(eq(instance.professorId, user.id));
 
-  async function sape(data: FormData) {
+  async function sendMails(data: FormData) {
     "use server";
     const option = Number(data.get("option"));
     const subject = String(data.get("subject")).concat(" - ", String(actualSchool?.name));
@@ -101,6 +102,7 @@ export default async function Page({ params }: Props) {
         console.log(res);
       }
     }
+    redirect(`${params.slug}/`)
   }
 
   return (
@@ -109,7 +111,7 @@ export default async function Page({ params }: Props) {
         <h1 className="text-4xl text-primary-900 dark:text-primary-100">
           Notificación a madres y padres
         </h1>
-        <form action={sape}>
+        <form action={sendMails}>
           {/* FIXME: Se esta enviando todos los alumnos de la institución al dispositivo cliente. */}
           {user.profiles.find((e) => e.role === "admin")
             ? (
