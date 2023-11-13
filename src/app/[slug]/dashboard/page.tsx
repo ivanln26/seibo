@@ -27,7 +27,6 @@ export default async function Page({ params }: Props) {
   const schoolAverage = (await getSchoolAverage(params.slug))[0].average;
 
   const examsAveragePerSubject = await getExamsAveragePerSubject(params.slug);
-  console.log(examsAveragePerSubject)
 
   return (
     <>

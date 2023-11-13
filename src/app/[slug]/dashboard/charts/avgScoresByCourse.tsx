@@ -5,7 +5,7 @@ import Chart from "chart.js/auto";
 
 
 type Data = {
-  subject: number;
+  subject: string;
   average: number;
 };
 
