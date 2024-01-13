@@ -29,7 +29,7 @@ type TableProps<TData> = {
   limit: number;
 };
 
-export default function Table<TData,>({
+export default function Table<TData>({
   title,
   data,
   columns,

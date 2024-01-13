@@ -52,7 +52,7 @@ export default function Icon({ icon, ...props }: IconPickerProps) {
       return <Search {...props} />;
     case "mail":
       return <Mail {...props} />;
-      case "chart":
+    case "chart":
       return <Chart {...props} />;
     default:
       return <Add {...props} />;

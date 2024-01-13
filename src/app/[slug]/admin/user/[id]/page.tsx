@@ -81,7 +81,11 @@ export default async function Page({ params }: Props) {
           </div>
           <div className="flex">
             <label htmlFor="" className="mr-5">Esta activo</label>
-            <Checkbox checked={selectedUser.school_user.isActive} id="active" name="isActive" />
+            <Checkbox
+              checked={selectedUser.school_user.isActive}
+              id="active"
+              name="isActive"
+            />
           </div>
           <div>
             <Button color="tertiary" type="submit">Guardar</Button>

@@ -71,7 +71,10 @@ export default async function Page({ params }: Props) {
   async function sendMails(data: FormData) {
     "use server";
     const option = Number(data.get("option"));
-    const subject = String(data.get("subject")).concat(" - ", String(actualSchool?.name));
+    const subject = String(data.get("subject")).concat(
+      " - ",
+      String(actualSchool?.name),
+    );
     const optText = String(data.get("optText"));
     let parents;
 
@@ -102,7 +105,7 @@ export default async function Page({ params }: Props) {
         console.log(res);
       }
     }
-    redirect(`${params.slug}/`)
+    redirect(`${params.slug}/`);
   }
 
   return (

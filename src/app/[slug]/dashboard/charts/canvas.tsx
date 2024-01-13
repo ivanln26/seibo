@@ -25,8 +25,8 @@ export default function Canvas({ data }: CanvasProps) {
             responsive: true,
             maintainAspectRatio: true,
             layout: {
-              padding: 50
-            }
+              padding: 50,
+            },
           },
           data: {
             labels: data.map((row) => row.grade),
@@ -42,7 +42,5 @@ export default function Canvas({ data }: CanvasProps) {
     }
   }, [ref]);
 
-  return (
-      <canvas ref={ref} />
-  );
+  return <canvas ref={ref} />;
 }

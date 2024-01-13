@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 import Chart from "chart.js/auto";
 
-
 type Data = {
   month: number;
   count: number;
@@ -24,12 +23,12 @@ export default function AttendancesByMonth({ data }: CanvasProps) {
           type: "line",
           options: {
             responsive: true,
-            maintainAspectRatio: true
+            maintainAspectRatio: true,
           },
           data: {
             labels: data.map((row) => {
-                const date = new Date(2009, row.month-1, 1);
-                return date.toLocaleString('es-ES', { month: 'long' });
+              const date = new Date(2009, row.month - 1, 1);
+              return date.toLocaleString("es-ES", { month: "long" });
             }),
             datasets: [
               {
@@ -43,7 +42,5 @@ export default function AttendancesByMonth({ data }: CanvasProps) {
     }
   }, [ref]);
 
-  return (
-      <canvas ref={ref} />
-  );
+  return <canvas ref={ref} />;
 }

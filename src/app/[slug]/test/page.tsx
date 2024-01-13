@@ -39,7 +39,7 @@ export default async function Page({ params }: Props) {
   const tests = await db.selectDistinct({
     test: test,
     course: course,
-    grade: grade
+    grade: grade,
   }).from(test)
     .innerJoin(instance, eq(test.instanceId, instance.id))
     .innerJoin(user, eq(instance.professorId, user.id))
@@ -52,7 +52,7 @@ export default async function Page({ params }: Props) {
   const instances = await db.selectDistinct({
     instance: instance,
     grade: grade,
-    course:course
+    course: course,
   }).from(instance)
     .innerJoin(user, eq(instance.professorId, user.id))
     .innerJoin(schoolUser, eq(user.id, schoolUser.userId))

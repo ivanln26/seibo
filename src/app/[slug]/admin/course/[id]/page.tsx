@@ -45,15 +45,15 @@ export default async function Page({ params }: Props) {
       eq(course.id, res.data.id),
     );
     redirect(`${params.slug}/admin/course/`);
-  };
+  }
 
-  async function del(){
+  async function del() {
     "use server";
     await db.delete(course).where(
       eq(course.id, Number(params.id)),
     );
     redirect(`${params.slug}/admin/course`);
-  };
+  }
 
   return (
     <section>

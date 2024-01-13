@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 import Chart from "chart.js/auto";
 
-
 type Data = {
   subject: string;
   average: number;
@@ -25,7 +24,7 @@ export default function AvgScoresByCourse({ data }: CanvasProps) {
           options: {
             responsive: true,
             maintainAspectRatio: true,
-            indexAxis: "y"
+            indexAxis: "y",
           },
           data: {
             labels: data.map((row) => row.subject),
@@ -41,7 +40,5 @@ export default function AvgScoresByCourse({ data }: CanvasProps) {
     }
   }, [ref]);
 
-  return (
-      <canvas ref={ref} />
-  );
+  return <canvas ref={ref} />;
 }

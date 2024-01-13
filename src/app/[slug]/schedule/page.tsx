@@ -35,7 +35,9 @@ export default async function Page({ params }: Props) {
 
   if (!profile || !actualSchool) return <>Error</>;
 
-  const schedules = profile.profiles.find((r) => r.role === "admin") ? allSchedules : userSchedules
+  const schedules = profile.profiles.find((r) => r.role === "admin")
+    ? allSchedules
+    : userSchedules;
 
   const weekSchedules = {
     monday: schedules.filter((s) => s.schedule.weekday === "monday"),
