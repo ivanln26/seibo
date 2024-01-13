@@ -3,6 +3,7 @@ import Check from "./check";
 import CheckList from "./checklist";
 import Clock from "./clock";
 import Description from "./description";
+import Expand from "./expand";
 import Home from "./home";
 import Mail from "./mail";
 import Menu from "./menu";
@@ -16,6 +17,7 @@ export type Icon =
   | "checklist"
   | "clock"
   | "description"
+  | "expand"
   | "home"
   | "menu"
   | "person"
@@ -42,6 +44,8 @@ export default function Icon({ icon, ...props }: IconPickerProps) {
       return <CheckList {...props} />;
     case "description":
       return <Description {...props} />;
+    case "expand":
+      return <Expand {...props} />;
     case "home":
       return <Home {...props} />;
     case "menu":
