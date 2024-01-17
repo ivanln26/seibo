@@ -1,0 +1,41 @@
+"use server";
+
+import { z } from "zod";
+
+type SendMailOption = "all" | "course" | "student";
+
+const sendMailSchema = z.discriminatedUnion("option", [
+  z.object({
+    option: z.literal("all"),
+    subject: z.string().min(1),
+    body: z.string().min(1),
+  }),
+  z.object({
+    option: z.literal("course"),
+    subject: z.string().min(1),
+    body: z.string().min(1),
+    course: z.coerce.number(),
+  }),
+  z.object({
+    option: z.literal("student"),
+    subject: z.string().min(1),
+    body: z.string().min(1),
+    student: z.coerce.number(),
+  }),
+]);
+
+export async function sendMails(
+  option: SendMailOption,
+  prevState: { success: boolean },
+  data: FormData,
+): Promise<{ success: boolean }> {
+  const obj = sendMailSchema.safeParse({
+    option,
+    subject: data.get("subject"),
+    body: data.get("body"),
+  });
+  if (!obj.success) {
+    return { success: false };
+  }
+  return { success: true };
+}
