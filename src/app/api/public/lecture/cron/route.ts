@@ -18,7 +18,7 @@ function nextWorkDay(dayOfWeek: number): Date {
   return d;
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   const nextWeek = {
     "monday": nextWorkDay(1),
     "tuesday": nextWorkDay(2),

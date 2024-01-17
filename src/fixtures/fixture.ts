@@ -18,7 +18,7 @@ import {
   test,
   user,
 } from "@/db/schema";
-import type { NewSchool } from "@/db/schema";
+import type { NewSchedule, NewSchool } from "@/db/schema";
 
 const envSchema = z.object({
   databaseURL: z.string(),
@@ -176,16 +176,16 @@ const instances = [
   },
 ];
 
-const schedules = [
+const schedules: NewSchedule[] = [
   {
     instanceId: 1,
-    weekday: "monday" as any,
+    weekday: "monday",
     startTime: "14:00:00",
     endTime: "14:45:00",
   },
   {
     instanceId: 1,
-    weekday: "wednesday" as any,
+    weekday: "wednesday",
     startTime: "09:00:00",
     endTime: "09:45:00",
   },

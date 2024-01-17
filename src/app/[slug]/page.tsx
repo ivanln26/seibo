@@ -96,7 +96,7 @@ export default async function Home({ params }: Props) {
           (
             <div
               className={`flex flex-col justify-between gap-y-2 px-4 py-6 rounded ${
-                !!card.color ? colors[card.color] : colors["primary"]
+                card.color ? colors[card.color] : colors["primary"]
               }`}
               key={i}
             >

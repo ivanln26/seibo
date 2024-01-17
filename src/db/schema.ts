@@ -195,6 +195,9 @@ export const schedule = mysqlTable("schedule", {
   endTime: time("end_time").notNull(),
 });
 
+export type Schedule = typeof schedule.$inferSelect;
+export type NewSchedule = typeof schedule.$inferInsert;
+
 export const lecture = mysqlTable("lecture", {
   id: int("id").autoincrement().primaryKey(),
   scheduleId: int("schedule_id").notNull(),

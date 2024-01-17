@@ -2,6 +2,9 @@
 
 import { z } from "zod";
 
+import { db } from "@/db/db";
+import { studentContact } from "@/db/schema";
+
 type SendMailOption = "all" | "course" | "student";
 
 const sendMailSchema = z.discriminatedUnion("option", [
@@ -26,7 +29,7 @@ const sendMailSchema = z.discriminatedUnion("option", [
 
 export async function sendMails(
   option: SendMailOption,
-  prevState: { success: boolean },
+  _prevState: { success: boolean },
   data: FormData,
 ): Promise<{ success: boolean }> {
   const obj = sendMailSchema.safeParse({
@@ -37,5 +40,6 @@ export async function sendMails(
   if (!obj.success) {
     return { success: false };
   }
+  await db.select().from(studentContact);
   return { success: true };
 }

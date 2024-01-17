@@ -1,7 +1,7 @@
 "use client";
 
 import Button from "@/components/button";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 enum options {
   all = 1,
@@ -44,10 +44,6 @@ type Props = {
 export default function EmailSender({ students, grades, roles }: Props) {
   const [option, setOption] = useState<options>(options.null);
   const [grade, setGrade] = useState<number>(0);
-
-  useEffect(() => {
-    if (option == 3) {}
-  }, [option, grade]);
 
   return (
     <div className="flex flex-col gap-5 px-5 w-full">
