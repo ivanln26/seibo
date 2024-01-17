@@ -1,11 +1,22 @@
 "use client";
 
-import Button from "@/components/button";
+import { useFormState } from "react-dom";
+
+import SubmitButton from "@/components/submit-button";
 import TextField from "@/components/text-field";
 
+import { sendMails } from "@/app/actions";
+
+const initialState: { success: boolean } = {
+  success: true,
+};
+
 export default function Form() {
+  const sendAllMails = sendMails.bind(null, "all");
+  const [state, formAction] = useFormState(sendAllMails, initialState);
+
   return (
-    <form>
+    <form action={formAction}>
       <TextField id="subject" name="subject" label="Asunto" required />
       <div className="flex flex-col gap-y-1 group py-2">
         <label
@@ -21,9 +32,7 @@ export default function Form() {
           required
         />
       </div>
-      <Button color="tertiary" type="submit">
-        Enviar
-      </Button>
+      <SubmitButton />
     </form>
   );
 }
