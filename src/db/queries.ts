@@ -63,3 +63,16 @@ export async function getUserSchools() {
     .groupBy(({ id }) => id)
     .having(({ count }) => gt(count, 0));
 }
+
+/**
+ * Server-side
+ */
+export async function getSchool({ slug }: { slug: string }) {
+  const school = await db.query.school.findFirst({
+    where: (school, { eq }) => eq(school.slug, slug),
+  });
+  if (school === undefined) {
+    throw new Error("Error al obtener la escuela por slug.");
+  }
+  return school;
+}

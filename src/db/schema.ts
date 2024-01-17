@@ -80,6 +80,8 @@ export const student = mysqlTable("student", {
   ),
 }));
 
+export type Student = typeof student.$inferSelect;
+
 export const studentContact = mysqlTable("student_contact", {
   id: int("id").autoincrement().primaryKey(),
   studentId: int("student_id").notNull(),
@@ -105,6 +107,8 @@ export const grade = mysqlTable("grade", {
   schoolId: int("school_id").notNull(),
   name: varchar("name", { length: 32 }).notNull(),
 });
+
+export type Grade = typeof grade.$inferSelect;
 
 export const studentGrade = mysqlTable("student_grade", {
   id: int("id").autoincrement().primaryKey(),
