@@ -17,7 +17,7 @@ export default function Canvas({ data }: CanvasProps) {
 
   useEffect(() => {
     if (ref.current) {
-      new Chart(
+      const chart = new Chart(
         ref.current,
         {
           type: "pie",
@@ -39,8 +39,11 @@ export default function Canvas({ data }: CanvasProps) {
           },
         },
       );
+      return () => {
+        chart.destroy();
+      };
     }
   }, [ref]);
 
-  return <canvas ref={ref} />;
+  return <canvas id="xd" ref={ref} />;
 }
