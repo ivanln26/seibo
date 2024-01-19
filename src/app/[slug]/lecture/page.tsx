@@ -48,11 +48,9 @@ export default async function Page({ params }: Props) {
     <>
       {lectures.length === 0
         ? (
-          <section className="flex flex-row justify-center items-center w-full h-full">
-            <div className="text-4xl p-4 bg-primary-100 rounded shadow">
-              No tenés clases para dictar.
-            </div>
-          </section>
+          <p className="py-2 text-2xl text-primary-600 dark:text-primary-200">
+            No tenés clases para dictar.
+          </p>
         )
         : getClosestLecture()}
     </>

@@ -1,13 +1,8 @@
 import { redirect } from "next/navigation";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
 
-import { updateAssistances } from "./update-assistances";
+import Form from "./form";
 import { getAttendances, getLectureCourses, getStudents } from "../utils";
-import AssistanceRow from "./assistance-row";
 import LecturePicker from "./lecture-picker";
-import UndoButton from "./undo-button";
-import Modal from "@/components/modal";
 import { getUserProfile } from "@/db/queries";
 
 type Props = {
@@ -34,22 +29,15 @@ export default async function Page({ params }: Props) {
   const lectureID = Number(params.id);
 
   if (Number.isNaN(lectureID)) {
-    redirect("/");
+    redirect(`/${params.slug}/lecture`);
   }
 
   const today = new Date();
-  const monthName = format(today, "MMMM", { locale: es });
 
   const lectureCourse = await getLectureCourses(lectureID);
 
   if (lectureCourse.instance.professorId !== user.id) {
-    return (
-      <section className="flex flex-row justify-center items-center w-full h-full">
-        <div className="text-4xl p-4 bg-primary-100 rounded shadow">
-          Usted no da esta clase.
-        </div>
-      </section>
-    );
+    redirect(`/${params.slug}/lecture`);
   }
 
   const attendances = await getAttendances(lectureID);
@@ -81,51 +69,17 @@ export default async function Page({ params }: Props) {
   });
 
   return (
-    <div className="flex flex-col gap-5 h-screen mx-2">
-      <h1 className="text-4xl">
-        Asistencias - {today.getDate()} de {monthName} de {today.getFullYear()}
-      </h1>
-      <h2 className="text-2xl">Clases</h2>
-      <section className="flex flex-row gap-5 overflow-x-auto w-screen md:w-max text-center">
-        <LecturePicker slug={params.slug} lectureID={Number(lectureID)} />
+    <>
+      <LecturePicker slug={params.slug} lectureID={Number(lectureID)} />
+      <section className="py-2 md:w-[1080px] ">
+        <h2 className="text-2xl">Alumnos</h2>
+        <Form
+          slug={params.slug}
+          lectureID={lectureID}
+          attendances={list}
+          notes={lectureCourse.lecture.notes}
+        />
       </section>
-      <section className="flex px-4 flex-col gap-2 mt-2 w-screen md:w-[1080px] ">
-        <form action={updateAssistances}>
-          <input type="hidden" name="lectureID" value={lectureID} />
-          {list.map((l) => {
-            return (
-              <AssistanceRow
-                firstName={l.name}
-                lastName={l.surname}
-                id={String(l.id)}
-                isPresent={l.isPresent}
-                studentId={l.studentId}
-              />
-            );
-          })}
-
-          <div className="flex flex-col h-full">
-            <label htmlFor="notes" className="mt-5 text-2xl mb-4">Notas</label>
-            <textarea
-              defaultValue={lectureCourse.lecture.notes}
-              name="notes"
-              id="notes"
-              className="w-full border border-grey rounded pb-5 resize-y"
-            />
-          </div>
-          <div className="fixed bottom-2 right-5 flex flex-row gap-5">
-            <UndoButton lectureID={lectureID} />
-            <Modal
-              buttonText="Guardar"
-              confirmButton={{ text: "guardar", type: "submit" }}
-            >
-              <h1 className="text-2xl">
-                ¿Segur@ que desea guardar los cambios?
-              </h1>
-            </Modal>
-          </div>
-        </form>
-      </section>
-    </div>
+    </>
   );
 }
