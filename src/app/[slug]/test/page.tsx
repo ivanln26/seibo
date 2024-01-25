@@ -118,7 +118,7 @@ export default async function Page({ params }: Props) {
 
   return (
     <>
-      <h1 className="text-4xl">Examenes</h1>
+      <h1 className="text-4xl font-bold">Examenes</h1>
       <div className="flex flex-row justify-center gap-5 flex-wrap lg:flex-nowrap">
         {dividedTests.map((trimester, i) => (
           <div className="flex flex-col gap-2 basis-full lg:basis-1/3" key={i}>

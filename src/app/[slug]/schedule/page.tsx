@@ -58,7 +58,7 @@ export default async function Page({ params }: Props) {
 
   return (
     <>
-      <h1 className="text-4xl">Horarios</h1>
+      <h1 className="text-4xl font-bold">Horarios</h1>
       <div className="flex flex-wrap gap-2 w-full lg:flex-nowrap">
         {weekdays.map((weekday, i) => (
           <div className="flex flex-col gap-2 basis-full lg:basis-1/5" key={i}>
