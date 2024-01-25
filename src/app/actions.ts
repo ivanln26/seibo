@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { db } from "@/db/db";
-import { attendance, lecture, studentContact } from "@/db/schema";
+import { attendance, lecture, score, studentContact } from "@/db/schema";
 
 type SendMailOption = "all" | "course" | "student";
 
@@ -86,5 +86,46 @@ export async function updateAssistances(
   }
 
   revalidatePath(`/${slug}/lecture/${lectureID}`);
+  return { success: true };
+}
+
+export async function updateScores(
+  slug: string,
+  testId: number,
+  _prevState: { success: boolean },
+  data: FormData,
+): Promise<{ success: boolean }> {
+  const studentRE = /student-(\d+)/i;
+  const scoreRE = /score-(\d+)/i;
+
+  for (const [key, value] of data) {
+    const scoreMatch = scoreRE.exec(key);
+    if (scoreMatch !== null) {
+      if (value === "absent") {
+        await db.delete(score).where(eq(score.id, Number(scoreMatch[1])));
+        continue;
+      }
+      if (Number.isNaN(value)) continue;
+      await db
+        .update(score)
+        .set({ score: Number(value) })
+        .where(eq(score.id, Number(scoreMatch[1])));
+      continue;
+    }
+
+    const studentMatch = studentRE.exec(key);
+    if (studentMatch !== null) {
+      if (value === "absent" || Number.isNaN(value)) continue;
+      await db
+        .insert(score)
+        .values({
+          testId: testId,
+          studentId: Number(studentMatch[1]),
+          score: Number(value),
+        });
+    }
+  }
+
+  revalidatePath(`/${slug}/test/${testId}`);
   return { success: true };
 }
