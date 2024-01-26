@@ -3,16 +3,31 @@
 import { useFormStatus } from "react-dom";
 
 import Button from "@/components/button";
+import type { Icon as IconType } from "@/components/icons/icon";
 
-export default function SubmitButton() {
+type Color = "primary" | "secondary" | "tertiary" | "error";
+
+type Props = {
+  title?: string;
+  color?: Color;
+  icon?: IconType;
+};
+
+export default function SubmitButton(
+  {
+    title = "Enviar",
+    color = "tertiary",
+    icon,
+  }: Props,
+) {
   const { pending } = useFormStatus();
 
   return (
     <>
       {!pending
         ? (
-          <Button color="tertiary" disabled={pending} type="submit">
-            Enviar
+          <Button color={color} disabled={pending} icon={icon} type="submit">
+            {title}
           </Button>
         )
         : (
