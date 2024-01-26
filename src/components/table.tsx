@@ -39,7 +39,7 @@ export default function Table<TData>({
   limit,
 }: TableProps<TData>) {
   return (
-    <div className="flex flex-col gap-y-2 py-2 rounded-lg md:px-4 md:py-0">
+    <div className="flex flex-col gap-y-2 py-2 md:px-4 md:py-0">
       <h1 className="text-4xl">{title}</h1>
       {/* <TableSearch /> */}
       <table className="table-auto w-full">
