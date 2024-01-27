@@ -9,6 +9,7 @@ import { db } from "@/db/db";
 import {
   attendance,
   classroom,
+  instance,
   lecture,
   score,
   studentContact,
@@ -137,94 +138,131 @@ export async function updateScores(
   return { success: true };
 }
 
-type AdminModel = "classroom";
-
-const updateAdminModelSchema = z.discriminatedUnion("model", [
-  z.object({
-    model: z.literal("classroom"),
-    name: z.string(),
-  }),
-]);
-
-export type UpdateAdminModelResult =
-  | {
-    success: true;
-    message: string;
-  }
+const updateAdminClassroomSchema = z.object({ name: z.string() });
+type UpdateAdminClassroomSchema = z.infer<typeof updateAdminClassroomSchema>;
+export type UpdateAdminClassroomResult =
+  | { success: true; message: string }
   | {
     success: false;
-    error:
-      | string
-      | typeToFlattenedError<z.infer<typeof updateAdminModelSchema>>;
+    error: string | typeToFlattenedError<UpdateAdminClassroomSchema>;
   };
 
-export async function updateAdminModel(
-  model: AdminModel,
+export async function updateAdminClassroom(
   slug: string,
   classroomId: number,
-  _prevState: UpdateAdminModelResult,
+  _prevState: UpdateAdminClassroomResult,
   data: FormData,
-): Promise<UpdateAdminModelResult> {
-  if (model === "classroom") {
-    const newClassroom = updateAdminModelSchema.safeParse({
-      model,
-      name: data.get("name"),
-    });
-    if (!newClassroom.success) {
-      return { success: false, error: newClassroom.error.flatten() };
-    }
-    try {
-      await db
-        .update(classroom)
-        .set({
-          name: newClassroom.data.name,
-        })
-        .where(eq(classroom.id, classroomId));
-    } catch (err) {
-      if (
-        err instanceof Object && "code" in err && err.code === "ER_DUP_ENTRY"
-      ) {
-        return {
-          success: false,
-          error: `Ya existe un aula con el nombre "${newClassroom.data.name}".`,
-        };
-      }
+): Promise<UpdateAdminClassroomResult> {
+  const newClassroom = updateAdminClassroomSchema.safeParse({
+    name: data.get("name"),
+  });
+
+  if (!newClassroom.success) {
+    return { success: false, error: newClassroom.error.flatten() };
+  }
+
+  try {
+    await db
+      .update(classroom)
+      .set({ ...newClassroom.data })
+      .where(eq(classroom.id, classroomId));
+  } catch (err) {
+    if (
+      err instanceof Object && "code" in err && err.code === "ER_DUP_ENTRY"
+    ) {
       return {
         success: false,
-        error: "Ha ocurrido un error en la base de datos.",
+        error: `Ya existe un aula con el nombre "${newClassroom.data.name}".`,
       };
     }
-    revalidatePath(`/${slug}/admin/classroom/${classroomId}`);
+    return {
+      success: false,
+      error: "Ha ocurrido un error en la base de datos.",
+    };
   }
+
+  revalidatePath(`/${slug}/admin/classroom/${classroomId}`);
   return { success: true, message: "Se ha actualizado correctamente." };
 }
 
-export type DeleteAdminModelResult =
-  | {
-    success: true;
-    message: string;
-  }
+const updateAdminInstanceSchema = z.object({
+  courseId: z.coerce.number(),
+  classroomId: z.coerce.number(),
+  professorId: z.coerce.number(),
+  gradeId: z.coerce.number(),
+});
+type UpdateAdminInstanceSchema = z.infer<typeof updateAdminInstanceSchema>;
+export type UpdateAdminInstanceResult =
+  | { success: true; message: string }
   | {
     success: false;
-    error: string;
+    error: string | typeToFlattenedError<UpdateAdminInstanceSchema>;
   };
 
-export async function deleteClassroom(
+export async function updateAdminInstance(
+  slug: string,
+  instanceId: number,
+  _prevState: UpdateAdminInstanceResult,
+  data: FormData,
+): Promise<UpdateAdminInstanceResult> {
+  const newInstance = updateAdminInstanceSchema.safeParse({
+    courseId: data.get("course"),
+    classroomId: data.get("classroom"),
+    professorId: data.get("professor"),
+    gradeId: data.get("grade"),
+  });
+
+  if (!newInstance.success) {
+    return { success: false, error: newInstance.error.flatten() };
+  }
+
+  try {
+    await db
+      .update(instance)
+      .set({ ...newInstance.data })
+      .where(eq(instance.id, instanceId));
+  } catch {
+    return {
+      success: false,
+      error: "Ha ocurrido un error en la base de datos.",
+    };
+  }
+
+  revalidatePath(`/${slug}/admin/instance/${instanceId}`);
+  return { success: true, message: "Se ha actualizado correctamente." };
+}
+
+type AdminModel = "classroom" | "instance";
+
+export type DeleteAdminModelResult =
+  | { success: true; message: string }
+  | { success: false; error: string };
+
+export async function deleteAdminModel(
   model: AdminModel,
   slug: string,
-  classroomId: number,
-  _prevState: { success: boolean },
+  modelId: number,
+  _prevState: DeleteAdminModelResult,
   _data: FormData,
 ): Promise<DeleteAdminModelResult> {
   if (model === "classroom") {
     try {
       await db
         .delete(classroom)
-        .where(eq(classroom.id, classroomId));
+        .where(eq(classroom.id, modelId));
     } catch {
       return { success: false, error: "Ha ocurrido un error." };
     }
-    revalidatePath(`/${slug}/admin/classroom/${classroomId}`);
+    revalidatePath(`/${slug}/admin/classroom/${modelId}`);
+  } else if (model === "instance") {
+    try {
+      await db
+        .delete(instance)
+        .where(eq(instance.id, modelId));
+    } catch {
+      return { success: false, error: "Ha ocurrido un error." };
+    }
+    revalidatePath(`/${slug}/admin/instance/${modelId}`);
   }
   return { success: true, message: "Se ha borrado correctamente." };
 }

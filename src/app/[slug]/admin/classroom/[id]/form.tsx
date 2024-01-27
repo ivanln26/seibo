@@ -3,17 +3,17 @@
 import { useEffect, useState } from "react";
 import { useFormState } from "react-dom";
 
-import { deleteClassroom, updateAdminModel } from "@/app/actions";
+import { deleteAdminModel, updateAdminClassroom } from "@/app/actions";
 import type {
   DeleteAdminModelResult,
-  UpdateAdminModelResult,
+  UpdateAdminClassroomResult,
 } from "@/app/actions";
 import Snackbar from "@/components/snackbar";
 import type { SnackbarMessage } from "@/components/snackbar";
 import SubmitButton from "@/components/submit-button";
 import TextField from "@/components/text-field";
 
-const updateInitialState: UpdateAdminModelResult = {
+const updateInitialState: UpdateAdminClassroomResult = {
   success: true,
   message: "",
 };
@@ -34,9 +34,8 @@ type Props = {
 export default function Form({ slug, classroom }: Props) {
   const [messages, setMessages] = useState<SnackbarMessage[]>([]);
 
-  const updateAction = updateAdminModel.bind(
+  const updateAction = updateAdminClassroom.bind(
     null,
-    "classroom",
     slug,
     classroom.id,
   );
@@ -45,7 +44,7 @@ export default function Form({ slug, classroom }: Props) {
     updateInitialState,
   );
 
-  const deleteAction = deleteClassroom.bind(
+  const deleteAction = deleteAdminModel.bind(
     null,
     "classroom",
     slug,
