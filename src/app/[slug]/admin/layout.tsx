@@ -22,7 +22,7 @@ export default function AdminLayout({ children, params }: Props) {
   return (
     <div className="flex flex-col md:flex-row">
       <SideNavigation title="Administrador" links={links} />
-      <section className="w-full">
+      <section className="py-2 w-full md:px-4 md:py-0">
         {children}
       </section>
     </div>

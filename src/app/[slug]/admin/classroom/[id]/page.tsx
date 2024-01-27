@@ -24,12 +24,12 @@ export default async function Page({ params }: Props) {
   }
 
   return (
-    <div className="py-2 md:px-4 md:py-0">
+    <>
       <h1 className="text-4xl">Modificar aula</h1>
       <Form
         slug={params.slug}
         classroom={{ id: Number(params.id), name: currentClassroom.name }}
       />
-    </div>
+    </>
   );
 }
