@@ -10,7 +10,7 @@ type SelectProps = {
   id: string;
   name: string;
   label?: string;
-  required: boolean;
+  required?: boolean;
   defaultValue?: string | number;
   options: Option[];
 };

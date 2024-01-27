@@ -13,7 +13,9 @@ import {
   instance,
   lecture,
   score,
+  student,
   studentContact,
+  studentGrade,
 } from "@/db/schema";
 
 type SendMailOption = "all" | "course" | "student";
@@ -148,6 +150,14 @@ const updateAdminSchemas = {
     professorId: z.coerce.number(),
     gradeId: z.coerce.number(),
   }),
+  student: z.object({
+    studentCode: z.string(),
+    firstName: z.string(),
+    lastName: z.string(),
+    email: z.string(),
+    studentGradeId: z.coerce.number(),
+    // TODO: add studentContact
+  }),
 } as const;
 
 export type UpdateAdminModelResult<T extends keyof typeof updateAdminSchemas> =
@@ -243,11 +253,46 @@ export async function updateAdminModel<
     }
 
     revalidatePath(`/${slug}/admin/instance/${modelId}`);
+  } else if (model === "student") {
+    const newStudent = updateAdminSchemas["student"].safeParse({
+      studentCode: data.get("studentCode"),
+      firstName: data.get("firstName"),
+      lastName: data.get("lastName"),
+      email: data.get("email"),
+      studentGradeId: data.get("studentGrade"),
+    });
+
+    if (!newStudent.success) {
+      return { success: false, error: newStudent.error.flatten() };
+    }
+
+    try {
+      await db
+        .update(student)
+        .set({
+          studentCode: newStudent.data.studentCode,
+          firstName: newStudent.data.firstName,
+          lastName: newStudent.data.lastName,
+          email: newStudent.data.email,
+        })
+        .where(eq(student.id, modelId));
+      await db
+        .update(studentGrade)
+        .set({ gradeId: newStudent.data.studentGradeId })
+        .where(eq(studentGrade.studentId, modelId));
+    } catch {
+      return {
+        success: false,
+        error: "Ha ocurrido un error en la base de datos.",
+      };
+    }
+
+    revalidatePath(`/${slug}/admin/student/${modelId}`);
   }
   return { success: true, message: "Se ha actualizado correctamente." };
 }
 
-type AdminModel = "classroom" | "grade" | "instance";
+type AdminModel = "classroom" | "grade" | "instance" | "student";
 
 export type DeleteAdminModelResult =
   | { success: true; message: string }
@@ -287,6 +332,20 @@ export async function deleteAdminModel(
       return { success: false, error: "Ha ocurrido un error." };
     }
     revalidatePath(`/${slug}/admin/instance/${modelId}`);
+  } else if (model === "student") {
+    try {
+      // FIXME: borrar studentContact.
+      await db
+        .delete(studentGrade)
+        .where(eq(studentGrade.studentId, modelId));
+      await db
+        .delete(student)
+        .where(eq(student.id, modelId));
+    } catch {
+      return { success: false, error: "Ha ocurrido un error." };
+    }
+    revalidatePath(`/${slug}/admin/student/${modelId}`);
   }
+
   return { success: true, message: "Se ha borrado correctamente." };
 }
