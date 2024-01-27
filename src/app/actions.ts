@@ -9,6 +9,7 @@ import { db } from "@/db/db";
 import {
   attendance,
   classroom,
+  course,
   grade,
   instance,
   lecture,
@@ -143,6 +144,10 @@ export async function updateScores(
 
 const updateAdminSchemas = {
   classroom: z.object({ name: z.string() }),
+  course: z.object({
+    name: z.string(),
+    topics: z.string(),
+  }),
   grade: z.object({ name: z.string() }),
   instance: z.object({
     courseId: z.coerce.number(),
@@ -206,6 +211,29 @@ export async function updateAdminModel<
     }
 
     revalidatePath(`/${slug}/admin/classroom/${modelId}`);
+  } else if (model === "course") {
+    const newCourse = updateAdminSchemas["course"].safeParse({
+      name: data.get("name"),
+      topics: data.get("topics"),
+    });
+
+    if (!newCourse.success) {
+      return { success: false, error: newCourse.error.flatten() };
+    }
+
+    try {
+      await db
+        .update(course)
+        .set({ ...newCourse.data })
+        .where(eq(course.id, modelId));
+    } catch (err) {
+      return {
+        success: false,
+        error: "Ha ocurrido un error en la base de datos.",
+      };
+    }
+
+    revalidatePath(`/${slug}/admin/course/${modelId}`);
   } else if (model === "grade") {
     const newGrade = updateAdminSchemas["grade"].safeParse({
       name: data.get("name"),
@@ -292,7 +320,7 @@ export async function updateAdminModel<
   return { success: true, message: "Se ha actualizado correctamente." };
 }
 
-type AdminModel = "classroom" | "grade" | "instance" | "student";
+type AdminModel = "classroom" | "course" | "grade" | "instance" | "student";
 
 export type DeleteAdminModelResult =
   | { success: true; message: string }
@@ -314,6 +342,15 @@ export async function deleteAdminModel(
       return { success: false, error: "Ha ocurrido un error." };
     }
     revalidatePath(`/${slug}/admin/classroom/${modelId}`);
+  } else if (model === "course") {
+    try {
+      await db
+        .delete(course)
+        .where(eq(course.id, modelId));
+    } catch {
+      return { success: false, error: "Ha ocurrido un error." };
+    }
+    revalidatePath(`/${slug}/admin/course/${modelId}`);
   } else if (model === "grade") {
     try {
       await db
