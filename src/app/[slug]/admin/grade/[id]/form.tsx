@@ -8,12 +8,13 @@ import type {
   DeleteAdminModelResult,
   UpdateAdminModelResult,
 } from "@/app/actions";
-import Snackbar from "@/components/snackbar";
-import type { SnackbarMessage } from "@/components/snackbar";
 import SubmitButton from "@/components/submit-button";
 import TextField from "@/components/text-field";
+import Snackbar from "@/components/snackbar";
+import type { SnackbarMessage } from "@/components/snackbar";
+import type { Grade } from "@/db/schema";
 
-const updateInitialState: UpdateAdminModelResult<"classroom"> = {
+const updateInitialState: UpdateAdminModelResult<"grade"> = {
   success: true,
   message: "",
 };
@@ -25,20 +26,17 @@ const deleteInitialState: DeleteAdminModelResult = {
 
 type Props = {
   slug: string;
-  classroom: {
-    id: number;
-    name: string;
-  };
+  grade: Grade;
 };
 
-export default function Form({ slug, classroom }: Props) {
+export default function Form({ slug, grade }: Props) {
   const [messages, setMessages] = useState<SnackbarMessage[]>([]);
 
   const updateAction = updateAdminModel.bind(
     null,
-    "classroom",
+    "grade",
     slug,
-    classroom.id,
+    grade.id,
   );
   const [updateState, updateFormAction] = useFormState(
     updateAction,
@@ -47,9 +45,9 @@ export default function Form({ slug, classroom }: Props) {
 
   const deleteAction = deleteAdminModel.bind(
     null,
-    "classroom",
+    "grade",
     slug,
-    classroom.id,
+    grade.id,
   );
   const [deleteState, deleteFormAction] = useFormState(
     deleteAction,
@@ -90,7 +88,7 @@ export default function Form({ slug, classroom }: Props) {
     <>
       <div className="flex justify-end py-1">
         <form action={deleteFormAction}>
-          <SubmitButton title="Eliminar" color="error" icon="delete" />
+          <SubmitButton title="Eliminar" icon="delete" color="error" />
         </form>
       </div>
       <form action={updateFormAction}>
@@ -98,7 +96,7 @@ export default function Form({ slug, classroom }: Props) {
           id="name"
           name="name"
           label="Nombre"
-          defaultValue={classroom.name}
+          defaultValue={grade.name}
           required
         />
         <SubmitButton title="Guardar" />

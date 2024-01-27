@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import { useFormState } from "react-dom";
 
-import { deleteAdminModel, updateAdminInstance } from "@/app/actions";
+import { deleteAdminModel, updateAdminModel } from "@/app/actions";
 import type {
   DeleteAdminModelResult,
-  UpdateAdminInstanceResult,
+  UpdateAdminModelResult,
 } from "@/app/actions";
 import Select from "@/components/select";
 import Snackbar from "@/components/snackbar";
@@ -14,7 +14,7 @@ import type { SnackbarMessage } from "@/components/snackbar";
 import SubmitButton from "@/components/submit-button";
 import type { Classroom, Course, Grade, Instance, User } from "@/db/schema";
 
-const updateInitialState: UpdateAdminInstanceResult = {
+const updateInitialState: UpdateAdminModelResult<"instance"> = {
   success: true,
   message: "",
 };
@@ -45,8 +45,9 @@ export default function Form(
 ) {
   const [messages, setMessages] = useState<SnackbarMessage[]>([]);
 
-  const updateAction = updateAdminInstance.bind(
+  const updateAction = updateAdminModel.bind(
     null,
+    "instance",
     slug,
     instance.id,
   );

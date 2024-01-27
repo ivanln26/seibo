@@ -66,6 +66,7 @@ export default async function Page({ params }: Props) {
     <>
       <h1 className="text-4xl">Modificar clase</h1>
       <Form
+        slug={params.slug}
         instance={instance}
         courses={courses}
         classrooms={classrooms}
