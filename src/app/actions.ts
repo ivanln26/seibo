@@ -13,6 +13,7 @@ import {
   grade,
   instance,
   lecture,
+  schedule,
   score,
   student,
   studentContact,
@@ -155,6 +156,12 @@ const updateAdminSchemas = {
     professorId: z.coerce.number(),
     gradeId: z.coerce.number(),
   }),
+  schedule: z.object({
+    instanceId: z.coerce.number(),
+    weekday: z.enum(["monday", "tuesday", "wednesday", "thursday", "friday"]),
+    startTime: z.string(),
+    endTime: z.string(),
+  }),
   student: z.object({
     studentCode: z.string(),
     firstName: z.string(),
@@ -226,7 +233,7 @@ export async function updateAdminModel<
         .update(course)
         .set({ ...newCourse.data })
         .where(eq(course.id, modelId));
-    } catch (err) {
+    } catch {
       return {
         success: false,
         error: "Ha ocurrido un error en la base de datos.",
@@ -281,6 +288,31 @@ export async function updateAdminModel<
     }
 
     revalidatePath(`/${slug}/admin/instance/${modelId}`);
+  } else if (model === "schedule") {
+    const newSchedule = updateAdminSchemas["schedule"].safeParse({
+      instanceId: data.get("instance"),
+      weekday: data.get("weekday"),
+      startTime: data.get("start"),
+      endTime: data.get("end"),
+    });
+
+    if (!newSchedule.success) {
+      return { success: false, error: newSchedule.error.flatten() };
+    }
+
+    try {
+      await db
+        .update(schedule)
+        .set({ ...newSchedule.data })
+        .where(eq(schedule.id, modelId));
+    } catch {
+      return {
+        success: false,
+        error: "Ha ocurrido un error en la base de datos.",
+      };
+    }
+
+    revalidatePath(`/${slug}/admin/schedule/${modelId}`);
   } else if (model === "student") {
     const newStudent = updateAdminSchemas["student"].safeParse({
       studentCode: data.get("studentCode"),
@@ -320,7 +352,13 @@ export async function updateAdminModel<
   return { success: true, message: "Se ha actualizado correctamente." };
 }
 
-type AdminModel = "classroom" | "course" | "grade" | "instance" | "student";
+type AdminModel =
+  | "classroom"
+  | "course"
+  | "grade"
+  | "instance"
+  | "schedule"
+  | "student";
 
 export type DeleteAdminModelResult =
   | { success: true; message: string }
@@ -369,6 +407,16 @@ export async function deleteAdminModel(
       return { success: false, error: "Ha ocurrido un error." };
     }
     revalidatePath(`/${slug}/admin/instance/${modelId}`);
+  } else if (model === "schedule") {
+    try {
+      // FIXME: borrar lecture.
+      await db
+        .delete(schedule)
+        .where(eq(schedule.id, modelId));
+    } catch {
+      return { success: false, error: "Ha ocurrido un error." };
+    }
+    revalidatePath(`/${slug}/admin/schedule/${modelId}`);
   } else if (model === "student") {
     try {
       // FIXME: borrar studentContact.
