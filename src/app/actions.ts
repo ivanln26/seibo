@@ -14,10 +14,12 @@ import {
   instance,
   lecture,
   schedule,
+  schoolUser,
   score,
   student,
   studentContact,
   studentGrade,
+  user,
 } from "@/db/schema";
 
 type SendMailOption = "all" | "course" | "student";
@@ -169,6 +171,12 @@ const updateAdminSchemas = {
     email: z.string(),
     studentGradeId: z.coerce.number(),
     // TODO: add studentContact
+  }),
+  user: z.object({
+    name: z.string(),
+    email: z.string(),
+    role: z.enum(["teacher", "tutor", "principal", "admin"]),
+    isActive: z.coerce.boolean().default(false),
   }),
 } as const;
 
@@ -348,6 +356,48 @@ export async function updateAdminModel<
     }
 
     revalidatePath(`/${slug}/admin/student/${modelId}`);
+  } else if (model === "user") {
+    const newUser = updateAdminSchemas["user"].safeParse({
+      name: data.get("name"),
+      email: data.get("email"),
+      role: data.get("role"),
+      isActive: data.get("isActive"),
+    });
+
+    if (!newUser.success) {
+      return { success: false, error: newUser.error.flatten() };
+    }
+
+    try {
+      await db.transaction(async (tx) => {
+        const query = await tx
+          .select({ id: user.id })
+          .from(user)
+          .innerJoin(schoolUser, eq(user.id, schoolUser.userId))
+          .where(eq(schoolUser.id, modelId));
+
+        if (query.length !== 1) {
+          throw new Error();
+        }
+
+        await tx
+          .update(user)
+          .set({ name: newUser.data.name, email: newUser.data.email })
+          .where(eq(user.id, query[0].id));
+
+        await tx
+          .update(schoolUser)
+          .set({ role: newUser.data.role, isActive: newUser.data.isActive })
+          .where(eq(schoolUser.id, modelId));
+      });
+    } catch {
+      return {
+        success: false,
+        error: "Ha ocurrido un error en la base de datos.",
+      };
+    }
+
+    revalidatePath(`/${slug}/admin/user/${modelId}`);
   }
   return { success: true, message: "Se ha actualizado correctamente." };
 }
