@@ -30,7 +30,13 @@ export default async function Page({ params, searchParams }: Props) {
   if (!school) return <></>;
 
   const classrooms = await db.query.classroom.findMany({
-    where: (classroom, { eq }) => eq(classroom.schoolId, school.id),
+    where: (classroom, { and, eq, like }) =>
+      and(
+        eq(classroom.schoolId, school.id),
+        query.query !== ""
+          ? like(classroom.name, `%${query.query}%`)
+          : undefined,
+      ),
     limit: query.limit,
     offset: (query.page - 1) * query.limit,
   });

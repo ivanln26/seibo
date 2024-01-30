@@ -14,6 +14,7 @@ type ButtonProps = {
   color?: Color;
   kind?: Kind;
   onClick?: () => void;
+  disabled?: boolean;
   type?: Type;
   icon?: IconType;
 };
@@ -72,8 +73,15 @@ const config: Record<Kind, Record<Color, string>> = {
 } as const;
 
 export default function Button(
-  { children, kind = "filled", color = "primary", icon, onClick, type }:
-    ButtonProps,
+  {
+    children,
+    kind = "filled",
+    color = "primary",
+    icon,
+    onClick,
+    disabled = false,
+    type,
+  }: ButtonProps,
 ) {
   return (
     <button
@@ -82,6 +90,7 @@ export default function Button(
       } rounded-full ${config[kind][color]}`}
       onClick={onClick}
       type={type}
+      disabled={disabled}
     >
       {icon && <Icon icon={icon} height={18} width={18} />}
       {children}

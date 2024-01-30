@@ -1,8 +1,8 @@
-import { and, eq, sql } from "drizzle-orm";
-
-import Canvas from "./charts/canvas";
 import Attendances from "./charts/attendances";
 import AttendancesByMonth from "./charts/attendancesbyMonth";
+import AvgScoresByCourse from "./charts/avgScoresByCourse";
+import Canvas from "./charts/canvas";
+import PrintButton from "./printButton";
 import {
   getAtendancesbyMonth,
   getAttendancesByCourse,
@@ -11,8 +11,6 @@ import {
   getSchoolAverage,
   getStudentsByGrade,
 } from "./queries";
-import AvgScoresByCourse from "./charts/avgScoresByCourse";
-import PrintButton from "./printButton";
 
 export const revalidate = 0;
 
@@ -40,6 +38,7 @@ export default async function Page({ params }: Props) {
 
   return (
     <>
+      <h1 className="text-4xl font-bold">Reportes</h1>
       <div className="grid grid-cols-4 gap-12 m-4">
         <div className="col-span-4 lg:col-span-1 flex flex-col justify-center items-center p-2 outline outline-1 outline-outline rounded-xl">
           <h1 className="text-center text-xl">Cantidad de alumnos por curso</h1>

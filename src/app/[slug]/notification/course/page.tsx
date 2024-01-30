@@ -1,0 +1,18 @@
+import { db } from "@/db/db";
+import { grade } from "@/db/schema";
+import { getUserProfile } from "@/db/queries";
+
+import Form from "./form";
+
+type Props = {
+  params: {
+    slug: string;
+  };
+};
+
+export default async function Page({ params }: Props) {
+  const user = await getUserProfile({ slug: params.slug });
+  const grades = await db.select().from(grade);
+
+  return <Form grades={grades} />;
+}

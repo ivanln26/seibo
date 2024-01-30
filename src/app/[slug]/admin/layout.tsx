@@ -1,4 +1,5 @@
-import AdminNavigation from "@/components/admin/navigation";
+import SideNavigation from "@/components/side-navigation";
+import type { Link } from "@/components/side-navigation-link";
 
 type Props = {
   children: React.ReactNode;
@@ -8,10 +9,20 @@ type Props = {
 };
 
 export default function AdminLayout({ children, params }: Props) {
+  const links: Link[] = [
+    { name: "Aula", href: `/${params.slug}/admin/classroom` },
+    { name: "Clase", href: `/${params.slug}/admin/instance` },
+    { name: "Curso", href: `/${params.slug}/admin/grade` },
+    { name: "Estudiante", href: `/${params.slug}/admin/student` },
+    { name: "Horario", href: `/${params.slug}/admin/schedule` },
+    { name: "Materia", href: `/${params.slug}/admin/course` },
+    { name: "Usuario", href: `/${params.slug}/admin/user` },
+  ];
+
   return (
     <div className="flex flex-col md:flex-row">
-      <AdminNavigation slug={params.slug} />
-      <section className="w-full">
+      <SideNavigation title="Administrador" links={links} />
+      <section className="py-2 w-full md:px-4 md:py-0">
         {children}
       </section>
     </div>

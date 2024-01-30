@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -5,8 +6,7 @@ import Modal from "@/components/modal";
 import TextField from "@/components/text-field";
 import Table, { querySchema } from "@/components/table";
 import { db } from "@/db/db";
-import { course } from "@/db/schema";
-import Link from "next/link";
+import { course, school } from "@/db/schema";
 
 export const revalidate = 0;
 
@@ -24,14 +24,15 @@ type Props = {
 export default async function Page({ params, searchParams }: Props) {
   const query = querySchema.parse(searchParams);
 
-  // FIXME: filter by user school.
   const courses = await db
     .select({
       id: course.id,
       name: course.name,
       topics: course.topics,
     })
-    .from(course);
+    .from(course)
+    .innerJoin(school, eq(course.schoolId, school.id))
+    .where(eq(school.slug, params.slug));
 
   const create = async (formData: FormData) => {
     "use server";

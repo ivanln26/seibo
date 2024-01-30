@@ -17,7 +17,7 @@ export default function AttendancesByMonth({ data }: CanvasProps) {
 
   useEffect(() => {
     if (ref.current) {
-      new Chart(
+      const chart = new Chart(
         ref.current,
         {
           type: "line",
@@ -39,6 +39,9 @@ export default function AttendancesByMonth({ data }: CanvasProps) {
           },
         },
       );
+      return () => {
+        chart.destroy();
+      };
     }
   }, [ref]);
 

@@ -61,8 +61,6 @@ export default async function Page({ params }: Props) {
     .innerJoin(course, eq(instance.courseId, course.id))
     .where(and(eq(school.slug, params.slug), eq(user.id, u.id)));
 
-  console.log(instances);
-
   function divideTests() {
     const dividedTests: testCardData[][] = [[], [], []];
     for (const t of tests) {
@@ -89,6 +87,7 @@ export default async function Page({ params }: Props) {
     }
     return dividedTests;
   }
+
   async function createTest(data: FormData) {
     "use server";
     const testType = z.object({
@@ -114,62 +113,27 @@ export default async function Page({ params }: Props) {
     });
     revalidatePath(`/${params.slug}/student`);
   }
+
   const dividedTests = divideTests();
+
   return (
     <>
-      <h1 className="text-4xl">Examenes</h1>
+      <h1 className="text-4xl font-bold">Examenes</h1>
       <div className="flex flex-row justify-center gap-5 flex-wrap lg:flex-nowrap">
-        <div className="basis-full lg:basis-1/3">
-          <div className="text-center">
-            <h2 className="text-2xl">1° Trimestre</h2>
-          </div>
-          <div className="flex flex-col my-5 divide-y divide-black bg-primary-100 rounded-xl border text-center justify-center">
-            {dividedTests[0].map((t) => (
-              <Link href={`/${params.slug}/test/${t.id}`}>
-                <div className="flex flex-col hover:bg-primary-200 rounded-xl">
-                  <p className="font-bold text-xl">
-                    {t.title} | {t.subject} | {t.course}
-                  </p>
-                  <p>{t.date.toLocaleDateString()}</p>
+        {dividedTests.map((trimester, i) => (
+          <div className="flex flex-col gap-2 basis-full lg:basis-1/3" key={i}>
+            <h2 className="text-2xl">{i + 1}° Trimestre</h2>
+            {trimester.map((test, j) => (
+              <Link href={`/${params.slug}/test/${test.id}`} key={j}>
+                <div className="flex flex-col p-2 rounded bg-primary-100 text-primary-900 dark:bg-primary-700 dark:text-primary-100">
+                  <p className="font-bold text-xl">{test.title}</p>
+                  <p>{test.course} | {test.subject}</p>
+                  <p>{test.date.toLocaleDateString()}</p>
                 </div>
               </Link>
             ))}
           </div>
-        </div>
-        <div className="basis-full lg:basis-1/3">
-          <div className="text-center">
-            <h2 className="text-2xl">2° Trimestre</h2>
-          </div>
-          <div className="flex flex-col my-5 divide-y divide-black bg-primary-100 rounded-xl border text-center justify-center">
-            {dividedTests[1].map((t) => (
-              <Link href={`/${params.slug}/test/${t.id}`}>
-                <div className="flex flex-col hover:bg-primary-200 rounded-xl">
-                  <p className="font-bold text-xl">
-                    {t.title} | {t.subject} | {t.course}
-                  </p>
-                  <p>{t.date.toLocaleDateString()}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-        <div className="basis-full lg:basis-1/3">
-          <div className="text-center">
-            <h2 className="text-2xl">3° Trimestre</h2>
-          </div>
-          <div className="flex flex-col my-5 divide-y divide-black bg-primary-100 rounded-xl border text-center justify-center">
-            {dividedTests[2].map((t) => (
-              <Link href={`/${params.slug}/test/${t.id}`}>
-                <div className="flex flex-col hover:bg-primary-200 rounded-xl">
-                  <p className="font-bold text-xl">
-                    {t.title} | {t.subject} | {t.course}
-                  </p>
-                  <p>{t.date.toLocaleDateString()}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
+        ))}
       </div>
       <form className="fixed bottom-10 right-10" action={createTest}>
         <Modal

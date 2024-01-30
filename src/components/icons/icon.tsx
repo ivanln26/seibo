@@ -2,7 +2,9 @@ import Add from "./add";
 import Check from "./check";
 import CheckList from "./checklist";
 import Clock from "./clock";
+import Delete from "./delete";
 import Description from "./description";
+import Expand from "./expand";
 import Home from "./home";
 import Mail from "./mail";
 import Menu from "./menu";
@@ -15,7 +17,9 @@ export type Icon =
   | "check"
   | "checklist"
   | "clock"
+  | "delete"
   | "description"
+  | "expand"
   | "home"
   | "menu"
   | "person"
@@ -40,8 +44,12 @@ export default function Icon({ icon, ...props }: IconPickerProps) {
       return <Check {...props} />;
     case "checklist":
       return <CheckList {...props} />;
+    case "delete":
+      return <Delete {...props} />;
     case "description":
       return <Description {...props} />;
+    case "expand":
+      return <Expand {...props} />;
     case "home":
       return <Home {...props} />;
     case "menu":

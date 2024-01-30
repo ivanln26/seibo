@@ -17,7 +17,7 @@ export default function AvgScoresByCourse({ data }: CanvasProps) {
 
   useEffect(() => {
     if (ref.current) {
-      new Chart(
+      const chart = new Chart(
         ref.current,
         {
           type: "bar",
@@ -37,6 +37,9 @@ export default function AvgScoresByCourse({ data }: CanvasProps) {
           },
         },
       );
+      return () => {
+        chart.destroy();
+      };
     }
   }, [ref]);
 

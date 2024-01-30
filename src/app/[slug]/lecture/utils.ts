@@ -4,7 +4,6 @@ import { db } from "@/db/db";
 import {
   attendance,
   course,
-  courseGrade,
   grade,
   instance,
   lecture,
@@ -12,7 +11,6 @@ import {
   student,
   studentGrade,
 } from "@/db/schema";
-import { Session } from "next-auth";
 
 export async function getLectureCourses(lectureID: number) {
   const aux = await db.select()

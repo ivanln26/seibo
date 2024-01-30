@@ -1,9 +1,7 @@
 import Link from "next/link";
 import { z } from "zod";
 
-// FIXME: `like` search does not work with drizzle-orm.
-// https://github.com/drizzle-team/drizzle-orm/issues/1141
-// import TableSearch from "@/components/table-search";
+import TableSearch from "./table-search";
 
 export const querySchema = z.object({
   page: z.coerce.number()
@@ -39,24 +37,24 @@ export default function Table<TData>({
   limit,
 }: TableProps<TData>) {
   return (
-    <div className="flex flex-col gap-y-2 p-4 rounded-lg outline outline-1 outline-neutral-variant-50 dark:outline-neutral-variant-60">
+    <div className="flex flex-col gap-y-2">
       <h1 className="text-4xl">{title}</h1>
-      {/* <TableSearch /> */}
+      <TableSearch />
       <table className="table-auto w-full">
         <thead className="bg-primary-100 text-primary-900 dark:bg-primary-700 dark:text-primary-100">
           <tr>
-            {columns.map(({ name }) => (
-              <th className="border border-outline">{name}</th>
+            {columns.map(({ name }, i) => (
+              <th className="border border-outline" key={i}>{name}</th>
             ))}
           </tr>
         </thead>
         <tbody className="bg-neutral-99 dark:bg-neutral-4">
-          {data.map((row) => (
-            <tr>
-              {columns.map(({ attr }, i) => (
-                i === 0
+          {data.map((row, i) => (
+            <tr key={i}>
+              {columns.map(({ attr }, j) => (
+                j === 0
                   ? (
-                    <td className="px-2 py-1 border border-outline">
+                    <td className="px-2 py-1 border border-outline" key={j}>
                       <Link
                         className="block w-full font-bold underline text-center text-secondary-600 dark:text-secondary-200"
                         href={`${href}/${row[detail]}`}
@@ -66,7 +64,7 @@ export default function Table<TData>({
                     </td>
                   )
                   : (
-                    <td className="px-2 py-1 border border-outline">
+                    <td className="px-2 py-1 border border-outline" key={j}>
                       {JSON.stringify(row[attr])}
                     </td>
                   )
@@ -78,13 +76,14 @@ export default function Table<TData>({
       <div className="flex justify-end gap-x-2">
         <p className="py-1">Elementos:</p>
         <ul className="flex gap-x-2">
-          {[10, 25, 50, 100].map((n) => (
+          {[10, 25, 50, 100].map((n, i) => (
             <li
               className={`px-3 py-1 rounded-full ${
                 limit === n
                   ? "bg-primary-100 text-primary-900 dark:bg-primary-700 dark:text-primary-100"
                   : "outline outline-1 outline-outline"
-              } `}
+              }`}
+              key={i}
             >
               <Link
                 href={{

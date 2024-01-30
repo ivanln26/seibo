@@ -1,7 +1,9 @@
+import Link from "next/link";
+
 import Button from "@/components/button";
 import { db } from "@/db/db";
+import type { Role } from "@/db/schema";
 import { getUserProfile } from "@/db/queries";
-import Link from "next/link";
 
 export const revalidate = 0;
 
@@ -11,149 +13,101 @@ type Props = {
   };
 };
 
+type Color = "primary" | "secondary" | "tertiary";
+
+const colors: Record<Color, string> = {
+  primary:
+    "bg-primary-100 text-primary-900 dark:bg-primary-700 dark:text-primary-100",
+  secondary:
+    "bg-secondary-100 text-secondary-900 dark:bg-secondary-700 dark:text-secondary-100",
+  tertiary:
+    "bg-tertiary-100 text-tertiary-900 dark:bg-tertiary-700 dark:text-tertiary-100",
+};
+
+type CardProps = {
+  title: string;
+  description: string;
+  path: string;
+  color?: Color;
+  roles?: Role[];
+};
+
 export default async function Home({ params }: Props) {
+  const user = await getUserProfile({ slug: params.slug });
+  const roles = user.profiles.map((p) => p.role);
   const school = await db.query.school.findFirst({
-    where: (school, { eq }) => eq(school.slug, params.slug),
+    where: (sc, { eq }) => eq(sc.slug, params.slug),
   });
 
-  if (!school) {
-    return <>No se encontró la escuela.</>;
-  }
-
-  const user = await getUserProfile({ slug: params.slug });
-  if (!user) return <>Error al obtener el usuario.</>;
+  const cards: CardProps[] = [
+    {
+      title: "Asistencias",
+      description:
+        "Toma asistencia de tus clases, anota observaciones sobre las mismas.",
+      path: `${params.slug}/lecture`,
+    },
+    {
+      title: "Examenes",
+      description:
+        "Registra información acerca de los examenes de tus materias y los resultados de los alumnos.",
+      path: `${params.slug}/test`,
+    },
+    {
+      title: "Horarios",
+      description: "Revisa tus horarios en la institución.",
+      path: `${params.slug}/schedule`,
+    },
+    {
+      title: "Notificaciones",
+      description: "Envia e-mails a los tutores de los alumnos.",
+      path: `${params.slug}/notification`,
+    },
+    {
+      title: "Reportes",
+      description:
+        "Visualiza e imprime reportes con indicadores y estadisticas relevantes.",
+      path: `${params.slug}/dashboard`,
+      color: "secondary",
+      roles: ["admin", "principal"],
+    },
+    {
+      title: "Admin",
+      description:
+        "Administra la información general del colegio y del sistema.",
+      path: `${params.slug}/dashboard`,
+      color: "secondary",
+      roles: ["admin", "principal"],
+    },
+  ];
 
   return (
-    <section>
-      <div className="container mx-auto mt-8 p-8 bg-white rounded-xl outline outline-1 outline-outline shadow">
-        <h1 className="text-4xl font-bold mb-4">
-          Bienvenido a SEIBO &#128394;
-        </h1>
-        <p className="text-gray-600 mb-8">
-          Gestiona fácilmente la información de la institución{" "}
-          <b>{school.name}</b>
-        </p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {user.profiles.find((u) => u.role === "teacher") &&
-            (
-              <>
-                <div className="bg-primary-100 p-6 rounded-xl outline outline-1 outline-outline flex flex-col justify-between">
-                  <div>
-                    <h2 className="text-xl font-bold mb-2 text-primary-800">
-                      Asistencias
-                    </h2>
-                  </div>
-                  <div>
-                    <p className="text-gray-700">
-                      Toma asistencia de tus clases, anota observaciones sobre
-                      las mismas.
-                    </p>
-                  </div>
-                  <div className="px-4 py-2">
-                    <Link href={`${params.slug}/lecture`}>
-                      <Button color="primary">Ver detalle</Button>
-                    </Link>
-                  </div>
-                </div>
-
-                <div className="bg-primary-100 p-6 rounded-xl outline outline-1 outline-outline flex flex-col justify-between">
-                  <div>
-                    <h2 className="text-xl font-bold mb-2 text-primary-800">
-                      Examenes
-                    </h2>
-                  </div>
-                  <div>
-                    <p className="text-gray-700">
-                      Registra información acerca de los examenes de tus
-                      materias y los resultados de los alumnos.
-                    </p>
-                  </div>
-                  <div className="px-4 py-2">
-                    <Link href={`${params.slug}/test`}>
-                      <Button color="primary">Ver detalle</Button>
-                    </Link>
-                  </div>
-                </div>
-              </>
-            )}
-
-          {(user.profiles.find((p) => p.role === "teacher") ||
-            user.profiles.find((p) =>
-              p.role === "admin" ||
-              user.profiles.find((p) => p.role === "principal")
-            )) &&
-            (
-              <>
-                <div className="bg-primary-100 p-6 rounded-xl outline outline-1 outline-outline flex flex-col justify-between">
-                  <div>
-                    <h2 className="text-xl font-bold mb-2 text-primary-800">
-                      Horarios
-                    </h2>
-                  </div>
-                  <div>
-                    <p className="text-gray-700">
-                      Revisa tus horarios en la institución
-                    </p>
-                  </div>
-                  <div className="px-4 py-2">
-                    <Link href={`${params.slug}/schedule`}>
-                      <Button color="primary">Ver detalle</Button>
-                    </Link>
-                  </div>
-                </div>
-
-                <div className="bg-primary-100 p-6 rounded-xl outline outline-1 outline-outline flex flex-col justify-between space-between">
-                  <h2 className="text-xl font-bold mb-2 text-primary-800">
-                    Notificaciones
-                  </h2>
-                  <p className="text-gray-700">
-                    Envia e-mails a los tutores de los alumnos.
-                  </p>
-                  <div className="px-4 py-2">
-                    <Link href={`${params.slug}/notification`}>
-                      <Button color="primary">Ver detalle</Button>
-                    </Link>
-                  </div>
-                </div>
-              </>
-            )}
-
-          {(user.profiles.find((p) => p.role === "admin") ||
-            user.profiles.find((p) => p.role === "principal")) &&
-            (
-              <>
-                <div className="bg-secondary-100 p-6 rounded-xl outline outline-1 outline-outline flex flex-col justify-between space-between">
-                  <h2 className="text-xl font-bold mb-2 text-secondary-800">
-                    Reportes
-                  </h2>
-                  <p className="text-gray-700">
-                    Visualiza e imprime reportes con indicadores y estadisticas
-                    relevantes.
-                  </p>
-                  <div className="px-4 py-2">
-                    <Link href={`${params.slug}/dashboard`}>
-                      <Button color="secondary">Ver detalle</Button>
-                    </Link>
-                  </div>
-                </div>
-
-                <div className="bg-secondary-100 p-6 rounded-xl outline outline-1 outline-outline flex flex-col justify-between space-between">
-                  <h2 className="text-xl font-bold mb-2 text-secondary-800">
-                    Admin
-                  </h2>
-                  <p className="text-gray-700">
-                    Administra la información general del colegio y del sistema.
-                  </p>
-                  <div className="px-4 py-2">
-                    <Link href={`${params.slug}/admin`}>
-                      <Button color="secondary">Ver detalle</Button>
-                    </Link>
-                  </div>
-                </div>
-              </>
-            )}
-        </div>
+    <section className="flex flex-col p-6 gap-y-4">
+      <h1 className="text-4xl font-bold">
+        Bienvenido a SEIBO &#128394;
+      </h1>
+      <p className="text-primary-600 dark:text-primary-200">
+        Gestiona fácilmente la información de la institución{" "}
+        <b>{school?.name}</b>
+      </p>
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+        {cards.map((card, i) =>
+          (!card.roles ||
+            roles.filter((role) => card.roles?.includes(role)).length > 0) &&
+          (
+            <div
+              className={`flex flex-col justify-between gap-y-2 px-4 py-6 rounded ${
+                card.color ? colors[card.color] : colors["primary"]
+              }`}
+              key={i}
+            >
+              <h2 className="text-xl font-bold">{card.title}</h2>
+              <p>{card.description}</p>
+              <Link href={card.path}>
+                <Button color={card.color}>Ver detalle</Button>
+              </Link>
+            </div>
+          )
+        )}
       </div>
     </section>
   );

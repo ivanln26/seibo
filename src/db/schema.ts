@@ -23,6 +23,7 @@ export const user = mysqlTable("user", {
 }));
 
 export type User = typeof user.$inferSelect;
+export type NewUser = typeof user.$inferInsert;
 
 type SchoolSettings = {
   primaryColor: number;
@@ -39,7 +40,12 @@ export const school = mysqlTable("school", {
   settings: json("settings").$type<SchoolSettings>(),
 });
 
+export type School = typeof school.$inferSelect;
 export type NewSchool = typeof school.$inferInsert;
+
+export const schoolRelations = relations(school, ({ many }) => ({
+  profiles: many(schoolUser),
+}));
 
 export type Role = "teacher" | "tutor" | "principal" | "admin";
 
@@ -58,11 +64,16 @@ export const schoolUser = mysqlTable("school_user", {
 }));
 
 export type SchoolUser = typeof schoolUser.$inferSelect;
+export type NewSchoolUser = typeof schoolUser.$inferInsert;
 
 export const schoolUserRelations = relations(schoolUser, ({ one }) => ({
   user: one(user, {
     fields: [schoolUser.userId],
     references: [user.id],
+  }),
+  school: one(school, {
+    fields: [schoolUser.schoolId],
+    references: [school.id],
   }),
 }));
 
@@ -80,6 +91,9 @@ export const student = mysqlTable("student", {
   ),
 }));
 
+export type Student = typeof student.$inferSelect;
+export type NewStudent = typeof student.$inferInsert;
+
 export const studentContact = mysqlTable("student_contact", {
   id: int("id").autoincrement().primaryKey(),
   studentId: int("student_id").notNull(),
@@ -88,6 +102,9 @@ export const studentContact = mysqlTable("student_contact", {
   phone: varchar("phone", { length: 30 }).notNull(),
   type: mysqlEnum("type", ["father", "mother", "tutor", "other"]).notNull(),
 });
+
+export type StudentContact = typeof studentContact.$inferSelect;
+export type NewStudentContact = typeof studentContact.$inferInsert;
 
 export const classroom = mysqlTable("classroom", {
   id: int("id").autoincrement().primaryKey(),
@@ -100,11 +117,17 @@ export const classroom = mysqlTable("classroom", {
   ),
 }));
 
+export type Classroom = typeof classroom.$inferSelect;
+export type NewClassroom = typeof classroom.$inferInsert;
+
 export const grade = mysqlTable("grade", {
   id: int("id").autoincrement().primaryKey(),
   schoolId: int("school_id").notNull(),
   name: varchar("name", { length: 32 }).notNull(),
 });
+
+export type Grade = typeof grade.$inferSelect;
+export type NewGrade = typeof grade.$inferInsert;
 
 export const studentGrade = mysqlTable("student_grade", {
   id: int("id").autoincrement().primaryKey(),
@@ -117,6 +140,9 @@ export const studentGrade = mysqlTable("student_grade", {
   ),
 }));
 
+export type StudentGrade = typeof studentGrade.$inferSelect;
+export type NewStudentGrade = typeof studentGrade.$inferInsert;
+
 export const course = mysqlTable("course", {
   id: int("id").autoincrement().primaryKey(),
   schoolId: int("school_id").notNull(),
@@ -128,6 +154,9 @@ export const course = mysqlTable("course", {
     course.name,
   ),
 }));
+
+export type Course = typeof course.$inferSelect;
+export type NewCourse = typeof course.$inferInsert;
 
 export const courseRelations = relations(course, ({ many }) => ({
   courseToProfessor: many(courseProfessor),
@@ -143,6 +172,9 @@ export const courseProfessor = mysqlTable("course_professor", {
     table.professorId,
   ),
 }));
+
+export type CourseProfessor = typeof courseProfessor.$inferSelect;
+export type NewCourseProfessor = typeof courseProfessor.$inferInsert;
 
 export const courseProfessorRelations = relations(
   courseProfessor,
@@ -169,6 +201,9 @@ export const courseGrade = mysqlTable("course_grade", {
   ),
 }));
 
+export type CourseGrade = typeof courseGrade.$inferSelect;
+export type NewCourseGrade = typeof courseGrade.$inferInsert;
+
 export const instance = mysqlTable("instance", {
   id: int("id").autoincrement().primaryKey(),
   courseId: int("course_id").notNull(),
@@ -176,6 +211,9 @@ export const instance = mysqlTable("instance", {
   classroomId: int("classroom_id").notNull(),
   gradeId: int("grade_id").notNull(),
 });
+
+export type Instance = typeof instance.$inferSelect;
+export type NewInstance = typeof instance.$inferInsert;
 
 export const schedule = mysqlTable("schedule", {
   id: int("id").autoincrement().primaryKey(),
@@ -191,12 +229,18 @@ export const schedule = mysqlTable("schedule", {
   endTime: time("end_time").notNull(),
 });
 
+export type Schedule = typeof schedule.$inferSelect;
+export type NewSchedule = typeof schedule.$inferInsert;
+
 export const lecture = mysqlTable("lecture", {
   id: int("id").autoincrement().primaryKey(),
   scheduleId: int("schedule_id").notNull(),
   notes: text("notes").notNull().default(""),
   date: date("date").notNull(),
 });
+
+export type Lecture = typeof lecture.$inferSelect;
+export type NewLecture = typeof lecture.$inferInsert;
 
 export const attendance = mysqlTable("attendance", {
   id: int("id").autoincrement().primaryKey(),
@@ -205,6 +249,9 @@ export const attendance = mysqlTable("attendance", {
   isPresent: boolean("is_present").notNull().default(true),
 });
 
+export type Attendance = typeof attendance.$inferSelect;
+export type NewAttendance = typeof attendance.$inferInsert;
+
 export const test = mysqlTable("test", {
   id: int("id").autoincrement().primaryKey(),
   instanceId: int("instance_id").notNull(),
@@ -212,6 +259,9 @@ export const test = mysqlTable("test", {
   topics: text("topics").notNull(),
   date: date("date").notNull(),
 });
+
+export type Test = typeof test.$inferSelect;
+export type NewTest = typeof test.$inferInsert;
 
 export const score = mysqlTable("score", {
   id: int("id").autoincrement().primaryKey(),
@@ -225,6 +275,9 @@ export const score = mysqlTable("score", {
   ),
 }));
 
+export type Score = typeof score.$inferSelect;
+export type NewScore = typeof score.$inferInsert;
+
 export const audit = mysqlTable("audit", {
   id: int("id").autoincrement().primaryKey(),
   table: mysqlEnum("table", ["studentGrade", "courseProfessor"]).notNull(),
@@ -232,3 +285,6 @@ export const audit = mysqlTable("audit", {
   delta: json("delta").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
+
+export type Audit = typeof audit.$inferSelect;
+export type NewAudit = typeof audit.$inferInsert;
