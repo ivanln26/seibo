@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import type { typeToFlattenedError } from "zod";
 
+import env from "@/env";
 import { db } from "@/db/db";
 import {
   attendance,
@@ -21,44 +22,114 @@ import {
   studentGrade,
   user,
 } from "@/db/schema";
+import type { StudentContact } from "@/db/schema";
+import { transporter } from "@/mail";
 
-type SendMailOption = "all" | "course" | "student";
-
-const sendMailSchema = z.discriminatedUnion("option", [
-  z.object({
-    option: z.literal("all"),
+const sendMailSchemas = {
+  all: z.object({
     subject: z.string().min(1),
     body: z.string().min(1),
   }),
-  z.object({
-    option: z.literal("course"),
+  grade: z.object({
     subject: z.string().min(1),
     body: z.string().min(1),
-    course: z.coerce.number(),
+    grade: z.coerce.number(),
   }),
-  z.object({
-    option: z.literal("student"),
+  student: z.object({
     subject: z.string().min(1),
     body: z.string().min(1),
     student: z.coerce.number(),
   }),
-]);
+} as const;
+
+export type SendMailsResult =
+  | { success: true; message: string }
+  | { success: false; error: string };
 
 export async function sendMails(
-  option: SendMailOption,
-  _prevState: { success: boolean },
+  option: keyof typeof sendMailSchemas,
+  _prevState: SendMailsResult,
   data: FormData,
-): Promise<{ success: boolean }> {
-  const obj = sendMailSchema.safeParse({
-    option,
-    subject: data.get("subject"),
-    body: data.get("body"),
-  });
-  if (!obj.success) {
-    return { success: false };
+): Promise<SendMailsResult> {
+  let subject = "";
+  let body = "";
+  let contacts: StudentContact[] = [];
+
+  if (option === "all") {
+    const mail = sendMailSchemas["all"].safeParse({
+      subject: data.get("subject"),
+      body: data.get("body"),
+    });
+    if (!mail.success) {
+      return { success: false, error: "Ha ocurrido un error." };
+    }
+    subject = mail.data.subject;
+    body = mail.data.body;
+    // TODO: filtrar por la escuela correspondiente.
+    contacts = await db.select().from(studentContact);
+  } else if (option === "grade") {
+    const mail = sendMailSchemas["grade"].safeParse({
+      subject: data.get("subject"),
+      body: data.get("body"),
+      grade: data.get("grade"),
+    });
+    if (!mail.success) {
+      return { success: false, error: "Ha ocurrido un error." };
+    }
+    // TODO: validar que el grade id sea realmente de la institucion enviada.
+    subject = mail.data.subject;
+    body = mail.data.body;
+    contacts = await db
+      .select({
+        id: studentContact.id,
+        studentId: studentContact.studentId,
+        name: studentContact.name,
+        email: studentContact.email,
+        phone: studentContact.phone,
+        type: studentContact.type,
+      })
+      .from(studentContact)
+      .innerJoin(student, eq(studentContact.studentId, student.id))
+      .innerJoin(studentGrade, eq(student.id, studentGrade.studentId))
+      .innerJoin(grade, eq(studentGrade.gradeId, grade.id))
+      .where(eq(grade.id, mail.data.grade));
+  } else if (option === "student") {
+    const mail = sendMailSchemas["student"].safeParse({
+      subject: data.get("subject"),
+      body: data.get("body"),
+      student: data.get("student"),
+    });
+    if (!mail.success) {
+      return { success: false, error: "Ha ocurrido un error." };
+    }
+    // TODO: validar que el student id sea realmente de la institucion enviada.
+    subject = mail.data.subject;
+    body = mail.data.body;
+    contacts = await db
+      .select({
+        id: studentContact.id,
+        studentId: studentContact.studentId,
+        name: studentContact.name,
+        email: studentContact.email,
+        phone: studentContact.phone,
+        type: studentContact.type,
+      })
+      .from(studentContact)
+      .innerJoin(student, eq(studentContact.studentId, student.id))
+      .where(eq(student.id, mail.data.student));
   }
-  await db.select().from(studentContact);
-  return { success: true };
+
+  const promises = contacts.map(({ email }) =>
+    transporter.sendMail({
+      from: env.NODEMAILER_EMAIL,
+      to: email,
+      subject: subject,
+      text: body,
+    })
+  );
+  await Promise.all(promises);
+
+  return { success: true, message: "Se han enviado los mails correctamente." };
 }
 
 export async function updateAssistances(

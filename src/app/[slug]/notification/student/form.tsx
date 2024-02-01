@@ -1,8 +1,22 @@
 "use client";
 
-import Button from "@/components/button";
+import { useEffect, useState } from "react";
+import { useFormState } from "react-dom";
+
+import { sendMails } from "@/app/actions";
+import type { SendMailsResult } from "@/app/actions";
+import Select from "@/components/select";
+import Snackbar from "@/components/snackbar";
+import type { SnackbarMessage } from "@/components/snackbar";
+import SubmitButton from "@/components/submit-button";
+import TextArea from "@/components/text-area";
 import TextField from "@/components/text-field";
 import type { Grade, Student } from "@/db/schema";
+
+const initialState: SendMailsResult = {
+  success: true,
+  message: "",
+};
 
 type Props = {
   grades: Grade[];
@@ -10,64 +24,50 @@ type Props = {
 };
 
 export default function Form({ grades, students }: Props) {
+  const sendAllMails = sendMails.bind(null, "student");
+  const [state, formAction] = useFormState(sendAllMails, initialState);
+
+  const [messages, setMessages] = useState<SnackbarMessage[]>([]);
+
+  useEffect(() => {
+    if (state.success && state.message != "") {
+      setMessages((prevArr) => [
+        ...prevArr,
+        { message: state.message, color: "tertiary" },
+      ]);
+    }
+  }, [state]);
+
   return (
-    <form>
-      <div className="flex flex-col gap-y-1 group py-2">
-        <label
-          className="animate-all ease-in-out duration-300 group-focus-within:font-bold group-focus-within:text-primary-600 dark:group-focus-within:text-primary-200"
-          htmlFor="grade"
-        >
-          Curso*
-        </label>
-        <select
+    <>
+      <form action={formAction}>
+        <Select
           id="grade"
           name="grade"
-          className="h-12 px-4 rounded bg-transparent outline outline-1 outline-outline animate-color ease-in-out duration-300 focus:outline-2 focus:outline-primary-600 dark:focus:outline-primary-200"
+          label="Curso"
           required
-        >
-          <option value="0">-----</option>
-          {grades.map((grade) => (
-            <option value={grade.id} key={grade.id}>{grade.name}</option>
-          ))}
-        </select>
-      </div>
-      <div className="flex flex-col gap-y-1 group py-2">
-        <label
-          className="animate-all ease-in-out duration-300 group-focus-within:font-bold group-focus-within:text-primary-600 dark:group-focus-within:text-primary-200"
-          htmlFor="student"
-        >
-          Alumno*
-        </label>
-        <select
+          options={grades.map((grade) => ({
+            value: grade.id,
+            description: grade.name,
+            key: grade.id,
+          }))}
+        />
+        <Select
           id="student"
           name="student"
-          className="h-12 px-4 rounded bg-transparent outline outline-1 outline-outline animate-color ease-in-out duration-300 focus:outline-2 focus:outline-primary-600 dark:focus:outline-primary-200"
+          label="Alumno"
           required
-        >
-          <option value="0">-----</option>
-          {students.map((student) => (
-            <option value={student.id} key={student.id}>
-              {student.lastName} {student.firstName}
-            </option>
-          ))}
-        </select>
-      </div>
-      <TextField id="subject" name="subject" label="Asunto" required />
-      <div className="flex flex-col gap-y-1 group py-2">
-        <label
-          className="animate-all ease-in-out duration-300 group-focus-within:font-bold group-focus-within:text-primary-600 dark:group-focus-within:text-primary-200"
-          htmlFor="body"
-        >
-          Cuerpo*
-        </label>
-        <textarea
-          id="body"
-          name="body"
-          className="px-4 py-2 rounded bg-transparent outline outline-1 outline-outline animate-all ease-in-out duration-300 focus:outline-2 focus:outline-primary-600 dark:focus:outline-primary-200"
-          required
+          options={students.map((student) => ({
+            value: student.id,
+            description: `${student.lastName}, ${student.firstName}`,
+            key: student.id,
+          }))}
         />
-      </div>
-      <Button color="tertiary" type="submit">Enviar</Button>
-    </form>
+        <TextField id="subject" name="subject" label="Asunto" required />
+        <TextArea id="body" name="body" label="Cuerpo" required />
+        <SubmitButton />
+      </form>
+      <Snackbar list={messages} />
+    </>
   );
 }

@@ -5,19 +5,25 @@ import { useFormState } from "react-dom";
 
 import { sendMails } from "@/app/actions";
 import type { SendMailsResult } from "@/app/actions";
+import Select from "@/components/select";
 import Snackbar from "@/components/snackbar";
 import type { SnackbarMessage } from "@/components/snackbar";
 import SubmitButton from "@/components/submit-button";
 import TextArea from "@/components/text-area";
 import TextField from "@/components/text-field";
+import type { Grade } from "@/db/schema";
 
 const initialState: SendMailsResult = {
   success: true,
   message: "",
 };
 
-export default function Form() {
-  const sendAllMails = sendMails.bind(null, "all");
+type Props = {
+  grades: Grade[];
+};
+
+export default function Form({ grades }: Props) {
+  const sendAllMails = sendMails.bind(null, "grade");
   const [state, formAction] = useFormState(sendAllMails, initialState);
 
   const [messages, setMessages] = useState<SnackbarMessage[]>([]);
@@ -34,6 +40,17 @@ export default function Form() {
   return (
     <>
       <form action={formAction}>
+        <Select
+          id="grade"
+          name="grade"
+          label="Curso"
+          required
+          options={grades.map((grade) => ({
+            value: grade.id,
+            description: grade.name,
+            key: grade.id,
+          }))}
+        />
         <TextField id="subject" name="subject" label="Asunto" required />
         <TextArea id="body" name="body" label="Cuerpo" required />
         <SubmitButton />

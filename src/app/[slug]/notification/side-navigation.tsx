@@ -13,7 +13,7 @@ export default async function Page({ slug }: Props) {
 
   const links: Link[] = [
     { name: "Todos los tutores", href: `/${slug}/notification/all` },
-    { name: "Tutores de un curso", href: `/${slug}/notification/course` },
+    { name: "Tutores de un curso", href: `/${slug}/notification/grade` },
     { name: "Tutor de un alumno", href: `/${slug}/notification/student` },
   ];
 
