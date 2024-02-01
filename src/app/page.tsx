@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import Link from "next/link";
 
 import { getUserSchools } from "@/db/queries";
@@ -7,6 +8,10 @@ export const revalidate = 0;
 
 export default async function Page() {
   const schools = await getUserSchools();
+
+  if (schools.length === 1) {
+    redirect(`/${schools[0].slug}`);
+  }
 
   return (
     <main className="flex justify-center items-center w-full h-[100svh] px-4 md:px-0">
