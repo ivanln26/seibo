@@ -1,6 +1,6 @@
 import SideNavigation from "@/components/side-navigation";
 import type { Link } from "@/components/side-navigation-link";
-import { getUserProfile } from "@/db/queries";
+import { getUserProfile, hasRoles } from "@/db/queries";
 
 export const revalidate = 0;
 
@@ -10,6 +10,7 @@ type Props = {
 
 export default async function Page({ slug }: Props) {
   const user = await getUserProfile({ slug });
+  const isAdminOrPrincipal = await hasRoles(user, "OR", "admin", "principal");
 
   const links: Link[] = [
     { name: "Todos los tutores", href: `/${slug}/notification/all` },
@@ -17,10 +18,7 @@ export default async function Page({ slug }: Props) {
     { name: "Tutor de un alumno", href: `/${slug}/notification/student` },
   ];
 
-  if (
-    user.profiles.filter((p) => p.role === "admin" || p.role === "principal")
-      .length === 0
-  ) {
+  if (!isAdminOrPrincipal) {
     links.shift();
   }
 

@@ -3,12 +3,16 @@ import { getServerSession } from "next-auth";
 
 import { db } from "./db";
 import { school, schoolUser, user } from "./schema";
-import type { SchoolUser, User } from "./schema";
+import type { Role, SchoolUser, User } from "./schema";
+
+export type UserProfile = User & { profiles: SchoolUser[] };
 
 /**
  * Server-side
  */
-export async function getUserProfile({ slug }: { slug: string }) {
+export async function getUserProfile(
+  { slug }: { slug: string },
+): Promise<UserProfile> {
   const session = await getServerSession();
 
   if (!session) {
@@ -30,13 +34,24 @@ export async function getUserProfile({ slug }: { slug: string }) {
     throw new Error("No se pudo obtener ningún perfil.");
   }
 
-  return profiles.reduce<User & { profiles: SchoolUser[] }>((u, row) => {
+  return profiles.reduce<UserProfile>((u, row) => {
     u.profiles.push(row.schoolUser);
     return u;
   }, {
     ...profiles[0].user,
     profiles: [],
   });
+}
+
+export async function hasRoles(
+  user: UserProfile,
+  strategy: "OR" | "AND",
+  ...roles: Role[]
+): Promise<boolean> {
+  const intersection = user.profiles.filter(({ role }) => roles.includes(role));
+  return strategy === "OR"
+    ? intersection.length > 0
+    : intersection.length === roles.length;
 }
 
 export async function getUserSchools() {

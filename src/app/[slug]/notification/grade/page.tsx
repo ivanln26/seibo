@@ -4,6 +4,8 @@ import { getUserProfile } from "@/db/queries";
 
 import Form from "./form";
 
+export const revalidate = 0;
+
 type Props = {
   params: {
     slug: string;

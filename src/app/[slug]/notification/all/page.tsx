@@ -1,7 +1,9 @@
 import { redirect } from "next/navigation";
 
 import Form from "./form";
-import { getUserProfile } from "@/db/queries";
+import { getUserProfile, hasRoles } from "@/db/queries";
+
+export const revalidate = 0;
 
 type Props = {
   params: {
@@ -11,11 +13,9 @@ type Props = {
 
 export default async function Page({ params }: Props) {
   const user = await getUserProfile({ slug: params.slug });
+  const isAdminOrPrincipal = await hasRoles(user, "OR", "admin", "principal");
 
-  if (
-    user.profiles.filter((p) => p.role === "admin" || p.role === "principal")
-      .length === 0
-  ) {
+  if (!isAdminOrPrincipal) {
     redirect(`/${params.slug}/notification`);
   }
 

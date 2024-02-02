@@ -6,6 +6,8 @@ import { grade, student, studentGrade } from "@/db/schema";
 import Form from "./form";
 import { getSchool, getUserProfile } from "@/db/queries";
 
+export const revalidate = 0;
+
 type Props = {
   params: {
     slug: string;
