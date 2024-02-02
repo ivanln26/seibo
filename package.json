@@ -21,7 +21,7 @@
     "mysql2": "^3.7.0",
     "next": "^14.0.4",
     "next-auth": "^4.24.5",
-    "nodemailer": "^6.9.8",
+    "nodemailer": "^6.9.9",
     "path-to-regexp": "^6.2.1",
     "postcss": "^8.4.33",
     "react": "18.2.0",
