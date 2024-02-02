@@ -34,5 +34,7 @@ export default async function Page({ params }: Props) {
     .innerJoin(studentGrade, eq(student.id, studentGrade.studentId))
     .innerJoin(grade, eq(studentGrade.gradeId, grade.id));
 
-  return <Form grades={grades} students={students} />;
+  return (
+    <Form user={user} slug={params.slug} grades={grades} students={students} />
+  );
 }

@@ -16,5 +16,5 @@ export default async function Page({ params }: Props) {
   const user = await getUserProfile({ slug: params.slug });
   const grades = await db.select().from(grade);
 
-  return <Form grades={grades} />;
+  return <Form user={user} slug={params.slug} grades={grades} />;
 }

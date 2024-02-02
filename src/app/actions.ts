@@ -1,6 +1,6 @@
 "use server";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import type { typeToFlattenedError } from "zod";
@@ -15,6 +15,7 @@ import {
   instance,
   lecture,
   schedule,
+  school,
   schoolUser,
   score,
   student,
@@ -23,6 +24,8 @@ import {
   user,
 } from "@/db/schema";
 import type { StudentContact } from "@/db/schema";
+import { hasRoles } from "@/db/queries";
+import type { UserProfile } from "@/db/queries";
 import { transporter } from "@/mail";
 
 const sendMailSchemas = {
@@ -47,13 +50,31 @@ export type SendMailsResult =
   | { success: false; error: string };
 
 export async function sendMails(
+  userProfile: UserProfile,
+  slug: string,
   option: keyof typeof sendMailSchemas,
   _prevState: SendMailsResult,
   data: FormData,
 ): Promise<SendMailsResult> {
+  const isTeacherOrTutor = await hasRoles(
+    userProfile,
+    "OR",
+    "teacher",
+    "tutor",
+  );
+
   let subject = "";
   let body = "";
   let contacts: StudentContact[] = [];
+
+  const selectData = {
+    id: studentContact.id,
+    studentId: studentContact.studentId,
+    name: studentContact.name,
+    email: studentContact.email,
+    phone: studentContact.phone,
+    type: studentContact.type,
+  };
 
   if (option === "all") {
     const mail = sendMailSchemas["all"].safeParse({
@@ -65,8 +86,12 @@ export async function sendMails(
     }
     subject = mail.data.subject;
     body = mail.data.body;
-    // TODO: filtrar por la escuela correspondiente.
-    contacts = await db.select().from(studentContact);
+    contacts = await db
+      .select(selectData)
+      .from(studentContact)
+      .innerJoin(student, eq(studentContact.studentId, student.id))
+      .innerJoin(school, eq(student.schoolId, school.id))
+      .where(eq(school.slug, slug));
   } else if (option === "grade") {
     const mail = sendMailSchemas["grade"].safeParse({
       subject: data.get("subject"),
@@ -76,23 +101,23 @@ export async function sendMails(
     if (!mail.success) {
       return { success: false, error: "Ha ocurrido un error." };
     }
-    // TODO: validar que el grade id sea realmente de la institucion enviada.
     subject = mail.data.subject;
     body = mail.data.body;
     contacts = await db
-      .select({
-        id: studentContact.id,
-        studentId: studentContact.studentId,
-        name: studentContact.name,
-        email: studentContact.email,
-        phone: studentContact.phone,
-        type: studentContact.type,
-      })
+      .select(selectData)
       .from(studentContact)
       .innerJoin(student, eq(studentContact.studentId, student.id))
       .innerJoin(studentGrade, eq(student.id, studentGrade.studentId))
       .innerJoin(grade, eq(studentGrade.gradeId, grade.id))
-      .where(eq(grade.id, mail.data.grade));
+      .innerJoin(school, eq(student.schoolId, school.id))
+      .innerJoin(schoolUser, eq(school.id, schoolUser.schoolId))
+      .where(
+        and(
+          isTeacherOrTutor ? eq(schoolUser.userId, userProfile.id) : undefined,
+          eq(school.slug, slug),
+          eq(grade.id, mail.data.grade),
+        ),
+      );
   } else if (option === "student") {
     const mail = sendMailSchemas["student"].safeParse({
       subject: data.get("subject"),
@@ -102,21 +127,26 @@ export async function sendMails(
     if (!mail.success) {
       return { success: false, error: "Ha ocurrido un error." };
     }
-    // TODO: validar que el student id sea realmente de la institucion enviada.
     subject = mail.data.subject;
     body = mail.data.body;
     contacts = await db
-      .select({
-        id: studentContact.id,
-        studentId: studentContact.studentId,
-        name: studentContact.name,
-        email: studentContact.email,
-        phone: studentContact.phone,
-        type: studentContact.type,
-      })
+      .select(selectData)
       .from(studentContact)
       .innerJoin(student, eq(studentContact.studentId, student.id))
-      .where(eq(student.id, mail.data.student));
+      .innerJoin(school, eq(student.schoolId, school.id))
+      .where(
+        and(
+          // TODO: si el usuario es teacher/tutor asegurarse de que
+          // sea del estudiante en cuestión.
+          // isTeacherOrTutor ? eq() : undefined,
+          eq(school.slug, slug),
+          eq(student.id, mail.data.student),
+        ),
+      );
+  }
+
+  if (contacts.length === 0) {
+    return { success: false, error: "No hay contactos para enviar mails." };
   }
 
   const promises = contacts.map(({ email }) =>

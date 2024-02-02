@@ -10,14 +10,20 @@ import type { SnackbarMessage } from "@/components/snackbar";
 import SubmitButton from "@/components/submit-button";
 import TextArea from "@/components/text-area";
 import TextField from "@/components/text-field";
+import type { UserProfile } from "@/db/queries";
 
 const initialState: SendMailsResult = {
   success: true,
   message: "",
 };
 
-export default function Form() {
-  const sendAllMails = sendMails.bind(null, "all");
+type Props = {
+  user: UserProfile;
+  slug: string;
+};
+
+export default function Form({ user, slug }: Props) {
+  const sendAllMails = sendMails.bind(null, user, slug, "all");
   const [state, formAction] = useFormState(sendAllMails, initialState);
 
   const [messages, setMessages] = useState<SnackbarMessage[]>([]);

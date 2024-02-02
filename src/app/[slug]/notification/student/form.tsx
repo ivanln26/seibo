@@ -12,6 +12,7 @@ import SubmitButton from "@/components/submit-button";
 import TextArea from "@/components/text-area";
 import TextField from "@/components/text-field";
 import type { Grade, Student } from "@/db/schema";
+import { UserProfile } from "@/db/queries";
 
 const initialState: SendMailsResult = {
   success: true,
@@ -19,12 +20,14 @@ const initialState: SendMailsResult = {
 };
 
 type Props = {
+  user: UserProfile;
+  slug: string;
   grades: Grade[];
   students: Array<Student & { gradeId: number }>;
 };
 
-export default function Form({ grades, students }: Props) {
-  const sendAllMails = sendMails.bind(null, "student");
+export default function Form({ user, slug, grades, students }: Props) {
+  const sendAllMails = sendMails.bind(null, user, slug, "student");
   const [state, formAction] = useFormState(sendAllMails, initialState);
 
   const [messages, setMessages] = useState<SnackbarMessage[]>([]);

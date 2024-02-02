@@ -19,5 +19,5 @@ export default async function Page({ params }: Props) {
     redirect(`/${params.slug}/notification`);
   }
 
-  return <Form />;
+  return <Form user={user} slug={params.slug} />;
 }
