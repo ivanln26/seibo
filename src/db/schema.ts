@@ -158,52 +158,6 @@ export const course = mysqlTable("course", {
 export type Course = typeof course.$inferSelect;
 export type NewCourse = typeof course.$inferInsert;
 
-export const courseRelations = relations(course, ({ many }) => ({
-  courseToProfessor: many(courseProfessor),
-}));
-
-export const courseProfessor = mysqlTable("course_professor", {
-  id: int("id").autoincrement().primaryKey(),
-  courseId: int("course_id").notNull(),
-  professorId: int("user_id").notNull(),
-}, (table) => ({
-  uniqueCourseProfessor: uniqueIndex("unique_course_professor_idx").on(
-    table.courseId,
-    table.professorId,
-  ),
-}));
-
-export type CourseProfessor = typeof courseProfessor.$inferSelect;
-export type NewCourseProfessor = typeof courseProfessor.$inferInsert;
-
-export const courseProfessorRelations = relations(
-  courseProfessor,
-  ({ one }) => ({
-    course: one(course, {
-      fields: [courseProfessor.courseId],
-      references: [course.id],
-    }),
-    professor: one(user, {
-      fields: [courseProfessor.professorId],
-      references: [user.id],
-    }),
-  }),
-);
-
-export const courseGrade = mysqlTable("course_grade", {
-  id: int("id").autoincrement().primaryKey(),
-  courseId: int("course_id").notNull(),
-  gradeId: int("grade_id").notNull(),
-}, (table) => ({
-  uniqueCourseGrade: uniqueIndex("unique_course_grade_idx").on(
-    table.courseId,
-    table.gradeId,
-  ),
-}));
-
-export type CourseGrade = typeof courseGrade.$inferSelect;
-export type NewCourseGrade = typeof courseGrade.$inferInsert;
-
 export const instance = mysqlTable("instance", {
   id: int("id").autoincrement().primaryKey(),
   courseId: int("course_id").notNull(),
@@ -269,7 +223,7 @@ export const score = mysqlTable("score", {
   studentId: int("student_id").notNull(),
   score: tinyint("score").notNull(),
 }, (score) => ({
-  uniqueCourseGrade: uniqueIndex("unique_score_student_test_idx").on(
+  uniqueScoreStudent: uniqueIndex("unique_score_student_test_idx").on(
     score.testId,
     score.studentId,
   ),
@@ -280,7 +234,7 @@ export type NewScore = typeof score.$inferInsert;
 
 export const audit = mysqlTable("audit", {
   id: int("id").autoincrement().primaryKey(),
-  table: mysqlEnum("table", ["studentGrade", "courseProfessor"]).notNull(),
+  table: mysqlEnum("table", ["studentGrade"]).notNull(),
   pk: int("primary_key").notNull(),
   delta: json("delta").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
