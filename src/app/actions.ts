@@ -56,12 +56,13 @@ export async function sendMails(
   _prevState: SendMailsResult,
   data: FormData,
 ): Promise<SendMailsResult> {
-  const isTeacherOrTutor = await hasRoles(
+  const isAdminOrPrincipal = await hasRoles(
     userProfile,
     "OR",
-    "teacher",
-    "tutor",
+    "admin",
+    "principal",
   );
+  const isTeacher = await hasRoles(userProfile, "OR", "teacher");
 
   let subject = "";
   let body = "";
@@ -103,21 +104,39 @@ export async function sendMails(
     }
     subject = mail.data.subject;
     body = mail.data.body;
-    contacts = await db
-      .select(selectData)
-      .from(studentContact)
-      .innerJoin(student, eq(studentContact.studentId, student.id))
-      .innerJoin(studentGrade, eq(student.id, studentGrade.studentId))
-      .innerJoin(grade, eq(studentGrade.gradeId, grade.id))
-      .innerJoin(school, eq(student.schoolId, school.id))
-      .innerJoin(schoolUser, eq(school.id, schoolUser.schoolId))
-      .where(
-        and(
-          isTeacherOrTutor ? eq(schoolUser.userId, userProfile.id) : undefined,
-          eq(school.slug, slug),
-          eq(grade.id, mail.data.grade),
-        ),
-      );
+    if (isAdminOrPrincipal) {
+      contacts = await db
+        .select(selectData)
+        .from(studentContact)
+        .innerJoin(student, eq(studentContact.studentId, student.id))
+        .innerJoin(studentGrade, eq(student.id, studentGrade.studentId))
+        .innerJoin(school, eq(student.schoolId, school.id))
+        .where(
+          and(
+            eq(school.slug, slug),
+            eq(studentGrade.gradeId, mail.data.grade),
+          ),
+        );
+    } else if (isTeacher) {
+      contacts = await db
+        .selectDistinct(selectData)
+        .from(studentContact)
+        .innerJoin(student, eq(studentContact.studentId, student.id))
+        .innerJoin(studentGrade, eq(student.id, studentGrade.studentId))
+        .innerJoin(grade, eq(studentGrade.gradeId, grade.id))
+        .innerJoin(school, eq(grade.schoolId, school.id))
+        .innerJoin(instance, eq(grade.id, instance.gradeId))
+        .innerJoin(user, eq(instance.professorId, user.id))
+        .where(
+          and(
+            eq(school.slug, slug),
+            eq(grade.id, mail.data.grade),
+            !isAdminOrPrincipal && isTeacher
+              ? eq(user.id, userProfile.id)
+              : undefined,
+          ),
+        );
+    } // TODO: isTutor
   } else if (option === "student") {
     const mail = sendMailSchemas["student"].safeParse({
       subject: data.get("subject"),
@@ -129,20 +148,36 @@ export async function sendMails(
     }
     subject = mail.data.subject;
     body = mail.data.body;
-    contacts = await db
-      .select(selectData)
-      .from(studentContact)
-      .innerJoin(student, eq(studentContact.studentId, student.id))
-      .innerJoin(school, eq(student.schoolId, school.id))
-      .where(
-        and(
-          // TODO: si el usuario es teacher/tutor asegurarse de que
-          // sea del estudiante en cuestión.
-          // isTeacherOrTutor ? eq() : undefined,
-          eq(school.slug, slug),
-          eq(student.id, mail.data.student),
-        ),
-      );
+    if (isAdminOrPrincipal) {
+      contacts = await db
+        .select(selectData)
+        .from(studentContact)
+        .innerJoin(student, eq(studentContact.studentId, student.id))
+        .innerJoin(school, eq(student.schoolId, school.id))
+        .where(
+          and(
+            eq(school.slug, slug),
+            eq(student.id, mail.data.student),
+          ),
+        );
+    } else if (isTeacher) {
+      contacts = await db
+        .selectDistinct(selectData)
+        .from(studentContact)
+        .innerJoin(student, eq(studentContact.studentId, student.id))
+        .innerJoin(studentGrade, eq(student.id, studentGrade.studentId))
+        .innerJoin(grade, eq(studentGrade.gradeId, grade.id))
+        .innerJoin(instance, eq(grade.id, instance.gradeId))
+        .innerJoin(user, eq(instance.professorId, user.id))
+        .innerJoin(school, eq(student.schoolId, school.id))
+        .where(
+          and(
+            eq(school.slug, slug),
+            eq(user.id, userProfile.id),
+            eq(student.id, mail.data.student),
+          ),
+        );
+    } // TODO: isTutor
   }
 
   if (contacts.length === 0) {
