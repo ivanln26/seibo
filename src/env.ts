@@ -2,6 +2,8 @@ import { z } from "zod";
 
 const env = z.object({
   DATABASE_URL: z.string(),
+  NODEMAILER_EMAIL: z.string().email(),
+  NODEMAILER_PW: z.string(),
 });
 
 declare global {

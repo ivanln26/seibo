@@ -1,5 +1,7 @@
 "use client";
 
+import { ChangeEventHandler } from "react";
+
 type Option = {
   value: string | number;
   description: string;
@@ -10,6 +12,9 @@ type SelectProps = {
   id: string;
   name: string;
   label?: string;
+  onChange?: ChangeEventHandler<HTMLSelectElement>;
+  hasNull?: boolean;
+  disabled?: boolean;
   required?: boolean;
   defaultValue?: string | number;
   options: Option[];
@@ -19,6 +24,9 @@ export default function Select({
   id,
   name,
   label,
+  onChange,
+  hasNull,
+  disabled,
   options,
   required = false,
   defaultValue,
@@ -38,9 +46,12 @@ export default function Select({
         id={id}
         name={name}
         className="h-12 px-4 rounded bg-transparent animate ease-in-out duration-300 outline outline-1 outline-neutral-variant-50 dark:outline-neutral-variant-60 focus:outline-2 focus:outline-primary-600 dark:focus:outline-primary-200"
+        onChange={onChange}
+        disabled={disabled}
         required={required}
         defaultValue={defaultValue}
       >
+        {hasNull && <option value="">-----</option>}
         {options.map(({ value, description, key }, i) => (
           <option value={value} key={key ? key : i}>
             {description}

@@ -1,38 +1,50 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useFormState } from "react-dom";
 
-import SubmitButton from "@/components/submit-button";
-import TextField from "@/components/text-field";
-
 import { sendMails } from "@/app/actions";
+import type { SendMailsResult } from "@/app/actions";
+import Snackbar from "@/components/snackbar";
+import type { SnackbarMessage } from "@/components/snackbar";
+import SubmitButton from "@/components/submit-button";
+import TextArea from "@/components/text-area";
+import TextField from "@/components/text-field";
+import type { UserProfile } from "@/db/queries";
 
-const initialState: { success: boolean } = {
+const initialState: SendMailsResult = {
   success: true,
+  message: "",
 };
 
-export default function Form() {
-  const sendAllMails = sendMails.bind(null, "all");
+type Props = {
+  user: UserProfile;
+  slug: string;
+};
+
+export default function Form({ user, slug }: Props) {
+  const sendAllMails = sendMails.bind(null, user, slug, "all");
   const [state, formAction] = useFormState(sendAllMails, initialState);
 
+  const [messages, setMessages] = useState<SnackbarMessage[]>([]);
+
+  useEffect(() => {
+    if (state.success && state.message != "") {
+      setMessages((prevArr) => [
+        ...prevArr,
+        { message: state.message, color: "tertiary" },
+      ]);
+    }
+  }, [state]);
+
   return (
-    <form action={formAction}>
-      <TextField id="subject" name="subject" label="Asunto" required />
-      <div className="flex flex-col gap-y-1 group py-2">
-        <label
-          className="animate-all ease-in-out duration-300 group-focus-within:font-bold group-focus-within:text-primary-600 dark:group-focus-within:text-primary-200"
-          htmlFor="body"
-        >
-          Cuerpo*
-        </label>
-        <textarea
-          id="body"
-          name="body"
-          className="px-4 py-2 rounded bg-transparent outline outline-1 outline-outline animate-all ease-in-out duration-300 focus:outline-2 focus:outline-primary-600 dark:focus:outline-primary-200"
-          required
-        />
-      </div>
-      <SubmitButton />
-    </form>
+    <>
+      <form action={formAction}>
+        <TextField id="subject" name="subject" label="Asunto" required />
+        <TextArea id="body" name="body" label="Cuerpo" required />
+        <SubmitButton />
+      </form>
+      <Snackbar list={messages} />
+    </>
   );
 }
