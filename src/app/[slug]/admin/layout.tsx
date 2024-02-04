@@ -16,6 +16,7 @@ export default function AdminLayout({ children, params }: Props) {
     { name: "Estudiante", href: `/${params.slug}/admin/student` },
     { name: "Horario", href: `/${params.slug}/admin/schedule` },
     { name: "Materia", href: `/${params.slug}/admin/course` },
+    { name: "Preceptor", href: `/${params.slug}/admin/tutor` },
     { name: "Usuario", href: `/${params.slug}/admin/user` },
   ];
 

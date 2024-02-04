@@ -308,6 +308,12 @@ const updateAdminSchemas = {
     studentGradeId: z.coerce.number(),
     // TODO: add studentContact
   }),
+  tutor: z.object({
+    name: z.string(),
+    email: z.string(),
+    isActive: z.coerce.boolean().default(false),
+    // TODO: add grades
+  }),
   user: z.object({
     name: z.string(),
     email: z.string(),
@@ -492,6 +498,38 @@ export async function updateAdminModel<
     }
 
     revalidatePath(`/${slug}/admin/student/${modelId}`);
+  } else if (model === "tutor") {
+    const newTutor = updateAdminSchemas["tutor"].safeParse({
+      name: data.get("name"),
+      email: data.get("email"),
+      isActive: data.get("isActive"),
+    });
+
+    if (!newTutor.success) {
+      return { success: false, error: newTutor.error.flatten() };
+    }
+
+    try {
+      await db.transaction(async (tx) => {
+        await tx
+          .update(user)
+          .set({ name: newTutor.data.name, email: newTutor.data.email })
+          .where(eq(user.id, modelId));
+        await tx
+          .update(schoolUser)
+          .set({ isActive: newTutor.data.isActive })
+          .where(and(
+            eq(schoolUser.role, "tutor"),
+            eq(schoolUser.userId, modelId),
+          ));
+        // TODO: update gradeTutor
+      });
+    } catch {
+      return {
+        success: false,
+        error: "Ha ocurrido un error en la base de datos.",
+      };
+    }
   } else if (model === "user") {
     const newUser = updateAdminSchemas["user"].safeParse({
       name: data.get("name"),
