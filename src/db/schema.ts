@@ -30,6 +30,7 @@ type SchoolSettings = {
 };
 
 export const userRelations = relations(user, ({ many }) => ({
+  gradeTutors: many(gradeTutor),
   profiles: many(schoolUser),
   instances: many(instance),
 }));
@@ -161,6 +162,7 @@ export type Grade = typeof grade.$inferSelect;
 export type NewGrade = typeof grade.$inferInsert;
 
 export const gradeRelations = relations(grade, ({ many, one }) => ({
+  gradeTutors: many(gradeTutor),
   instances: many(instance),
   school: one(school, {
     fields: [grade.schoolId],
@@ -355,6 +357,28 @@ export const scoreRelations = relations(score, ({ one }) => ({
   test: one(test, {
     fields: [score.testId],
     references: [test.id],
+  }),
+}));
+
+export const gradeTutor = mysqlTable("grade_tutor", {
+  id: int("id").autoincrement().primaryKey(),
+  gradeId: int("grade_id").notNull(),
+  tutorId: int("user_id").notNull(),
+}, (table) => ({
+  uniqueGradeTutor: uniqueIndex("unique_grade_tutor_idx").on(
+    table.gradeId,
+    table.tutorId,
+  ),
+}));
+
+export const gradeTutorRelations = relations(gradeTutor, ({ one }) => ({
+  grade: one(grade, {
+    fields: [gradeTutor.gradeId],
+    references: [grade.id],
+  }),
+  tutor: one(user, {
+    fields: [gradeTutor.tutorId],
+    references: [user.id],
   }),
 }));
 
