@@ -8,7 +8,6 @@ import { db } from "@/db/db";
 import {
   classroom,
   course,
-  courseProfessor,
   grade,
   instance,
   schoolUser,
@@ -82,17 +81,9 @@ export default async function Page({ params, searchParams }: Props) {
       professorId: Number(data.get("professorId")),
     });
 
-    const newCourseProfessor = z.object({
-      professorId: z.number(),
-      courseId: z.number(),
-    }).safeParse({
-      professorId: Number(data.get("professorId")),
-      courseId: Number(data.get("courseId")),
-    });
-    if (!newInstance.success || !newCourseProfessor.success) return;
+    if (!newInstance.success) return;
 
     await db.insert(instance).values(newInstance.data);
-    await db.insert(courseProfessor).values(newCourseProfessor.data);
     revalidatePath(`/${params.slug}/admin/instance`);
   }
 

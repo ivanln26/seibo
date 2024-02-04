@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 
 import LogOutButton from "./logout-button";
 import { db } from "@/db/db";
-import { course, courseProfessor } from "@/db/schema";
+import { course, instance, user } from "@/db/schema";
 import type { Role } from "@/db/schema";
 import { getUserProfile } from "@/db/queries";
 
@@ -22,7 +22,7 @@ const translation: Record<Role, string> = {
 };
 
 export default async function Page({ params }: Props) {
-  const user = await getUserProfile({ slug: params.slug });
+  const userProfile = await getUserProfile({ slug: params.slug });
   const school = await db.query.school.findFirst({
     columns: { name: true },
     where: (school, { eq }) => eq(school.slug, params.slug),
@@ -33,32 +33,37 @@ export default async function Page({ params }: Props) {
   }
 
   const courses = await db
-    .select({
+    .selectDistinct({
       id: course.id,
       name: course.name,
     })
-    .from(course)
-    .innerJoin(courseProfessor, eq(course.id, courseProfessor.courseId))
-    .where(eq(courseProfessor.professorId, user.id));
+    .from(instance)
+    .innerJoin(course, eq(instance.courseId, course.id))
+    .innerJoin(user, eq(instance.professorId, user.id))
+    .where(eq(user.id, userProfile.id));
 
   return (
     <div className="flex flex-col md:flex-row gap-x-6 gap-y-4">
       <section className="flex flex-col gap-y-3 p-4 rounded outline outline-1 md:outline-0 outline-outline">
-        <h1 className="text-4xl font-bold">{user.name}</h1>
-        <h2 className="text-lg">{user.email}</h2>
+        <h1 className="text-4xl font-bold">{userProfile.name}</h1>
+        <h2 className="text-lg">{userProfile.email}</h2>
         <LogOutButton />
       </section>
       <section className="flex flex-col gap-y-2 p-4 rounded outline outline-1 md:outline-0 outline-outline">
         <h2 className="text-4xl font-bold">{school.name}</h2>
         <h1 className="text-2xl">Roles</h1>
         <ul className="list-disc list-inside text-lg">
-          {user.profiles.map((p) => (
-            <li className="ml-4">{translation[p.role]}</li>
+          {userProfile.profiles.map((p, i) => (
+            <li className="ml-4" key={i}>{translation[p.role]}</li>
           ))}
         </ul>
         <h1 className="text-2xl">Materias</h1>
         <ul className="list-disc list-inside text-lg">
-          {courses.map(({ name }) => <li className="ml-4">{name}</li>)}
+          {courses.map(({ name }, i) => (
+            <li className="ml-4" key={i}>
+              {name}
+            </li>
+          ))}
         </ul>
       </section>
     </div>
