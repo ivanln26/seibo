@@ -1,5 +1,7 @@
 import { and, eq, sql } from "drizzle-orm";
+import Link from "next/link";
 
+import Button from "@/components/button";
 import Table, { querySchema } from "@/components/table";
 import { db } from "@/db/db";
 import { gradeTutor, school, schoolUser, user } from "@/db/schema";
@@ -50,6 +52,18 @@ export default async function Page({ params, searchParams }: Props) {
         page={query.page}
         limit={query.limit}
       />
+      <div className="fixed bottom-5 right-5 md:right-10">
+        <Button color="tertiary">
+          <Link
+            href={{
+              pathname: `/${params.slug}/admin/new/user`,
+              query: { isTutor: true },
+            }}
+          >
+            Crear
+          </Link>
+        </Button>
+      </div>
     </>
   );
 }
