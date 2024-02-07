@@ -12,6 +12,7 @@ import {
   classroom,
   course,
   grade,
+  gradeTutor,
   instance,
   lecture,
   schedule,
@@ -622,7 +623,20 @@ export async function updateAdminModel<
             eq(schoolUser.role, "tutor"),
             eq(schoolUser.userId, modelId),
           ));
-        // TODO: update gradeTutor
+
+        // Maybe optimize
+        await tx
+          .delete(gradeTutor)
+          .where(eq(gradeTutor.tutorId, modelId));
+        const gradeRE = /grade-(\d+)/i;
+        for (const [key, value] of data.entries()) {
+          const gradeMatch = gradeRE.exec(key);
+          if (gradeMatch !== null && value === "on") {
+            await tx
+              .insert(gradeTutor)
+              .values({ gradeId: Number(gradeMatch[1]), tutorId: modelId });
+          }
+        }
       });
     } catch {
       return {

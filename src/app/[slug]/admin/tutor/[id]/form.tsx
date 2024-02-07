@@ -6,7 +6,6 @@ import { useFormState } from "react-dom";
 import { updateAdminModel } from "@/app/actions";
 import type { UpdateAdminModelResult } from "@/app/actions";
 import Checkbox from "@/components/checkbox";
-import Select from "@/components/select";
 import Snackbar from "@/components/snackbar";
 import type { SnackbarMessage } from "@/components/snackbar";
 import SubmitButton from "@/components/submit-button";
@@ -93,19 +92,23 @@ export default function Form({ slug, tutor, grades }: Props) {
         </div>
         <hr className="border border-neutral-variant-50 dark:border-neutral-variant-60" />
         <h2 className="text-2xl">Cursos asociados</h2>
-        {tutor.gradeIds.map((gradeId) => (
-          <Select
-            id={`grade-${gradeId}`}
-            name={`grade-${gradeId}`}
-            key={`grade-${gradeId}`}
-            defaultValue={gradeId}
-            options={grades.map((grade) => ({
-              value: grade.id,
-              description: grade.name,
-              key: grade.id,
-            }))}
-          />
-        ))}
+        <div className="grid grid-cols-1 gap-4 py-2 md:grid-cols-4 md:gap-2">
+          {grades.map((grade) => (
+            <div className="flex items-center gap-x-4" key={grade.id}>
+              <label
+                className="text-2xl font-mono"
+                htmlFor={`grade-${grade.id}`}
+              >
+                {grade.name}
+              </label>
+              <Checkbox
+                id={`grade-${grade.id}`}
+                name={`grade-${grade.id}`}
+                checked={tutor.gradeIds.includes(grade.id)}
+              />
+            </div>
+          ))}
+        </div>
         <SubmitButton title="Guardar" />
       </form>
       <Snackbar list={messages} />
