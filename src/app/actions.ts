@@ -12,6 +12,7 @@ import {
   classroom,
   course,
   grade,
+  gradeTutor,
   instance,
   lecture,
   schedule,
@@ -23,7 +24,7 @@ import {
   studentGrade,
   user,
 } from "@/db/schema";
-import type { StudentContact } from "@/db/schema";
+import type { Role, StudentContact } from "@/db/schema";
 import { hasRoles } from "@/db/queries";
 import type { UserProfile } from "@/db/queries";
 import { transporter } from "@/mail";
@@ -281,6 +282,106 @@ export async function updateScores(
   return { success: true };
 }
 
+const createAdminSchemas = {
+  user: z.object({
+    name: z.string(),
+    email: z.string().email(),
+    roles: z.array(z.union([
+      z.enum(["teacher", "tutor", "principal", "admin"]),
+      z.literal(""),
+      z.literal(null),
+    ])),
+  }).transform((val) => ({
+    ...val,
+    roles: val.roles.filter((role): role is Role =>
+      role !== "" && role !== null
+    ),
+  })).refine((val) => val.roles.length !== 0, {
+    message: "Se debe seleccionar al menos un rol.",
+  }),
+} as const;
+
+export type CreateAdminModelResult<T extends keyof typeof createAdminSchemas> =
+  | { success: true; message: string }
+  | {
+    success: false;
+    error: string | typeToFlattenedError<z.infer<typeof createAdminSchemas[T]>>;
+  };
+
+export async function createAdminModel<
+  T extends keyof typeof createAdminSchemas,
+>(
+  model: T,
+  slug: string,
+  _prevState: CreateAdminModelResult<T>,
+  data: FormData,
+): Promise<CreateAdminModelResult<T>> {
+  if (model === "user") {
+    const newUser = createAdminSchemas[model].safeParse({
+      name: data.get("name"),
+      email: data.get("email"),
+      roles: [
+        data.get("teacher") && "teacher",
+        data.get("tutor") && "tutor",
+        data.get("principal") && "principal",
+        data.get("admin") && "admin",
+      ],
+    });
+    if (!newUser.success) {
+      return { success: false, error: newUser.error.flatten() };
+    }
+
+    const u = await db
+      .select()
+      .from(user)
+      .innerJoin(schoolUser, eq(user.id, schoolUser.userId))
+      .innerJoin(school, eq(schoolUser.schoolId, school.id))
+      .where(and(
+        eq(school.slug, slug),
+        eq(user.email, newUser.data.email),
+      ));
+
+    if (u.length !== 0) {
+      return {
+        success: false,
+        error: "Ya existe un usuario con ese email en esta institución.",
+      };
+    }
+
+    try {
+      await db.transaction(async (tx) => {
+        await tx
+          .insert(user)
+          .values({ name: newUser.data.name, email: newUser.data.email })
+          .onDuplicateKeyUpdate({ set: { name: newUser.data.name } });
+        const u = await tx.query.user.findFirst({
+          where: (user, { eq }) => eq(user.email, newUser.data.email),
+        });
+        const s = await tx.query.school.findFirst({
+          where: (school, { eq }) => eq(school.slug, slug),
+        });
+        if (u === undefined || s === undefined) throw new Error();
+        for (const role of newUser.data.roles) {
+          await tx
+            .insert(schoolUser)
+            .values({
+              schoolId: s.id,
+              userId: u.id,
+              role: role,
+              isActive: true,
+            });
+        }
+      });
+    } catch {
+      return {
+        success: false,
+        error: "Ha ocurrido un error en la base de datos.",
+      };
+    }
+  }
+  return { success: true, message: "Se ha creado correctamente." };
+}
+
 const updateAdminSchemas = {
   classroom: z.object({ name: z.string() }),
   course: z.object({
@@ -307,6 +408,12 @@ const updateAdminSchemas = {
     email: z.string(),
     studentGradeId: z.coerce.number(),
     // TODO: add studentContact
+  }),
+  tutor: z.object({
+    name: z.string(),
+    email: z.string(),
+    isActive: z.coerce.boolean().default(false),
+    // TODO: add grades
   }),
   user: z.object({
     name: z.string(),
@@ -492,6 +599,51 @@ export async function updateAdminModel<
     }
 
     revalidatePath(`/${slug}/admin/student/${modelId}`);
+  } else if (model === "tutor") {
+    const newTutor = updateAdminSchemas["tutor"].safeParse({
+      name: data.get("name"),
+      email: data.get("email"),
+      isActive: data.get("isActive"),
+    });
+
+    if (!newTutor.success) {
+      return { success: false, error: newTutor.error.flatten() };
+    }
+
+    try {
+      await db.transaction(async (tx) => {
+        await tx
+          .update(user)
+          .set({ name: newTutor.data.name, email: newTutor.data.email })
+          .where(eq(user.id, modelId));
+        await tx
+          .update(schoolUser)
+          .set({ isActive: newTutor.data.isActive })
+          .where(and(
+            eq(schoolUser.role, "tutor"),
+            eq(schoolUser.userId, modelId),
+          ));
+
+        // Maybe optimize
+        await tx
+          .delete(gradeTutor)
+          .where(eq(gradeTutor.tutorId, modelId));
+        const gradeRE = /grade-(\d+)/i;
+        for (const [key, value] of data.entries()) {
+          const gradeMatch = gradeRE.exec(key);
+          if (gradeMatch !== null && value === "on") {
+            await tx
+              .insert(gradeTutor)
+              .values({ gradeId: Number(gradeMatch[1]), tutorId: modelId });
+          }
+        }
+      });
+    } catch {
+      return {
+        success: false,
+        error: "Ha ocurrido un error en la base de datos.",
+      };
+    }
   } else if (model === "user") {
     const newUser = updateAdminSchemas["user"].safeParse({
       name: data.get("name"),

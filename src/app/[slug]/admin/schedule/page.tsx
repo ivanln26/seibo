@@ -92,7 +92,10 @@ export default async function Page({ params, searchParams }: Props) {
         page={query.page}
         limit={query.limit}
       />
-      <form className="fixed bottom-10 right-10" action={createSchedule}>
+      <form
+        className="fixed bottom-5 right-5 md:right-10"
+        action={createSchedule}
+      >
         <Modal
           buttonText="Crear"
           confirmButton={{ text: "Crear", type: "submit" }}

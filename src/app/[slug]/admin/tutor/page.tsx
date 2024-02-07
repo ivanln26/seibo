@@ -1,15 +1,14 @@
-import { and, eq, like, or, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import Link from "next/link";
 
 import Button from "@/components/button";
 import Table, { querySchema } from "@/components/table";
 import { db } from "@/db/db";
-import { school, schoolUser, user } from "@/db/schema";
+import { gradeTutor, school, schoolUser, user } from "@/db/schema";
 
 type Props = {
   params: {
     slug: string;
-    id: string;
   };
   searchParams: {
     page?: string;
@@ -21,48 +20,48 @@ type Props = {
 export default async function Page({ params, searchParams }: Props) {
   const query = querySchema.parse(searchParams);
 
-  const users = await db
-    .select({
-      id: schoolUser.id,
+  const tutors = await db
+    .selectDistinct({
+      id: user.id,
       name: user.name,
       email: user.email,
-      role: schoolUser.role,
       isActive: sql<string>`if(${schoolUser.isActive}, "Alta", "Baja")`,
     })
     .from(user)
     .innerJoin(schoolUser, eq(user.id, schoolUser.userId))
     .innerJoin(school, eq(schoolUser.schoolId, school.id))
+    .leftJoin(gradeTutor, eq(user.id, gradeTutor.tutorId))
     .where(and(
       eq(school.slug, params.slug),
-      query.query
-        ? or(
-          like(user.name, `%${query.query}%`),
-          like(user.email, `%${query.query}%`),
-        )
-        : undefined,
-    ))
-    .orderBy(schoolUser.id);
+      eq(schoolUser.role, "tutor"),
+    ));
 
   return (
     <>
       <Table
-        title="Usuarios"
-        data={users}
+        title="Preceptores"
+        data={tutors}
         columns={[
           { attr: "id", name: "ID" },
           { attr: "name", name: "Nombre" },
           { attr: "email", name: "Email" },
-          { attr: "role", name: "Rol" },
           { attr: "isActive", name: "Estado" },
         ]}
-        href={`/${params.slug}/admin/user`}
+        href={`/${params.slug}/admin/tutor`}
         detail="id"
         page={query.page}
         limit={query.limit}
       />
       <div className="fixed bottom-5 right-5 md:right-10">
         <Button color="tertiary">
-          <Link href={`/${params.slug}/admin/new/user`}>Crear</Link>
+          <Link
+            href={{
+              pathname: `/${params.slug}/admin/new/user`,
+              query: { isTutor: true },
+            }}
+          >
+            Crear
+          </Link>
         </Button>
       </div>
     </>
