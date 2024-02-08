@@ -37,12 +37,12 @@ const schools: NewSchool[] = [
   {
     name: "ITS Villada",
     slug: "itsv",
-    settings: { primaryColor: 1 },
+    settings: { primary: "primary", secondary: "secondary" },
   },
   {
     name: "La Salle",
     slug: "la-salle",
-    settings: { primaryColor: 1 },
+    settings: { primary: "primary", secondary: "secondary" },
   },
 ];
 

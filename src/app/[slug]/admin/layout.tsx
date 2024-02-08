@@ -12,6 +12,7 @@ export default function AdminLayout({ children, params }: Props) {
   const links: Link[] = [
     { name: "Aula", href: `/${params.slug}/admin/classroom` },
     { name: "Clase", href: `/${params.slug}/admin/instance` },
+    { name: "Configuración", href: `/${params.slug}/admin/configuration` },
     { name: "Curso", href: `/${params.slug}/admin/grade` },
     { name: "Estudiante", href: `/${params.slug}/admin/student` },
     { name: "Horario", href: `/${params.slug}/admin/schedule` },

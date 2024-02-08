@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import type { typeToFlattenedError } from "zod";
 
-import env from "@/env";
+import { twColors } from "@/color";
 import { db } from "@/db/db";
 import {
   attendance,
@@ -27,6 +27,7 @@ import {
 import type { Role, StudentContact } from "@/db/schema";
 import { hasRoles } from "@/db/queries";
 import type { UserProfile } from "@/db/queries";
+import env from "@/env";
 import { transporter } from "@/mail";
 
 const sendMailSchemas = {
@@ -384,6 +385,10 @@ export async function createAdminModel<
 
 const updateAdminSchemas = {
   classroom: z.object({ name: z.string() }),
+  config: z.object({
+    primary: z.enum(twColors),
+    secondary: z.enum(twColors),
+  }),
   course: z.object({
     name: z.string(),
     topics: z.string(),
@@ -469,6 +474,29 @@ export async function updateAdminModel<
     }
 
     revalidatePath(`/${slug}/admin/classroom/${modelId}`);
+  } else if (model === "config") {
+    const newConfig = updateAdminSchemas["config"].safeParse({
+      primary: data.get("primary"),
+      secondary: data.get("secondary"),
+    });
+
+    if (!newConfig.success) {
+      return { success: false, error: newConfig.error.flatten() };
+    }
+
+    try {
+      await db
+        .update(school)
+        .set({ settings: newConfig.data })
+        .where(eq(school.slug, slug));
+    } catch {
+      return {
+        success: false,
+        error: "Ha ocurrido un error en la base de datos.",
+      };
+    }
+
+    revalidatePath(`/${slug}`);
   } else if (model === "course") {
     const newCourse = updateAdminSchemas["course"].safeParse({
       name: data.get("name"),
