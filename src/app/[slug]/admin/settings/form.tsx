@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormState } from "react-dom";
 
 import { updateAdminModel } from "@/app/actions";
 import type { UpdateAdminModelResult } from "@/app/actions";
 import Select from "@/components/select";
+import Snackbar from "@/components/snackbar";
+import type { SnackbarMessage } from "@/components/snackbar";
 import SubmitButton from "@/components/submit-button";
 import TextField from "@/components/text-field";
 import type { TwColor } from "@/color";
@@ -66,12 +68,31 @@ export default function Form({ slug, school }: Props) {
   const [secondary, setSecondary] = useState<TwColor>(
     school.settings?.color.secondary || "secondary",
   );
+  const [messages, setMessages] = useState<SnackbarMessage[]>([]);
 
   const updateAction = updateAdminModel.bind(null, "settings", slug, school.id);
   const [updateState, updateFormAction] = useFormState(
     updateAction,
     updateInitialState,
   );
+
+  useEffect(() => {
+    if (updateState.success && updateState.message !== "") {
+      setMessages(
+        (prevArr) => [...prevArr, {
+          message: updateState.message,
+          color: "tertiary",
+        }],
+      );
+    }
+    if (!updateState.success && typeof updateState.error === "string") {
+      const msg: SnackbarMessage = {
+        message: updateState.error,
+        color: "error",
+      };
+      setMessages((prevArr) => [...prevArr, msg]);
+    }
+  }, [updateState]);
 
   return (
     <>
@@ -171,6 +192,7 @@ export default function Form({ slug, school }: Props) {
         />
         <SubmitButton title="Guardar" />
       </form>
+      <Snackbar list={messages} />
     </>
   );
 }
