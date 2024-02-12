@@ -383,12 +383,12 @@ export async function createAdminModel<
   return { success: true, message: "Se ha creado correctamente." };
 }
 
+const termDate = z.coerce.date().transform((val) =>
+  val.toISOString().substring(0, 10)
+);
+
 const updateAdminSchemas = {
   classroom: z.object({ name: z.string() }),
-  config: z.object({
-    primary: z.enum(twColors),
-    secondary: z.enum(twColors),
-  }),
   course: z.object({
     name: z.string(),
     topics: z.string(),
@@ -406,6 +406,35 @@ const updateAdminSchemas = {
     startTime: z.string(),
     endTime: z.string(),
   }),
+  settings: z.object({
+    primary: z.enum(twColors),
+    secondary: z.enum(twColors),
+    firstTermStart: termDate,
+    firstTermEnd: termDate,
+    secondTermStart: termDate,
+    secondTermEnd: termDate,
+    thirdTermStart: termDate,
+    thirdTermEnd: termDate,
+  }).transform((val) => ({
+    color: {
+      primary: val.primary,
+      secondary: val.secondary,
+    },
+    terms: {
+      first: {
+        start: val.firstTermStart,
+        end: val.firstTermEnd,
+      },
+      second: {
+        start: val.secondTermStart,
+        end: val.secondTermEnd,
+      },
+      third: {
+        start: val.thirdTermStart,
+        end: val.thirdTermEnd,
+      },
+    },
+  })),
   student: z.object({
     studentCode: z.string(),
     firstName: z.string(),
@@ -474,29 +503,6 @@ export async function updateAdminModel<
     }
 
     revalidatePath(`/${slug}/admin/classroom/${modelId}`);
-  } else if (model === "config") {
-    const newConfig = updateAdminSchemas["config"].safeParse({
-      primary: data.get("primary"),
-      secondary: data.get("secondary"),
-    });
-
-    if (!newConfig.success) {
-      return { success: false, error: newConfig.error.flatten() };
-    }
-
-    try {
-      await db
-        .update(school)
-        .set({ settings: newConfig.data })
-        .where(eq(school.slug, slug));
-    } catch {
-      return {
-        success: false,
-        error: "Ha ocurrido un error en la base de datos.",
-      };
-    }
-
-    revalidatePath(`/${slug}`);
   } else if (model === "course") {
     const newCourse = updateAdminSchemas["course"].safeParse({
       name: data.get("name"),
@@ -592,6 +598,35 @@ export async function updateAdminModel<
     }
 
     revalidatePath(`/${slug}/admin/schedule/${modelId}`);
+  } else if (model === "settings") {
+    const newSettings = updateAdminSchemas["settings"].safeParse({
+      primary: data.get("primary"),
+      secondary: data.get("secondary"),
+      firstTermStart: data.get("first-term-start"),
+      firstTermEnd: data.get("first-term-end"),
+      secondTermStart: data.get("second-term-start"),
+      secondTermEnd: data.get("second-term-end"),
+      thirdTermStart: data.get("third-term-start"),
+      thirdTermEnd: data.get("third-term-end"),
+    });
+
+    if (!newSettings.success) {
+      return { success: false, error: newSettings.error.flatten() };
+    }
+
+    try {
+      await db
+        .update(school)
+        .set({ settings: newSettings.data })
+        .where(eq(school.slug, slug));
+    } catch {
+      return {
+        success: false,
+        error: "Ha ocurrido un error en la base de datos.",
+      };
+    }
+
+    revalidatePath(`/${slug}`);
   } else if (model === "student") {
     const newStudent = updateAdminSchemas["student"].safeParse({
       studentCode: data.get("studentCode"),

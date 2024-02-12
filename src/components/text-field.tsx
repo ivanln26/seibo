@@ -10,7 +10,7 @@ type TextFieldProps = {
   defaultValue?: string;
   pattern?: string;
   required?: boolean;
-  type?: "email" | "password" | "text" | "url";
+  type?: "email" | "password" | "text" | "url" | "date";
 };
 
 export default function TextField({

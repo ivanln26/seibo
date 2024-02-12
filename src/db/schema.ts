@@ -27,16 +27,23 @@ export const user = mysqlTable("user", {
 export type User = typeof user.$inferSelect;
 export type NewUser = typeof user.$inferInsert;
 
-type SchoolSettings = {
-  primary: TwColor;
-  secondary: TwColor;
-};
-
 export const userRelations = relations(user, ({ many }) => ({
   gradeTutors: many(gradeTutor),
   profiles: many(schoolUser),
   instances: many(instance),
 }));
+
+export type SchoolSettings = {
+  color: {
+    primary: TwColor;
+    secondary: TwColor;
+  };
+  terms: {
+    first: { start: string; end: string };
+    second: { start: string; end: string };
+    third: { start: string; end: string };
+  };
+};
 
 export const school = mysqlTable("school", {
   id: int("id").autoincrement().primaryKey(),

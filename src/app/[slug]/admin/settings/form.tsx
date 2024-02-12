@@ -7,10 +7,11 @@ import { updateAdminModel } from "@/app/actions";
 import type { UpdateAdminModelResult } from "@/app/actions";
 import Select from "@/components/select";
 import SubmitButton from "@/components/submit-button";
+import TextField from "@/components/text-field";
 import type { TwColor } from "@/color";
 import type { School } from "@/db/schema";
 
-const updateInitialState: UpdateAdminModelResult<"config"> = {
+const updateInitialState: UpdateAdminModelResult<"settings"> = {
   success: true,
   message: "",
 };
@@ -60,13 +61,13 @@ type Props = {
 
 export default function Form({ slug, school }: Props) {
   const [primary, setPrimary] = useState<TwColor>(
-    school.settings?.primary || "primary",
+    school.settings?.color.primary || "primary",
   );
   const [secondary, setSecondary] = useState<TwColor>(
-    school.settings?.secondary || "secondary",
+    school.settings?.color.secondary || "secondary",
   );
 
-  const updateAction = updateAdminModel.bind(null, "config", slug, school.id);
+  const updateAction = updateAdminModel.bind(null, "settings", slug, school.id);
   const [updateState, updateFormAction] = useFormState(
     updateAction,
     updateInitialState,
@@ -118,6 +119,56 @@ export default function Form({ slug, school }: Props) {
             <div className={`h-12 w-20 rounded ${twColors[secondary]}`} />
           </div>
         </div>
+        <hr className="border border-neutral-variant-50 dark:border-neutral-variant-60" />
+        <h2 className="text-2xl">Trimestre</h2>
+        <TextField
+          id="first-term-start"
+          name="first-term-start"
+          label="Inicio de primer trimestre"
+          defaultValue={school.settings?.terms.first.start}
+          required
+          type="date"
+        />
+        <TextField
+          id="first-term-end"
+          name="first-term-end"
+          label="Fin de primer trimestre"
+          defaultValue={school.settings?.terms.first.end}
+          required
+          type="date"
+        />
+        <TextField
+          id="second-term-start"
+          name="second-term-start"
+          label="Inicio de segundo trimestre"
+          defaultValue={school.settings?.terms.second.start}
+          required
+          type="date"
+        />
+        <TextField
+          id="second-term-end"
+          name="second-term-end"
+          label="Fin de segundo trimestre"
+          defaultValue={school.settings?.terms.second.end}
+          required
+          type="date"
+        />
+        <TextField
+          id="third-term-start"
+          name="third-term-start"
+          label="Inicio de tercer trimestre"
+          defaultValue={school.settings?.terms.third.start}
+          required
+          type="date"
+        />
+        <TextField
+          id="third-term-end"
+          name="third-term-end"
+          label="Fin de tercer trimestre"
+          defaultValue={school.settings?.terms.third.end}
+          required
+          type="date"
+        />
         <SubmitButton title="Guardar" />
       </form>
     </>

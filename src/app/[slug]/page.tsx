@@ -76,8 +76,8 @@ export default async function Home({ params }: Props) {
     redirect("/");
   }
 
-  const primaryColor = school.settings?.primary || "primary";
-  const secondaryColor = school.settings?.secondary || "secondary";
+  const primaryColor = school.settings?.color.primary || "primary";
+  const secondaryColor = school.settings?.color.secondary || "secondary";
 
   const cards: CardProps[] = [
     {
