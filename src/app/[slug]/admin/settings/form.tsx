@@ -118,7 +118,7 @@ export default function Form({ slug, school }: Props) {
             <div className={`h-12 w-20 rounded ${twColors[secondary]}`} />
           </div>
         </div>
-        <SubmitButton />
+        <SubmitButton title="Guardar" />
       </form>
     </>
   );
