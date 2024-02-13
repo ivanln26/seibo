@@ -245,7 +245,7 @@ const tests = [
     instanceId: 1,
     title: "Primera evaluación",
     topics: "Primera guerra mundial",
-    date: new Date("2023-08-05"),
+    date: "2024-04-01",
   },
 ];
 

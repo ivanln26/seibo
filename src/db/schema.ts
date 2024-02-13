@@ -330,7 +330,7 @@ export const test = mysqlTable("test", {
   instanceId: int("instance_id").notNull(),
   title: varchar("title", { length: 120 }).notNull(),
   topics: text("topics").notNull(),
-  date: date("date").notNull(),
+  date: varchar("date", { length: 10 }).notNull(),
 });
 
 export type Test = typeof test.$inferSelect;
