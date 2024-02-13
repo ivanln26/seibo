@@ -44,7 +44,7 @@ type CardProps = {
   title: string;
   description: string;
   path: string;
-  color?: "primary" | "secondary";
+  color: "primary" | "secondary";
   roles?: Role[];
 };
 
@@ -85,22 +85,26 @@ export default async function Home({ params }: Props) {
       description:
         "Toma asistencia de tus clases, anota observaciones sobre las mismas.",
       path: `${params.slug}/lecture`,
+      color: "primary",
     },
     {
       title: "Examenes",
       description:
         "Registra información acerca de los examenes de tus materias y los resultados de los alumnos.",
       path: `${params.slug}/test`,
+      color: "primary",
     },
     {
       title: "Horarios",
       description: "Revisa tus horarios en la institución.",
       path: `${params.slug}/schedule`,
+      color: "primary",
     },
     {
       title: "Notificaciones",
       description: "Envia e-mails a los tutores de los alumnos.",
       path: `${params.slug}/notification`,
+      color: "primary",
     },
     {
       title: "Reportes",
@@ -145,7 +149,13 @@ export default async function Home({ params }: Props) {
               <h2 className="text-xl font-bold">{card.title}</h2>
               <p>{card.description}</p>
               <Link href={card.path}>
-                <Button color={primaryColor}>Ver detalle</Button>
+                <Button
+                  color={card.color === "primary"
+                    ? primaryColor
+                    : secondaryColor}
+                >
+                  Ver detalle
+                </Button>
               </Link>
             </div>
           )
