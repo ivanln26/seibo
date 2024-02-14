@@ -6,6 +6,7 @@ type TextFieldProps = {
   name: string;
   label?: string;
   helpText?: string;
+  errorText?: string;
   icon?: TIcon;
   defaultValue?: string;
   pattern?: string;
@@ -18,6 +19,7 @@ export default function TextField({
   name,
   label,
   helpText,
+  errorText,
   icon,
   defaultValue,
   pattern,
@@ -57,9 +59,14 @@ export default function TextField({
           type={type}
         />
       </div>
-      {helpText && (
-        <span className="text-xs text-neutral-variant-30 dark:text-neutral-variant-90">
+      {helpText && errorText === undefined && (
+        <span className="px-2 text-xs text-neutral-variant-30 dark:text-neutral-variant-90">
           {helpText}
+        </span>
+      )}
+      {errorText && (
+        <span className="px-2 text-xs text-error-600 dark:text-error-200">
+          {errorText}
         </span>
       )}
     </div>

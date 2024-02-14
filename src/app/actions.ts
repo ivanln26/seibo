@@ -3,7 +3,6 @@
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import type { typeToFlattenedError } from "zod";
 
 import { twColors } from "@/color";
 import { db } from "@/db/db";
@@ -306,7 +305,11 @@ export type CreateAdminModelResult<T extends keyof typeof createAdminSchemas> =
   | { success: true; message: string }
   | {
     success: false;
-    error: string | typeToFlattenedError<z.infer<typeof createAdminSchemas[T]>>;
+    error:
+      | string
+      | z.inferFlattenedErrors<
+        z.ZodType<z.input<typeof createAdminSchemas[T]>>
+      >;
   };
 
 export async function createAdminModel<
@@ -383,9 +386,11 @@ export async function createAdminModel<
   return { success: true, message: "Se ha creado correctamente." };
 }
 
-const termDate = z.coerce.date().transform((val) =>
-  val.toISOString().substring(0, 10)
-);
+const termDate = z.coerce.date()
+  .refine((val) => val.getUTCFullYear() === (new Date()).getUTCFullYear(), {
+    message: `El año no puede ser distinto a ${(new Date()).getUTCFullYear()}`,
+  })
+  .transform((val) => val.toISOString().substring(0, 10));
 
 const updateAdminSchemas = {
   classroom: z.object({ name: z.string() }),
@@ -415,6 +420,21 @@ const updateAdminSchemas = {
     secondTermEnd: termDate,
     thirdTermStart: termDate,
     thirdTermEnd: termDate,
+  }).refine((val) => val.firstTermEnd > val.firstTermStart, {
+    message: "No puede ser inferior al inicio del primer trimestre",
+    path: ["firstTermEnd"],
+  }).refine((val) => val.secondTermStart > val.firstTermEnd, {
+    message: "No puede ser inferior al final del primer trimestre",
+    path: ["secondTermStart"],
+  }).refine((val) => val.secondTermEnd > val.secondTermStart, {
+    message: "No puede ser inferior al inicio del segundo trimestre",
+    path: ["secondTermEnd"],
+  }).refine((val) => val.thirdTermStart > val.secondTermEnd, {
+    message: "No puede ser inferior al final del segundo trimestre",
+    path: ["thirdTermStart"],
+  }).refine((val) => val.thirdTermEnd > val.thirdTermStart, {
+    message: "No puede ser inferior al inicio del tercer trimestre",
+    path: ["thirdTermEnd"],
   }).transform((val) => ({
     color: {
       primary: val.primary,
@@ -461,7 +481,11 @@ export type UpdateAdminModelResult<T extends keyof typeof updateAdminSchemas> =
   | { success: true; message: string }
   | {
     success: false;
-    error: string | typeToFlattenedError<z.infer<typeof updateAdminSchemas[T]>>;
+    error:
+      | string // TODO: remove string type
+      | z.inferFlattenedErrors<
+        z.ZodType<z.input<typeof updateAdminSchemas[T]>>
+      >;
   };
 
 export async function updateAdminModel<

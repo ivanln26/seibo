@@ -84,13 +84,23 @@ export default function Form({ slug, school }: Props) {
           color: "tertiary",
         }],
       );
-    }
-    if (!updateState.success && typeof updateState.error === "string") {
-      const msg: SnackbarMessage = {
-        message: updateState.error,
-        color: "error",
-      };
-      setMessages((prevArr) => [...prevArr, msg]);
+    } else if (!updateState.success) {
+      if (typeof updateState.error === "string") {
+        const msg: SnackbarMessage = {
+          message: updateState.error,
+          color: "error",
+        };
+        setMessages((prevArr) => [...prevArr, msg]);
+      } else if (
+        typeof updateState.error === "object" &&
+        updateState.error.formErrors.length > 0
+      ) {
+        const msg: SnackbarMessage = {
+          message: updateState.error.formErrors.join(", "),
+          color: "error",
+        };
+        setMessages((prevArr) => [...prevArr, msg]);
+      }
     }
   }, [updateState]);
 
@@ -147,6 +157,10 @@ export default function Form({ slug, school }: Props) {
           name="first-term-start"
           label="Inicio de primer trimestre"
           defaultValue={school.settings?.terms.first.start}
+          errorText={(updateState.success === false &&
+              typeof updateState.error === "object")
+            ? updateState.error.fieldErrors.firstTermStart?.join(", ")
+            : undefined}
           required
           type="date"
         />
@@ -155,6 +169,10 @@ export default function Form({ slug, school }: Props) {
           name="first-term-end"
           label="Fin de primer trimestre"
           defaultValue={school.settings?.terms.first.end}
+          errorText={(updateState.success === false &&
+              typeof updateState.error === "object")
+            ? updateState.error.fieldErrors.firstTermEnd?.join(", ")
+            : undefined}
           required
           type="date"
         />
@@ -163,6 +181,10 @@ export default function Form({ slug, school }: Props) {
           name="second-term-start"
           label="Inicio de segundo trimestre"
           defaultValue={school.settings?.terms.second.start}
+          errorText={(updateState.success === false &&
+              typeof updateState.error === "object")
+            ? updateState.error.fieldErrors.secondTermStart?.join(", ")
+            : undefined}
           required
           type="date"
         />
@@ -171,6 +193,10 @@ export default function Form({ slug, school }: Props) {
           name="second-term-end"
           label="Fin de segundo trimestre"
           defaultValue={school.settings?.terms.second.end}
+          errorText={(updateState.success === false &&
+              typeof updateState.error === "object")
+            ? updateState.error.fieldErrors.secondTermEnd?.join(", ")
+            : undefined}
           required
           type="date"
         />
@@ -179,6 +205,10 @@ export default function Form({ slug, school }: Props) {
           name="third-term-start"
           label="Inicio de tercer trimestre"
           defaultValue={school.settings?.terms.third.start}
+          errorText={(updateState.success === false &&
+              typeof updateState.error === "object")
+            ? updateState.error.fieldErrors.thirdTermStart?.join(", ")
+            : undefined}
           required
           type="date"
         />
@@ -187,6 +217,10 @@ export default function Form({ slug, school }: Props) {
           name="third-term-end"
           label="Fin de tercer trimestre"
           defaultValue={school.settings?.terms.third.end}
+          errorText={(updateState.success === false &&
+              typeof updateState.error === "object")
+            ? updateState.error.fieldErrors.thirdTermEnd?.join(", ")
+            : undefined}
           required
           type="date"
         />
