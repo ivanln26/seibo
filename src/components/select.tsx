@@ -16,6 +16,7 @@ type SelectProps = {
   hasNull?: boolean;
   disabled?: boolean;
   required?: boolean;
+  value?: string | number;
   defaultValue?: string | number;
   options: Option[];
 };
@@ -29,6 +30,7 @@ export default function Select({
   disabled,
   options,
   required = false,
+  value,
   defaultValue,
 }: SelectProps) {
   return (
@@ -49,6 +51,7 @@ export default function Select({
         onChange={onChange}
         disabled={disabled}
         required={required}
+        value={value}
         defaultValue={defaultValue}
       >
         {hasNull && <option value="">-----</option>}

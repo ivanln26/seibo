@@ -10,9 +10,10 @@ import type { Role } from "@/db/schema";
 type NavigationProps = {
   slug: string;
   roles: Role[];
+  logoPath: string;
 };
 
-export default function Navigation({ slug, roles }: NavigationProps) {
+export default function Navigation({ slug, roles, logoPath }: NavigationProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const open = () => {
@@ -31,7 +32,12 @@ export default function Navigation({ slug, roles }: NavigationProps) {
         isOpen={isOpen}
         close={close}
       />
-      <NavigationRail slug={slug} roles={roles} open={open} />
+      <NavigationRail
+        slug={slug}
+        roles={roles}
+        logoPath={logoPath}
+        open={open}
+      />
     </>
   );
 }

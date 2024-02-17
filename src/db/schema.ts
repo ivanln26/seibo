@@ -14,6 +14,8 @@ import {
   varchar,
 } from "drizzle-orm/mysql-core";
 
+import type { TwColor } from "@/color";
+
 export const user = mysqlTable("user", {
   id: int("id").autoincrement().primaryKey(),
   email: varchar("email", { length: 320 }).notNull(),
@@ -25,15 +27,23 @@ export const user = mysqlTable("user", {
 export type User = typeof user.$inferSelect;
 export type NewUser = typeof user.$inferInsert;
 
-type SchoolSettings = {
-  primaryColor: number;
-};
-
 export const userRelations = relations(user, ({ many }) => ({
   gradeTutors: many(gradeTutor),
   profiles: many(schoolUser),
   instances: many(instance),
 }));
+
+export type SchoolSettings = {
+  color: {
+    primary: TwColor;
+    secondary: TwColor;
+  };
+  terms: {
+    first: { start: string; end: string };
+    second: { start: string; end: string };
+    third: { start: string; end: string };
+  };
+};
 
 export const school = mysqlTable("school", {
   id: int("id").autoincrement().primaryKey(),
@@ -320,7 +330,7 @@ export const test = mysqlTable("test", {
   instanceId: int("instance_id").notNull(),
   title: varchar("title", { length: 120 }).notNull(),
   topics: text("topics").notNull(),
-  date: date("date").notNull(),
+  date: varchar("date", { length: 10 }).notNull(),
 });
 
 export type Test = typeof test.$inferSelect;

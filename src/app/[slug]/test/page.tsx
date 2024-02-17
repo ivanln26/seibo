@@ -1,21 +1,19 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import Modal from "@/components/modal";
+import Select from "@/components/select";
+import TextArea from "@/components/text-area";
 import TextField from "@/components/text-field";
 import { db } from "@/db/db";
-import {
-  course,
-  grade,
-  instance,
-  school,
-  schoolUser,
-  test,
-  user,
-} from "@/db/schema";
+import { course, grade, instance, schoolUser, test, user } from "@/db/schema";
+import type { Course, Grade, Test } from "@/db/schema";
 import { getUserProfile } from "@/db/queries";
+
+export const revalidate = 0;
 
 type Props = {
   params: {
@@ -23,112 +21,112 @@ type Props = {
   };
 };
 
-type testCardData = {
-  id: number;
-  title: string;
-  date: Date;
-  subject: string;
-  course: string;
-};
-
-export const revalidate = 0;
-
 export default async function Page({ params }: Props) {
   const u = await getUserProfile({ slug: params.slug });
 
-  const tests = await db.selectDistinct({
-    test: test,
-    course: course,
-    grade: grade,
-  }).from(test)
-    .innerJoin(instance, eq(test.instanceId, instance.id))
-    .innerJoin(user, eq(instance.professorId, user.id))
-    .innerJoin(course, eq(instance.courseId, course.id))
-    .innerJoin(schoolUser, eq(user.id, schoolUser.userId))
-    .innerJoin(grade, eq(instance.gradeId, grade.id))
-    .innerJoin(school, eq(schoolUser.schoolId, school.id))
-    .where(and(eq(user.id, u.id), eq(school.slug, params.slug)));
+  const school = await db.query.school.findFirst({
+    where: (school, { eq }) => eq(school.slug, params.slug),
+  });
 
-  const instances = await db.selectDistinct({
-    instance: instance,
-    grade: grade,
-    course: course,
-  }).from(instance)
-    .innerJoin(user, eq(instance.professorId, user.id))
-    .innerJoin(schoolUser, eq(user.id, schoolUser.userId))
-    .innerJoin(school, eq(schoolUser.schoolId, school.id))
-    .innerJoin(grade, eq(instance.gradeId, grade.id))
-    .innerJoin(course, eq(instance.courseId, course.id))
-    .where(and(eq(school.slug, params.slug), eq(user.id, u.id)));
-
-  function divideTests() {
-    const dividedTests: testCardData[][] = [[], [], []];
-    for (const t of tests) {
-      if (t.test.date.getMonth() <= 4) {
-        dividedTests[0].push({
-          ...t.test,
-          subject: t.course.name,
-          course: t.grade.name,
-        });
-        continue;
-      } else if (t.test.date.getMonth() <= 8 && t.test.date.getMonth()) {
-        dividedTests[1].push({
-          ...t.test,
-          subject: t.course.name,
-          course: t.grade.name,
-        });
-        continue;
-      }
-      dividedTests[2].push({
-        ...t.test,
-        subject: t.course.name,
-        course: t.grade.name,
-      });
-    }
-    return dividedTests;
+  if (school === undefined) {
+    redirect(`/${params.slug}`);
   }
+
+  const terms = [
+    {
+      start: school.settings?.terms.first.start || "2024-01-01",
+      end: school.settings?.terms.first.end || "2024-05-31",
+    },
+    {
+      start: school.settings?.terms.second.start || "2024-06-01",
+      end: school.settings?.terms.second.end || "2024-08-31",
+    },
+    {
+      start: school.settings?.terms.third.start || "2024-09-01",
+      end: school.settings?.terms.third.end || "2024-12-31",
+    },
+  ];
+
+  const queries: { test: Test; course: Course; grade: Grade }[][] = [];
+
+  for (const { start, end } of terms) {
+    const query = await db
+      .selectDistinct({ test, course, grade })
+      .from(test)
+      .innerJoin(instance, eq(test.instanceId, instance.id))
+      .innerJoin(course, eq(instance.courseId, course.id))
+      .innerJoin(grade, eq(instance.gradeId, grade.id))
+      .innerJoin(user, eq(instance.professorId, user.id))
+      .innerJoin(schoolUser, eq(user.id, schoolUser.userId))
+      .where(and(
+        eq(schoolUser.schoolId, school.id),
+        eq(user.id, u.id),
+        sql`STR_TO_DATE(test.date, "%Y-%m-%d") BETWEEN ${start} AND ${end}`,
+      ));
+    queries.push(query);
+  }
+
+  const instances = await db
+    .selectDistinct({ instance, grade, course })
+    .from(instance)
+    .innerJoin(course, eq(instance.courseId, course.id))
+    .innerJoin(grade, eq(instance.gradeId, grade.id))
+    .innerJoin(user, eq(instance.professorId, user.id))
+    .innerJoin(schoolUser, eq(user.id, schoolUser.userId))
+    .where(and(
+      eq(schoolUser.schoolId, school.id),
+      eq(user.id, u.id),
+    ));
 
   async function createTest(data: FormData) {
     "use server";
     const testType = z.object({
       title: z.string(),
       topics: z.string(),
-      instanceId: z.number(),
-      date: z.string(),
+      instanceId: z.coerce.number(),
+      date: z.coerce.date()
+        .transform((val) => val.toISOString().substring(0, 10)),
     });
 
     const newTest = testType.safeParse({
       title: data.get("title"),
       topics: data.get("topics"),
-      instanceId: Number(data.get("instanceId")),
+      instanceId: data.get("instance"),
       date: data.get("date"),
     });
 
     if (!newTest.success) {
       return;
     }
-    await db.insert(test).values({
-      ...newTest.data,
-      date: new Date(newTest.data.date),
-    });
-    revalidatePath(`/${params.slug}/student`);
+
+    await db.insert(test).values({ ...newTest.data });
+    revalidatePath(`/${params.slug}/test`);
   }
 
-  const dividedTests = divideTests();
+  const formatDate = (date: string) => {
+    // Date string format: "2024-01-01"
+    const [_, m, d] = date.split("-");
+    return `${d}/${m}`;
+  };
 
   return (
     <>
       <h1 className="text-4xl font-bold">Examenes</h1>
       <div className="flex flex-row justify-center gap-5 flex-wrap lg:flex-nowrap">
-        {dividedTests.map((trimester, i) => (
+        {queries.map((term, i) => (
           <div className="flex flex-col gap-2 basis-full lg:basis-1/3" key={i}>
-            <h2 className="text-2xl">{i + 1}° Trimestre</h2>
-            {trimester.map((test, j) => (
+            <div>
+              <h2 className="text-2xl">{i + 1}° Trimestre</h2>
+              <p className="text-xl">
+                {formatDate(terms[i].start)} - {formatDate(terms[i].end)}
+              </p>
+            </div>
+            {term.map(({ test, course, grade }, j) => (
               <Link href={`/${params.slug}/test/${test.id}`} key={j}>
                 <div className="flex flex-col p-2 rounded bg-primary-100 text-primary-900 dark:bg-primary-700 dark:text-primary-100">
                   <p className="font-bold text-xl">{test.title}</p>
-                  <p>{test.course} | {test.subject}</p>
-                  <p>{test.date.toLocaleDateString()}</p>
+                  <p>{course.name} | {grade.name}</p>
+                  <p>{formatDate(test.date)}</p>
                 </div>
               </Link>
             ))}
@@ -141,26 +139,24 @@ export default async function Page({ params }: Props) {
           buttonText="Crear"
         >
           <div className="flex flex-col gap-2">
-            <TextField id="title" name="title" label="Titulo"></TextField>
-            <label className="mt-1">Clase</label>
-            <select
-              className="bg-transparent py-4 outline outline-1 outline-outline rounded"
-              name="instanceId"
-            >
-              <option value="--">---</option>
-              {instances.map((i) => (
-                <option value={Number(i.instance.id)}>
-                  {i.course.name} | {i.grade.name}
-                </option>
-              ))}
-            </select>
-            <TextField id="topics" name="topics" label="Temas"></TextField>
-            <label className="mt-1">Fecha</label>
-            <input
+            <TextField id="title" name="title" label="Título" required />
+            <Select
+              id="instance"
+              name="instance"
+              label="Clase"
+              required
+              options={instances.map(({ instance, course, grade }) => ({
+                value: instance.id,
+                description: `${course.name} ${grade.name}`,
+              }))}
+            />
+            <TextArea id="topics" name="topics" label="Temas" required />
+            <TextField
+              id="date"
               name="date"
-              className="bg-transparent py-3 outline outline-1 outline-outline rounded"
+              label="Fecha"
+              required
               type="date"
-              placeholder="dd-mm-yyyy"
             />
           </div>
         </Modal>

@@ -1,11 +1,11 @@
 "use server";
 
 import { and, eq } from "drizzle-orm";
+import { promises as fs } from "fs";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import type { typeToFlattenedError } from "zod";
 
-import env from "@/env";
+import { twColors } from "@/color";
 import { db } from "@/db/db";
 import {
   attendance,
@@ -27,6 +27,7 @@ import {
 import type { Role, StudentContact } from "@/db/schema";
 import { hasRoles } from "@/db/queries";
 import type { UserProfile } from "@/db/queries";
+import env from "@/env";
 import { transporter } from "@/mail";
 
 const sendMailSchemas = {
@@ -305,7 +306,11 @@ export type CreateAdminModelResult<T extends keyof typeof createAdminSchemas> =
   | { success: true; message: string }
   | {
     success: false;
-    error: string | typeToFlattenedError<z.infer<typeof createAdminSchemas[T]>>;
+    error:
+      | string
+      | z.inferFlattenedErrors<
+        z.ZodType<z.input<typeof createAdminSchemas[T]>>
+      >;
   };
 
 export async function createAdminModel<
@@ -382,6 +387,12 @@ export async function createAdminModel<
   return { success: true, message: "Se ha creado correctamente." };
 }
 
+const termDate = z.coerce.date()
+  .refine((val) => val.getUTCFullYear() === (new Date()).getUTCFullYear(), {
+    message: `El año no puede ser distinto a ${(new Date()).getUTCFullYear()}`,
+  })
+  .transform((val) => val.toISOString().substring(0, 10));
+
 const updateAdminSchemas = {
   classroom: z.object({ name: z.string() }),
   course: z.object({
@@ -401,6 +412,50 @@ const updateAdminSchemas = {
     startTime: z.string(),
     endTime: z.string(),
   }),
+  settings: z.object({
+    primary: z.enum(twColors),
+    secondary: z.enum(twColors),
+    firstTermStart: termDate,
+    firstTermEnd: termDate,
+    secondTermStart: termDate,
+    secondTermEnd: termDate,
+    thirdTermStart: termDate,
+    thirdTermEnd: termDate,
+  }).refine((val) => val.firstTermEnd > val.firstTermStart, {
+    message: "No puede ser inferior al inicio del primer trimestre",
+    path: ["firstTermEnd"],
+  }).refine((val) => val.secondTermStart > val.firstTermEnd, {
+    message: "No puede ser inferior al final del primer trimestre",
+    path: ["secondTermStart"],
+  }).refine((val) => val.secondTermEnd > val.secondTermStart, {
+    message: "No puede ser inferior al inicio del segundo trimestre",
+    path: ["secondTermEnd"],
+  }).refine((val) => val.thirdTermStart > val.secondTermEnd, {
+    message: "No puede ser inferior al final del segundo trimestre",
+    path: ["thirdTermStart"],
+  }).refine((val) => val.thirdTermEnd > val.thirdTermStart, {
+    message: "No puede ser inferior al inicio del tercer trimestre",
+    path: ["thirdTermEnd"],
+  }).transform((val) => ({
+    color: {
+      primary: val.primary,
+      secondary: val.secondary,
+    },
+    terms: {
+      first: {
+        start: val.firstTermStart,
+        end: val.firstTermEnd,
+      },
+      second: {
+        start: val.secondTermStart,
+        end: val.secondTermEnd,
+      },
+      third: {
+        start: val.thirdTermStart,
+        end: val.thirdTermEnd,
+      },
+    },
+  })),
   student: z.object({
     studentCode: z.string(),
     firstName: z.string(),
@@ -427,7 +482,11 @@ export type UpdateAdminModelResult<T extends keyof typeof updateAdminSchemas> =
   | { success: true; message: string }
   | {
     success: false;
-    error: string | typeToFlattenedError<z.infer<typeof updateAdminSchemas[T]>>;
+    error:
+      | string // TODO: remove string type
+      | z.inferFlattenedErrors<
+        z.ZodType<z.input<typeof updateAdminSchemas[T]>>
+      >;
   };
 
 export async function updateAdminModel<
@@ -564,6 +623,41 @@ export async function updateAdminModel<
     }
 
     revalidatePath(`/${slug}/admin/schedule/${modelId}`);
+  } else if (model === "settings") {
+    const logo = data.get("logo");
+    if (logo instanceof File && logo.size > 0 && logo.size < 5e6) {
+      const filepath = `${process.cwd()}/public/logo/${slug}.png`;
+      const data = Buffer.from(await logo.arrayBuffer());
+      await fs.writeFile(filepath, data);
+    }
+    const newSettings = updateAdminSchemas["settings"].safeParse({
+      primary: data.get("primary"),
+      secondary: data.get("secondary"),
+      firstTermStart: data.get("first-term-start"),
+      firstTermEnd: data.get("first-term-end"),
+      secondTermStart: data.get("second-term-start"),
+      secondTermEnd: data.get("second-term-end"),
+      thirdTermStart: data.get("third-term-start"),
+      thirdTermEnd: data.get("third-term-end"),
+    });
+
+    if (!newSettings.success) {
+      return { success: false, error: newSettings.error.flatten() };
+    }
+
+    try {
+      await db
+        .update(school)
+        .set({ settings: newSettings.data })
+        .where(eq(school.slug, slug));
+    } catch {
+      return {
+        success: false,
+        error: "Ha ocurrido un error en la base de datos.",
+      };
+    }
+
+    revalidatePath(`/${slug}`);
   } else if (model === "student") {
     const newStudent = updateAdminSchemas["student"].safeParse({
       studentCode: data.get("studentCode"),

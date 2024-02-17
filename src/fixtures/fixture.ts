@@ -37,12 +37,12 @@ const schools: NewSchool[] = [
   {
     name: "ITS Villada",
     slug: "itsv",
-    settings: { primaryColor: 1 },
+    settings: null,
   },
   {
     name: "La Salle",
     slug: "la-salle",
-    settings: { primaryColor: 1 },
+    settings: null,
   },
 ];
 
@@ -245,7 +245,7 @@ const tests = [
     instanceId: 1,
     title: "Primera evaluación",
     topics: "Primera guerra mundial",
-    date: new Date("2023-08-05"),
+    date: "2024-04-01",
   },
 ];
 

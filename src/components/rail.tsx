@@ -1,14 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import Icon from "@/components/icons/icon";
 import type { Icon as IconType } from "@/components/icons/icon";
 import type { Role } from "@/db/schema";
-
-import Logo from "@public/logo.png";
 
 type RailButton = {
   name: string;
@@ -92,12 +90,16 @@ const buttons: RailButton[] = [
 type NavigationRailProps = {
   slug: string;
   roles: Role[];
+  logoPath: string;
   open: () => void;
 };
 
-export default function NavigationRail(
-  { slug, roles, open }: NavigationRailProps,
-) {
+export default function NavigationRail({
+  slug,
+  roles,
+  logoPath,
+  open,
+}: NavigationRailProps) {
   const pathname = usePathname();
 
   const btns = buttons.map((button) => ({
@@ -107,9 +109,11 @@ export default function NavigationRail(
 
   return (
     <nav className="hidden md:flex md:flex-col w-20 h-screen sticky top-0">
-      <Link className="" href={`/${slug}`}>
-        <Image src={Logo} alt="Seibo Logo" />
-      </Link>
+      <div className="flex justify-center items-center p-2">
+        <Link href={`/${slug}`}>
+          <Image src={logoPath} alt="Logo" height={60} width={60} />
+        </Link>
+      </div>
       <button
         className="flex flex-col justify-center items-center gap-y-1 mt-2 fill-black dark:fill-white"
         onClick={open}
