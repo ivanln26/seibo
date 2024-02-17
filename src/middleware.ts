@@ -11,6 +11,11 @@ export default withAuth(
       return;
     }
 
+    // FIXME: middleware config matcher not working for static assets.
+    if (req.nextUrl.pathname.endsWith(".png")) {
+      return;
+    }
+
     const arr = re.exec(req.nextUrl.pathname);
     if (arr === null || req.nextauth.token === null) {
       return NextResponse.redirect(new URL("/", req.url));
