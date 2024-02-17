@@ -1,6 +1,7 @@
 "use server";
 
 import { and, eq } from "drizzle-orm";
+import { promises as fs } from "fs";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -623,6 +624,12 @@ export async function updateAdminModel<
 
     revalidatePath(`/${slug}/admin/schedule/${modelId}`);
   } else if (model === "settings") {
+    const logo = data.get("logo");
+    if (logo instanceof File && logo.size > 0 && logo.size < 5e6) {
+      const filepath = `${process.cwd()}/public/logo/${slug}.png`;
+      const data = Buffer.from(await logo.arrayBuffer());
+      await fs.writeFile(filepath, data);
+    }
     const newSettings = updateAdminSchemas["settings"].safeParse({
       primary: data.get("primary"),
       secondary: data.get("secondary"),

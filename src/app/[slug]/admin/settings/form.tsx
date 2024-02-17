@@ -107,6 +107,15 @@ export default function Form({ slug, school }: Props) {
   return (
     <>
       <form action={updateFormAction}>
+        <div className="flex flex-col gap-y-1 py-2">
+          <label htmlFor="logo">Logo</label>
+          <input
+            id="logo"
+            name="logo"
+            accept="image/png"
+            type="file"
+          />
+        </div>
         <h2 className="text-2xl">Color</h2>
         <div className="flex items-end gap-x-2">
           <div className="grow">

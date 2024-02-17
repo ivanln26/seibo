@@ -90,12 +90,16 @@ const buttons: RailButton[] = [
 type NavigationRailProps = {
   slug: string;
   roles: Role[];
+  logoPath: string;
   open: () => void;
 };
 
-export default function NavigationRail(
-  { slug, roles, open }: NavigationRailProps,
-) {
+export default function NavigationRail({
+  slug,
+  roles,
+  logoPath,
+  open,
+}: NavigationRailProps) {
   const pathname = usePathname();
 
   const btns = buttons.map((button) => ({
@@ -107,7 +111,7 @@ export default function NavigationRail(
     <nav className="hidden md:flex md:flex-col w-20 h-screen sticky top-0">
       <div className="flex justify-center items-center p-2">
         <Link href={`/${slug}`}>
-          <Image src="/logo/seibo.png" alt="Logo" height={60} width={60} />
+          <Image src={logoPath} alt="Logo" height={60} width={60} />
         </Link>
       </div>
       <button
