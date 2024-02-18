@@ -14,7 +14,7 @@ export const querySchema = z.object({
   query: z.string().default(""),
 });
 
-type TableProps<TData> = {
+type TableProps<TData extends Record<string, string | number>> = {
   title: string;
   data: TData[];
   columns: {
@@ -27,7 +27,7 @@ type TableProps<TData> = {
   limit: number;
 };
 
-export default function Table<TData>({
+export default function Table<TData extends Record<string, string | number>>({
   title,
   data,
   columns,
@@ -59,13 +59,13 @@ export default function Table<TData>({
                         className="block w-full font-bold underline text-center text-secondary-600 dark:text-secondary-200"
                         href={`${href}/${row[detail]}`}
                       >
-                        {JSON.stringify(row[attr])}
+                        {row[attr]}
                       </Link>
                     </td>
                   )
                   : (
                     <td className="px-2 py-1 border border-outline" key={j}>
-                      {JSON.stringify(row[attr])}
+                      {row[attr]}
                     </td>
                   )
               ))}
