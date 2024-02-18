@@ -258,7 +258,7 @@ export async function updateScores(
         await db.delete(score).where(eq(score.id, Number(scoreMatch[1])));
         continue;
       }
-      if (Number.isNaN(value)) continue;
+      if (isNaN(Number(value))) continue;
       await db
         .update(score)
         .set({ score: Number(value) })
@@ -268,7 +268,7 @@ export async function updateScores(
 
     const studentMatch = studentRE.exec(key);
     if (studentMatch !== null) {
-      if (value === "absent" || Number.isNaN(value)) continue;
+      if (value === "absent" || isNaN(Number(value))) continue;
       await db
         .insert(score)
         .values({

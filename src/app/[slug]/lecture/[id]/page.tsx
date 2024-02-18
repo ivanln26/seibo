@@ -5,12 +5,7 @@ import { getAttendances, getLectureCourses, getStudents } from "../utils";
 import LecturePicker from "./lecture-picker";
 import { getUserProfile } from "@/db/queries";
 
-type Props = {
-  params: {
-    id: string;
-    slug: string;
-  };
-};
+export const revalidate = 0;
 
 type Attendance = {
   id: number | null;
@@ -21,18 +16,21 @@ type Attendance = {
   lectureId: number;
 };
 
-export const revalidate = 0;
+type Props = {
+  params: {
+    id: string;
+    slug: string;
+  };
+};
 
 export default async function Page({ params }: Props) {
   const user = await getUserProfile({ slug: params.slug });
 
   const lectureID = Number(params.id);
 
-  if (Number.isNaN(lectureID)) {
+  if (isNaN(lectureID)) {
     redirect(`/${params.slug}/lecture`);
   }
-
-  const today = new Date();
 
   const lectureCourse = await getLectureCourses(lectureID);
 
@@ -70,7 +68,7 @@ export default async function Page({ params }: Props) {
 
   return (
     <>
-      <LecturePicker slug={params.slug} lectureID={Number(lectureID)} />
+      <LecturePicker slug={params.slug} lectureID={lectureID} />
       <section className="py-2 md:w-[1080px] ">
         <h2 className="text-2xl">Alumnos</h2>
         <Form
