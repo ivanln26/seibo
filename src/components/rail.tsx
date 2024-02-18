@@ -65,7 +65,7 @@ const buttons: RailButton[] = [
     name: "Asistencia",
     icon: "checklist",
     href: "/lecture",
-    roles: ["teacher"],
+    roles: ["teacher"], // TODO: add tutor.
   },
   {
     name: "Notas",
@@ -77,6 +77,12 @@ const buttons: RailButton[] = [
     name: "Horarios",
     icon: "clock",
     href: "/schedule",
+    roles: ["teacher", "tutor", "principal", "admin"],
+  },
+  {
+    name: "Historial",
+    icon: "history",
+    href: "/history",
     roles: ["teacher", "tutor", "principal", "admin"],
   },
   {
