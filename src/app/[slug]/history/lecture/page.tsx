@@ -1,4 +1,4 @@
-import { desc, eq, like, sql } from "drizzle-orm";
+import { and, desc, eq, like, sql } from "drizzle-orm";
 
 import { db } from "@/db/db";
 import {
@@ -8,6 +8,7 @@ import {
   instance,
   lecture,
   schedule,
+  school,
   user,
 } from "@/db/schema";
 import Table, { querySchema } from "@/components/table";
@@ -45,11 +46,13 @@ export default async function Page({ params, searchParams }: Props) {
     .innerJoin(course, eq(instance.courseId, course.id))
     .innerJoin(grade, eq(instance.gradeId, grade.id))
     .innerJoin(user, eq(instance.professorId, user.id))
-    .where(
+    .innerJoin(school, eq(grade.schoolId, school.id))
+    .where(and(
+      eq(school.slug, params.slug),
       queryParams.query !== ""
         ? like(user.name, `%${queryParams.query}%`)
         : undefined,
-    )
+    ))
     .orderBy(desc(lecture.id))
     .limit(queryParams.limit)
     .offset((queryParams.page - 1) * queryParams.limit);

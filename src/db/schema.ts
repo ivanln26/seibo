@@ -261,16 +261,28 @@ export const instanceRelations = relations(instance, ({ many, one }) => ({
   }),
 }));
 
+const weekdays = [
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+] as const;
+
+export type Weekday = typeof weekdays[number];
+
+export const weekdayTranslate: Record<Weekday, string> = {
+  monday: "Lunes",
+  tuesday: "Martes",
+  wednesday: "Miércoles",
+  thursday: "Jueves",
+  friday: "Viernes",
+} as const;
+
 export const schedule = mysqlTable("schedule", {
   id: int("id").autoincrement().primaryKey(),
   instanceId: int("instance_id").notNull(),
-  weekday: mysqlEnum("weekday", [
-    "monday",
-    "tuesday",
-    "wednesday",
-    "thursday",
-    "friday",
-  ]).notNull(),
+  weekday: mysqlEnum("weekday", weekdays).notNull(),
   startTime: time("start_time").notNull(),
   endTime: time("end_time").notNull(),
 });
