@@ -31,7 +31,9 @@ export default async function Page({ params, searchParams }: Props) {
     .select({
       id: schedule.id,
       weekday: schedule.weekday,
-      time: sql`concat_ws(" - ", ${schedule.startTime}, ${schedule.endTime})`,
+      time: sql<
+        string
+      >`concat_ws(" - ", ${schedule.startTime}, ${schedule.endTime})`,
       course: course.name,
       grade: grade.name,
     })

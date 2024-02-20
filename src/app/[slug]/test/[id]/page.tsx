@@ -13,6 +13,8 @@ import {
   test,
 } from "@/db/schema";
 
+export const revalidate = 0;
+
 type Props = {
   params: {
     slug: string;
@@ -20,17 +22,8 @@ type Props = {
   };
 };
 
-type scoreRow = {
-  name: string;
-  score: number;
-  id: number;
-  studentId: number;
-};
-
-export const revalidate = 0;
-
 export default async function Page({ params }: Props) {
-  if (Number.isNaN(params.id)) {
+  if (isNaN(Number(params.id))) {
     redirect(`/${params.slug}/test`);
   }
 

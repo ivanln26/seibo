@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation";
+
 import Attendances from "./charts/attendances";
 import AttendancesByMonth from "./charts/attendancesbyMonth";
 import AvgScoresByCourse from "./charts/avgScoresByCourse";
@@ -11,6 +13,7 @@ import {
   getSchoolAverage,
   getStudentsByGrade,
 } from "./queries";
+import { getUserProfile, hasRoles } from "@/db/queries";
 
 export const revalidate = 0;
 
@@ -21,6 +24,13 @@ type Props = {
 };
 
 export default async function Page({ params }: Props) {
+  const user = await getUserProfile({ slug: params.slug });
+  const isAdminOrPrincipal = await hasRoles(user, "OR", "admin", "principal");
+
+  if (!isAdminOrPrincipal) {
+    redirect(`/${params.slug}`);
+  }
+
   const studentsByGrade = await getStudentsByGrade(params.slug);
 
   const attendances = await getAttendancesByCourse(params.slug);

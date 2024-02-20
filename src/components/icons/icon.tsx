@@ -5,6 +5,7 @@ import Clock from "./clock";
 import Delete from "./delete";
 import Description from "./description";
 import Expand from "./expand";
+import History from "./history";
 import Home from "./home";
 import Mail from "./mail";
 import Menu from "./menu";
@@ -20,6 +21,7 @@ export type Icon =
   | "delete"
   | "description"
   | "expand"
+  | "history"
   | "home"
   | "menu"
   | "person"
@@ -50,6 +52,8 @@ export default function Icon({ icon, ...props }: IconPickerProps) {
       return <Description {...props} />;
     case "expand":
       return <Expand {...props} />;
+    case "history":
+      return <History {...props} />;
     case "home":
       return <Home {...props} />;
     case "menu":
