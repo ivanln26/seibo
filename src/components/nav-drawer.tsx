@@ -51,7 +51,7 @@ const buttons: DrawerButton[] = [
     name: "Historial",
     icon: "history",
     href: "/history",
-    roles: ["teacher", "tutor", "principal", "admin"],
+    roles: ["principal", "admin"],
   },
   {
     name: "Mail",

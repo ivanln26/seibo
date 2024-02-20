@@ -83,7 +83,7 @@ const buttons: RailButton[] = [
     name: "Historial",
     icon: "history",
     href: "/history",
-    roles: ["teacher", "tutor", "principal", "admin"],
+    roles: ["principal", "admin"],
   },
   {
     name: "Mail",

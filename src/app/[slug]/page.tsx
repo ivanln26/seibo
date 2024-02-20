@@ -84,33 +84,33 @@ export default async function Home({ params }: Props) {
       title: "Asistencias",
       description:
         "Toma asistencia de tus clases, anota observaciones sobre las mismas.",
-      path: `${params.slug}/lecture`,
+      path: `/${params.slug}/lecture`,
       color: "primary",
     },
     {
       title: "Examenes",
       description:
         "Registra información acerca de los examenes de tus materias y los resultados de los alumnos.",
-      path: `${params.slug}/test`,
+      path: `/${params.slug}/test`,
       color: "primary",
     },
     {
       title: "Horarios",
       description: "Revisa tus horarios en la institución.",
-      path: `${params.slug}/schedule`,
+      path: `/${params.slug}/schedule`,
       color: "primary",
     },
     {
       title: "Notificaciones",
       description: "Envia e-mails a los tutores de los alumnos.",
-      path: `${params.slug}/notification`,
+      path: `/${params.slug}/notification`,
       color: "primary",
     },
     {
       title: "Reportes",
       description:
         "Visualiza e imprime reportes con indicadores y estadisticas relevantes.",
-      path: `${params.slug}/dashboard`,
+      path: `/${params.slug}/dashboard`,
       color: "secondary",
       roles: ["admin", "principal"],
     },
@@ -118,7 +118,15 @@ export default async function Home({ params }: Props) {
       title: "Admin",
       description:
         "Administra la información general del colegio y del sistema.",
-      path: `${params.slug}/dashboard`,
+      path: `/${params.slug}/dashboard`,
+      color: "secondary",
+      roles: ["admin", "principal"],
+    },
+    {
+      title: "Historial",
+      description:
+        "Información histórica acerca de los exámenes y asistencias.",
+      path: `/${params.slug}/history`,
       color: "secondary",
       roles: ["admin", "principal"],
     },
