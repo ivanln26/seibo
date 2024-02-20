@@ -85,21 +85,29 @@ export default async function Page({ params }: Props) {
         ({weekdayTranslate[query[0].weekday]})
       </p>
       <h2 className="py-1 text-2xl">Asistencias</h2>
-      <ul>
-        {attendances.map(({ id, student, isPresent }, i) => (
-          <Fragment key={id}>
-            <li className="flex justify-between py-1 text-2xl font-mono">
-              {student}
-              <span>
-                {isPresent ? "Presente" : "Ausente"}
-              </span>
-            </li>
-            {i + 1 !== attendances.length && (
-              <hr className="border border-neutral-variant-50 dark:border-neutral-variant-60" />
-            )}
-          </Fragment>
-        ))}
-      </ul>
+      {attendances.length === 0
+        ? (
+          <p className="text-red-600 dark:text-red-200">
+            No se cargaron asistencias esta clase.
+          </p>
+        )
+        : (
+          <ul>
+            {attendances.map(({ id, student, isPresent }, i) => (
+              <Fragment key={id}>
+                <li className="flex justify-between py-1 text-2xl font-mono">
+                  {student}
+                  <span>
+                    {isPresent ? "Presente" : "Ausente"}
+                  </span>
+                </li>
+                {i + 1 !== attendances.length && (
+                  <hr className="border border-neutral-variant-50 dark:border-neutral-variant-60" />
+                )}
+              </Fragment>
+            ))}
+          </ul>
+        )}
       <h2 className="py-1 text-2xl">Observaciones</h2>
       <p className="font-mono">{query[0].notes}</p>
     </>
