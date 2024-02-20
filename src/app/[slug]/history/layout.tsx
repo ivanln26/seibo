@@ -1,5 +1,8 @@
+import { redirect } from "next/navigation";
+
 import SideNavigation from "@/components/side-navigation";
 import { Link } from "@/components/side-navigation-link";
+import { getUserProfile, hasRoles } from "@/db/queries";
 
 type Props = {
   children: React.ReactNode;
@@ -8,7 +11,14 @@ type Props = {
   };
 };
 
-export default function Layout({ children, params }: Props) {
+export default async function Layout({ children, params }: Props) {
+  const user = await getUserProfile({ slug: params.slug });
+  const isAdminOrPrincipal = await hasRoles(user, "OR", "admin", "principal");
+
+  if (!isAdminOrPrincipal) {
+    redirect(`/${params.slug}`);
+  }
+
   const links: Link[] = [
     { name: "Asistencia", href: `/${params.slug}/history/lecture` },
   ];
