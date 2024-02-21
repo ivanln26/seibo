@@ -62,7 +62,7 @@ export default async function Page({ params }: Props) {
         </div>
         <div className="col-span-4 lg:col-span-1 flex flex-col justify-center items-center p-2 outline outline-1 outline-outline rounded-xl">
           <h1 className="text-center text-xl">
-            Promedio total de resultados de examenes
+            Promedio total de resultados de exámenes
           </h1>
           <h1 className="text-center text-8xl">
             {Number(schoolAverage).toPrecision(3)}
@@ -76,7 +76,7 @@ export default async function Page({ params }: Props) {
         </div>
         <div className="col-span-4 lg:col-span-2 flex flex-col justify-center items-center p-2 outline outline-1 outline-outline rounded-xl">
           <h1 className="text-center text-xl">
-            Promedio de resultados de examenes por materia
+            Promedio de resultados de exámenes por materia
           </h1>
           <AvgScoresByCourse data={examsAveragePerSubject} />
         </div>

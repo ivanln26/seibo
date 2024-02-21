@@ -88,9 +88,9 @@ export default async function Home({ params }: Props) {
       color: "primary",
     },
     {
-      title: "Examenes",
+      title: "Exámenes",
       description:
-        "Registra información acerca de los examenes de tus materias y los resultados de los alumnos.",
+        "Registra información acerca de los exámenes de tus materias y los resultados de los alumnos.",
       path: `/${params.slug}/test`,
       color: "primary",
     },
