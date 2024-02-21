@@ -21,6 +21,7 @@ export default async function Layout({ children, params }: Props) {
 
   const links: Link[] = [
     { name: "Asistencia", href: `/${params.slug}/history/lecture` },
+    { name: "Examen", href: `/${params.slug}/history/test` },
   ];
 
   return (
