@@ -1,12 +1,22 @@
-import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import Modal from "@/components/modal";
+import Select from "@/components/select";
 import Table, { querySchema } from "@/components/table";
 import TextField from "@/components/text-field";
 import { db } from "@/db/db";
-import { grade, student, studentContact, studentGrade } from "@/db/schema";
+import { student, studentContact, studentGrade } from "@/db/schema";
+
+export const revalidate = 0;
+
+const contactTypes = [
+  { value: "father", description: "Padre" },
+  { value: "mother", description: "Madre" },
+  { value: "tutor", description: "Tutor" },
+  { value: "other", description: "Otro" },
+];
 
 type Props = {
   params: {
@@ -20,85 +30,98 @@ type Props = {
 };
 
 export default async function Page({ params, searchParams }: Props) {
-  const query = querySchema.parse(searchParams);
+  const queryParams = querySchema.parse(searchParams);
 
-  const currentSchool = await db.query.school.findFirst({
+  const school = await db.query.school.findFirst({
     where: (school, { eq }) => eq(school.slug, params.slug),
   });
-  if (!currentSchool) return <>Error al obtener la institución.</>;
 
-  const grades = await db.select()
-    .from(grade)
-    .where(eq(grade.schoolId, currentSchool.id));
+  if (school === undefined) redirect("/");
 
-  const students = await db
-    .select({
-      id: student.id,
-      lastName: student.lastName,
-      firstName: student.firstName,
-      email: student.email,
-      code: student.studentCode,
-    })
-    .from(student)
-    .where(eq(student.schoolId, currentSchool.id));
+  const grades = await db.query.grade.findMany({
+    where: (grade, { eq }) => eq(grade.schoolId, school.id),
+    orderBy: (grade) => grade.id,
+  });
 
-  async function create(data: FormData) {
+  const students = await db.query.student.findMany({
+    where: (student, { and, eq, like, or }) =>
+      and(
+        eq(student.schoolId, school.id),
+        queryParams.query !== ""
+          ? or(
+            like(student.studentCode, `%${queryParams.query}%`),
+            like(student.lastName, `%${queryParams.query}%`),
+            like(student.firstName, `%${queryParams.query}%`),
+          )
+          : undefined,
+      ),
+    orderBy: (student) => student.id,
+    limit: queryParams.limit,
+    offset: (queryParams.page - 1) * queryParams.limit,
+  });
+
+  const create = async (data: FormData) => {
     "use server";
-    const studentType = z.object({
+    const studentSchema = z.object({
       firstName: z.string(),
       lastName: z.string(),
       email: z.string(),
       schoolId: z.number(),
       studentCode: z.string(),
     });
-    const contactType = z.object({
+    const contactSchema = z.object({
       name: z.string(),
       email: z.string(),
       phone: z.string(),
       type: z.enum(["father", "mother", "tutor", "other"]),
     });
+    const gradeId = z.coerce.number();
 
-    const gradeiDType = z.object({ id: z.number() });
-
-    const newStudent = studentType.safeParse({
-      firstName: data.get("studentFirstName"),
-      lastName: data.get("studentLastName"),
-      email: data.get("studentEmail"),
-      schoolId: 1, // TODO change
+    const newStudent = studentSchema.safeParse({
+      firstName: data.get("firstName"),
+      lastName: data.get("lastName"),
+      email: data.get("email"),
+      schoolId: school.id,
       studentCode: data.get("studentCode"),
     });
-    const newContact = contactType.safeParse({
+    const newContact = contactSchema.safeParse({
       name: data.get("contactName"),
       email: data.get("contactEmail"),
       phone: data.get("contactPhone"),
       type: data.get("contactType"),
     });
-
-    const newGradeId = gradeiDType.safeParse({
-      id: Number(data.get("studentGrade")),
-    });
+    const newGradeId = gradeId.safeParse(data.get("studentGrade"));
 
     if (!newStudent.success || !newContact.success || !newGradeId.success) {
       return;
     }
 
-    await db.insert(student).values(newStudent.data);
-    const savedStudent = await db.select().from(student).where(
-      eq(student.email, newStudent.data.email),
-    );
+    await db.transaction(async (tx) => {
+      await tx.insert(student).values(newStudent.data);
 
-    await db.insert(studentContact).values({
-      ...newContact.data,
-      studentId: savedStudent[0].id,
+      const savedStudent = await tx.query.student.findFirst({
+        where: (student, { eq }) =>
+          eq(student.studentCode, newStudent.data.studentCode),
+      });
+
+      if (savedStudent === undefined) {
+        tx.rollback();
+        return;
+      }
+
+      await tx.insert(studentContact).values({
+        ...newContact.data,
+        studentId: savedStudent.id,
+      });
+
+      await tx.insert(studentGrade).values({
+        studentId: savedStudent.id,
+        gradeId: newGradeId.data,
+      });
     });
 
-    await db.insert(studentGrade).values({
-      studentId: savedStudent[0].id,
-      gradeId: newGradeId.data.id,
-    });
-
-    revalidatePath(`/${params.slug}/student`);
-  }
+    revalidatePath(`/${params.slug}/admin/student`);
+  };
   return (
     <>
       <Table
@@ -106,73 +129,88 @@ export default async function Page({ params, searchParams }: Props) {
         data={students}
         columns={[
           { attr: "id", name: "ID" },
-          { attr: "code", name: "Legajo" },
+          { attr: "studentCode", name: "Legajo" },
           { attr: "lastName", name: "Apellido" },
           { attr: "firstName", name: "Nombre" },
           { attr: "email", name: "Email" },
         ]}
         href={`/${params.slug}/admin/student`}
         detail="id"
-        page={query.page}
-        limit={query.limit}
+        page={queryParams.page}
+        limit={queryParams.limit}
       />
       <form className="fixed bottom-5 right-5 md:right-10" action={create}>
         <Modal
           buttonText="Crear"
           confirmButton={{ text: "Guardar", type: "submit" }}
         >
-          <div className="grid grid-cols-2 gap-4">
+          <div>
+            <h1 className="text-2xl">Crear estudiante</h1>
             <TextField
-              id=""
-              name="studentFirstName"
+              id="firstName"
+              name="firstName"
               label="Nombre"
               required
             />
             <TextField
-              id=""
-              name="studentLastName"
+              id="lastName"
+              name="lastName"
               label="Apellido"
               required
             />
-            <TextField id="" name="studentEmail" label="E-mail" required />
-            <TextField id="" name="studentCode" label="Legajo" required />
-            <div className="flex-none basis-1/2 grow w-full">
-              <label htmlFor="" className="mt-4">Curso*</label>
-              <select
-                name="studentGrade"
-                className=" outline outline-1 outline-outline rounded p-4 w-full bg-transparent"
-              >
-                <option value="">----</option>
-                {grades.map((c) => <option value={c.id}>{c.name}</option>)}
-              </select>
-            </div>
+            <TextField
+              id="email"
+              name="email"
+              label="E-mail"
+              type="email"
+              required
+            />
+            <TextField
+              id="studentCode"
+              name="studentCode"
+              label="Legajo"
+              required
+            />
+            <Select
+              id="studentGrade"
+              name="studentGrade"
+              label="Curso"
+              required
+              options={grades.map((c) => ({
+                value: c.id,
+                description: c.name,
+                key: c.id,
+              }))}
+            />
           </div>
           <label htmlFor="" className="text-xl basis-full">
             Padre/Madre/Tutor
           </label>
-          <input
-            type="hidden"
-            name="studentSchool"
-            value={1} // TODO: Cambiar por colegio
-          />
           <div className="grid grid-cols-2 gap-4 border rounded-lg p-2">
-            <TextField label="Nombre y apellido" name="contactName" id="" />
-            <TextField label="E-mail" name="contactEmail" id="" />
-            <TextField label="telefono" name="contactPhone" id="" />
-            <div className="flex flex-col justify-center">
-              <label htmlFor="">Tipo</label>
-              <select
-                name="contactType"
-                id=""
-                className=" outline outline-1 outline-outline rounded px-4 py-[13px] w-full bg-transparent"
-              >
-                <option value="-">---</option>
-                <option value="father">Padre</option>
-                <option value="mother">Madre</option>
-                <option value="tutor">Tutor</option>
-                <option value="other">Otro</option>
-              </select>
-            </div>
+            <TextField
+              id="contactName"
+              name="contactName"
+              label="Nombre y apellido"
+              required
+            />
+            <TextField
+              id="contactEmail"
+              name="contactEmail"
+              label="E-mail"
+              required
+            />
+            <TextField
+              id="contactPhone"
+              name="contactPhone"
+              label="Teléfono"
+              required
+            />
+            <Select
+              id="contactType"
+              name="contactType"
+              label="Tipo"
+              options={contactTypes}
+            />
           </div>
         </Modal>
       </form>

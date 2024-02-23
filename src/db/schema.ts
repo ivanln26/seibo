@@ -261,7 +261,7 @@ export const instanceRelations = relations(instance, ({ many, one }) => ({
   }),
 }));
 
-const weekdays = [
+export const weekdays = [
   "monday",
   "tuesday",
   "wednesday",

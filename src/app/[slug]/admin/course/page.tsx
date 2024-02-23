@@ -1,12 +1,12 @@
-import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import Modal from "@/components/modal";
-import TextField from "@/components/text-field";
 import Table, { querySchema } from "@/components/table";
+import TextField from "@/components/text-field";
 import { db } from "@/db/db";
-import { course, school } from "@/db/schema";
+import { course } from "@/db/schema";
 
 export const revalidate = 0;
 
@@ -22,37 +22,44 @@ type Props = {
 };
 
 export default async function Page({ params, searchParams }: Props) {
-  const query = querySchema.parse(searchParams);
+  const queryParams = querySchema.parse(searchParams);
 
-  const courses = await db
-    .select({
-      id: course.id,
-      name: course.name,
-      topics: course.topics,
-    })
-    .from(course)
-    .innerJoin(school, eq(course.schoolId, school.id))
-    .where(eq(school.slug, params.slug));
+  const school = await db.query.school.findFirst({
+    where: (school, { eq }) => eq(school.slug, params.slug),
+  });
+
+  if (school === undefined) redirect("/");
+
+  const courses = await db.query.course.findMany({
+    where: (course, { and, eq, like }) =>
+      and(
+        eq(course.schoolId, school.id),
+        queryParams.query !== ""
+          ? like(course.name, `%${queryParams.query}%`)
+          : undefined,
+      ),
+    orderBy: (course) => course.id,
+    limit: queryParams.limit,
+    offset: (queryParams.page - 1) * queryParams.limit,
+  });
 
   const create = async (formData: FormData) => {
     "use server";
     const t = z.object({
-      content: z.string(),
+      name: z.string(),
       topics: z.string(),
+      schoolId: z.number(),
     });
     const res = t.safeParse({
-      content: formData.get("content"),
+      name: formData.get("name"),
       topics: formData.get("topics"),
+      schoolId: school.id,
     });
     if (!res.success) {
       return;
     }
-    await db.insert(course).values({
-      name: res.data.content,
-      topics: res.data.topics,
-      schoolId: 1,
-    });
-    revalidatePath("/");
+    await db.insert(course).values(res.data);
+    revalidatePath(`/${params.slug}/admin/course`);
   };
 
   return (
@@ -67,8 +74,8 @@ export default async function Page({ params, searchParams }: Props) {
         ]}
         href={`/${params.slug}/admin/course`}
         detail="id"
-        page={query.page}
-        limit={query.limit}
+        page={queryParams.page}
+        limit={queryParams.limit}
       />
       <form className="fixed bottom-5 right-5 md:right-10" action={create}>
         <Modal
@@ -76,11 +83,11 @@ export default async function Page({ params, searchParams }: Props) {
           confirmButton={{ text: "Crear", type: "submit" }}
         >
           <div>
-            <h1 className="text-2xl">Nuevo curso</h1>
+            <h1 className="text-2xl">Crear curso</h1>
             <div className="flex flex-col gap-1 mx-5">
               <TextField
-                id="content"
-                name="content"
+                id="name"
+                name="name"
                 label="Contenido"
                 required
               />
