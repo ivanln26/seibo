@@ -6,6 +6,8 @@ import Table, { querySchema } from "@/components/table";
 import { db } from "@/db/db";
 import { school, schoolUser, user } from "@/db/schema";
 
+export const revalidate = 0;
+
 type Props = {
   params: {
     slug: string;

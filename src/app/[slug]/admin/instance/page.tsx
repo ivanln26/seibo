@@ -1,5 +1,6 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, like, or } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import Modal from "@/components/modal";
@@ -13,7 +14,9 @@ import {
   schoolUser,
   user,
 } from "@/db/schema";
-import { getUserProfile } from "@/db/queries";
+import Select from "@/components/select";
+
+export const revalidate = 0;
 
 type Props = {
   params: {
@@ -27,13 +30,13 @@ type Props = {
 };
 
 export default async function Page({ params, searchParams }: Props) {
-  const query = querySchema.parse(searchParams);
+  const queryParams = querySchema.parse(searchParams);
 
-  const profile = await getUserProfile({ slug: params.slug });
   const school = await db.query.school.findFirst({
     where: (school, { eq }) => eq(school.slug, params.slug),
   });
-  if (!profile || !school) return <>Error</>;
+
+  if (school === undefined) redirect("/");
 
   const instances = await db
     .select({
@@ -47,7 +50,18 @@ export default async function Page({ params, searchParams }: Props) {
     .innerJoin(course, eq(instance.courseId, course.id))
     .innerJoin(grade, eq(instance.gradeId, grade.id))
     .innerJoin(user, eq(instance.professorId, user.id))
-    .innerJoin(classroom, eq(instance.classroomId, classroom.id));
+    .innerJoin(classroom, eq(instance.classroomId, classroom.id))
+    .where(and(
+      eq(grade.schoolId, school.id),
+      queryParams.query !== ""
+        ? or(
+          like(course.name, `%${queryParams.query}%`),
+          like(user.name, `%${queryParams.query}%`),
+        )
+        : undefined,
+    ))
+    .limit(queryParams.limit)
+    .offset((queryParams.page - 1) * queryParams.limit);
 
   const createInstanceData = {
     courses: await db.select().from(course).where(
@@ -67,25 +81,25 @@ export default async function Page({ params, searchParams }: Props) {
     ),
   };
 
-  async function createInstance(data: FormData) {
+  const create = async (data: FormData) => {
     "use server";
     const newInstance = z.object({
-      courseId: z.number(),
-      gradeId: z.number(),
-      classroomId: z.number(),
-      professorId: z.number(),
+      courseId: z.coerce.number(),
+      gradeId: z.coerce.number(),
+      classroomId: z.coerce.number(),
+      professorId: z.coerce.number(),
     }).safeParse({
-      courseId: Number(data.get("courseId")),
-      gradeId: Number(data.get("gradeId")),
-      classroomId: Number(data.get("classroomId")),
-      professorId: Number(data.get("professorId")),
+      courseId: data.get("course"),
+      gradeId: data.get("grade"),
+      classroomId: data.get("classroom"),
+      professorId: data.get("professor"),
     });
 
     if (!newInstance.success) return;
 
     await db.insert(instance).values(newInstance.data);
     revalidatePath(`/${params.slug}/admin/instance`);
-  }
+  };
 
   return (
     <>
@@ -101,12 +115,12 @@ export default async function Page({ params, searchParams }: Props) {
         ]}
         href={`/${params.slug}/admin/instance`}
         detail="id"
-        page={query.page}
-        limit={query.limit}
+        page={queryParams.page}
+        limit={queryParams.limit}
       />
       <form
         className="fixed bottom-5 right-5 md:right-10"
-        action={createInstance}
+        action={create}
       >
         <Modal
           buttonText="Crear"
@@ -114,50 +128,46 @@ export default async function Page({ params, searchParams }: Props) {
         >
           <h1 className="text-2xl">Crear clase</h1>
           <div className="flex flex-col gap-3">
-            <label htmlFor="">Materia</label>
-            <select
-              className="py-4 outline outline-1 outline-outline bg-transparent rounded"
-              name="courseId"
-              id=""
-            >
-              <option value="">---</option>
-              {createInstanceData.courses.map((c) => (
-                <option value={c.id}>{c.name}</option>
-              ))}
-            </select>
-            <label htmlFor="">Curso</label>
-            <select
-              className="py-4 outline outline-1 outline-outline bg-transparent rounded"
-              name="gradeId"
-              id=""
-            >
-              <option value="">---</option>
-              {createInstanceData.grades.map((c) => (
-                <option value={c.id}>{c.name}</option>
-              ))}
-            </select>
-            <label htmlFor="">Profesor</label>
-            <select
-              className="py-4 outline outline-1 outline-outline bg-transparent rounded"
-              name="professorId"
-              id=""
-            >
-              <option value="">---</option>
-              {createInstanceData.users.map((c) => (
-                <option value={c.user.id}>{c.user.name}</option>
-              ))}
-            </select>
-            <label htmlFor="">Aula</label>
-            <select
-              className="py-4 outline outline-1 outline-outline bg-transparent rounded"
-              name="classroomId"
-              id=""
-            >
-              <option value="">---</option>
-              {createInstanceData.classrooms.map((c) => (
-                <option value={c.id}>{c.name}</option>
-              ))}
-            </select>
+            <Select
+              id="course"
+              name="course"
+              label="Materia"
+              required
+              options={createInstanceData.courses.map((c) => ({
+                value: c.id,
+                description: c.name,
+              }))}
+            />
+            <Select
+              id="grade"
+              name="grade"
+              label="Materia"
+              required
+              options={createInstanceData.grades.map((g) => ({
+                value: g.id,
+                description: g.name,
+              }))}
+            />
+            <Select
+              id="professor"
+              name="professor"
+              label="Profesor"
+              required
+              options={createInstanceData.users.map((u) => ({
+                value: u.user.id,
+                description: u.user.name,
+              }))}
+            />
+            <Select
+              id="classroom"
+              name="classroom"
+              label="Aula"
+              required
+              options={createInstanceData.classrooms.map((c) => ({
+                value: c.id,
+                description: c.name,
+              }))}
+            />
           </div>
         </Modal>
       </form>

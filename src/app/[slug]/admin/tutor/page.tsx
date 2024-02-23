@@ -1,10 +1,12 @@
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, like, sql } from "drizzle-orm";
 import Link from "next/link";
 
 import Button from "@/components/button";
 import Table, { querySchema } from "@/components/table";
 import { db } from "@/db/db";
 import { gradeTutor, school, schoolUser, user } from "@/db/schema";
+
+export const revalidate = 0;
 
 type Props = {
   params: {
@@ -18,7 +20,7 @@ type Props = {
 };
 
 export default async function Page({ params, searchParams }: Props) {
-  const query = querySchema.parse(searchParams);
+  const queryParams = querySchema.parse(searchParams);
 
   const tutors = await db
     .selectDistinct({
@@ -34,7 +36,13 @@ export default async function Page({ params, searchParams }: Props) {
     .where(and(
       eq(school.slug, params.slug),
       eq(schoolUser.role, "tutor"),
-    ));
+      queryParams.query !== ""
+        ? like(user.name, `%${queryParams.query}%`)
+        : undefined,
+    ))
+    .orderBy(user.id)
+    .limit(queryParams.limit)
+    .offset((queryParams.page - 1) * queryParams.limit);
 
   return (
     <>
@@ -49,8 +57,8 @@ export default async function Page({ params, searchParams }: Props) {
         ]}
         href={`/${params.slug}/admin/tutor`}
         detail="id"
-        page={query.page}
-        limit={query.limit}
+        page={queryParams.page}
+        limit={queryParams.limit}
       />
       <div className="fixed bottom-5 right-5 md:right-10">
         <Button color="tertiary">

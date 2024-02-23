@@ -1,12 +1,22 @@
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, like, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import TimeInput from "./time-input";
 import Modal from "@/components/modal";
+import Select from "@/components/select";
 import Table, { querySchema } from "@/components/table";
 import { db } from "@/db/db";
-import { course, grade, instance, schedule, user as User } from "@/db/schema";
+import {
+  course,
+  grade,
+  instance,
+  schedule,
+  user as User,
+  weekdays,
+  weekdayTranslate,
+} from "@/db/schema";
 
 type Props = {
   params: {
@@ -20,12 +30,12 @@ type Props = {
 };
 
 export default async function Page({ params, searchParams }: Props) {
-  const query = querySchema.parse(searchParams);
+  const queryParams = querySchema.parse(searchParams);
 
-  const actualSchool = await db.query.school.findFirst({
+  const school = await db.query.school.findFirst({
     where: (school, { eq }) => eq(school.slug, params.slug),
   });
-  if (!actualSchool) return <>Error al obtener el usuario.</>;
+  if (school === undefined) redirect("/");
 
   const schedules = await db
     .select({
@@ -42,14 +52,28 @@ export default async function Page({ params, searchParams }: Props) {
     .innerJoin(course, eq(instance.courseId, course.id))
     .innerJoin(grade, eq(instance.gradeId, grade.id))
     .where(and(
-      eq(course.schoolId, actualSchool.id),
-    ));
+      eq(course.schoolId, school.id),
+      queryParams.query !== ""
+        ? like(course.name, `%${queryParams.query}%`)
+        : undefined,
+    ))
+    .orderBy(schedule.id)
+    .limit(queryParams.limit)
+    .offset((queryParams.page - 1) * queryParams.limit);
 
-  async function createSchedule(data: FormData) {
+  const instances = await db
+    .select()
+    .from(instance)
+    .innerJoin(course, eq(instance.courseId, course.id))
+    .innerJoin(grade, eq(instance.gradeId, grade.id))
+    .innerJoin(User, eq(instance.professorId, User.id))
+    .where(eq(course.schoolId, school.id));
+
+  const create = async (data: FormData) => {
     "use server";
     const t = z.object({
       instanceID: z.number(),
-      weekday: z.enum(["monday", "tuesday", "wednesday", "thursday", "friday"]),
+      weekday: z.enum(weekdays),
       startTime: z.string(),
       endTime: z.string(),
     });
@@ -69,14 +93,9 @@ export default async function Page({ params, searchParams }: Props) {
       startTime: newSchedule.data.startTime,
       endTime: newSchedule.data.endTime,
     });
-    revalidatePath(`${params.slug}/schedule`);
-  }
+    revalidatePath(`/${params.slug}/admin/schedule`);
+  };
 
-  const instances = await db.select().from(instance)
-    .innerJoin(course, eq(instance.courseId, course.id))
-    .innerJoin(grade, eq(instance.gradeId, grade.id))
-    .innerJoin(User, eq(instance.professorId, User.id))
-    .where(eq(course.schoolId, actualSchool.id));
   return (
     <>
       <Table
@@ -91,44 +110,45 @@ export default async function Page({ params, searchParams }: Props) {
         ]}
         href={`/${params.slug}/admin/schedule`}
         detail="id"
-        page={query.page}
-        limit={query.limit}
+        page={queryParams.page}
+        limit={queryParams.limit}
       />
       <form
         className="fixed bottom-5 right-5 md:right-10"
-        action={createSchedule}
+        action={create}
       >
         <Modal
           buttonText="Crear"
           confirmButton={{ text: "Crear", type: "submit" }}
         >
           <h1 className="text-2xl">Crear horario</h1>
-          <label htmlFor="">Clase</label>
-          <select
+          <Select
+            id="instanceID"
             name="instanceID"
-            className="py-4 outline outline-1 rounded outline-outline bg-transparent"
-          >
-            {instances.map((i) => (
-              <option value={Number(i.instance.id)}>
-                {i.course.name} | {i.grade.name} | {i.user.name}
-              </option>
-            ))}
-          </select>
-          <label htmlFor="">Dia de la semana</label>
-          <select
+            label="Clase"
+            required
+            options={instances.map((i) => ({
+              value: i.instance.id,
+              description:
+                `${i.course.name} | ${i.grade.name} | ${i.user.name}`,
+            }))}
+          />
+          <Select
+            id="weekday"
             name="weekday"
-            className="py-4 outline outline-1 rounded outline-outline bg-transparent"
-          >
-            <option value="monday">Lunes</option>
-            <option value="tuesday">Martes</option>
-            <option value="wednesday">Miercoles</option>
-            <option value="thursday">Jueves</option>
-            <option value="friday">Viernes</option>
-          </select>
-          <label htmlFor="">Hora de inicio</label>
-          <TimeInput name="startTime" />
-          <label htmlFor="">Hora de fin</label>
-          <TimeInput name="endTime" />
+            label="Día de la semana"
+            required
+            options={Object.entries(weekdayTranslate).map((
+              [value, description],
+            ) => ({
+              value,
+              description,
+            }))}
+          />
+          <label htmlFor="startTime">Hora de inicio*</label>
+          <TimeInput id="startTime" name="startTime" />
+          <label htmlFor="endTime">Hora de fin*</label>
+          <TimeInput id="endTime" name="endTime" />
         </Modal>
       </form>
     </>
