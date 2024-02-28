@@ -9,6 +9,7 @@ import { twColors } from "@/color";
 import { db } from "@/db/db";
 import {
   attendance,
+  audit,
   classroom,
   course,
   grade,
@@ -508,10 +509,21 @@ export async function updateAdminModel<
     }
 
     try {
-      await db
-        .update(classroom)
-        .set({ ...newClassroom.data })
-        .where(eq(classroom.id, modelId));
+      await db.transaction(async (tx) => {
+        const delta = await tx.query.classroom.findFirst({
+          columns: { name: true },
+          where: (classroom, { eq }) => eq(classroom.id, modelId),
+        });
+        if (delta === undefined) throw new Error();
+        if (delta.name === newClassroom.data.name) return;
+        await tx
+          .update(classroom)
+          .set(newClassroom.data)
+          .where(eq(classroom.id, modelId));
+        await tx
+          .insert(audit)
+          .values({ table: "classroom", pk: modelId, delta });
+      });
     } catch (err) {
       if (
         err instanceof Object && "code" in err && err.code === "ER_DUP_ENTRY"
