@@ -404,11 +404,20 @@ export const gradeTutorRelations = relations(gradeTutor, ({ one }) => ({
   }),
 }));
 
+const auditableTables = [
+  "classroom",
+  "course",
+  "grade",
+  "instance",
+  "schedule",
+  "student",
+] as const;
+
 export const audit = mysqlTable("audit", {
   id: int("id").autoincrement().primaryKey(),
-  table: mysqlEnum("table", ["studentGrade"]).notNull(),
+  table: mysqlEnum("table", auditableTables).notNull(),
   pk: int("primary_key").notNull(),
-  delta: json("delta").notNull(),
+  delta: json("delta").notNull().$type<Record<string, string>>(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
