@@ -19,26 +19,21 @@ export default async function Page({ params }: Props) {
 
   function getClosestLecture() {
     let closerLecture = lectures[0].lecture.id;
-    let closerDateDiff = lectures[0].lecture.date.getUTCDate() -
-      today.getUTCDate();
-    let closerTimeDiff =
+    
+    let closerDiff = Math.abs(
       new Date("1970-01-01T" + lectures[0].schedule.startTime).getTime() -
-      today.getTime();
+      today.getTime()
+    )
 
     lectures.forEach((lec) => {
-      const dateDiff = lec.lecture.date.getUTCDate() - today.getUTCDate();
-      const timeDiff =
+      const diff = Math.abs(
         new Date("1970-01-01T" + lec.schedule.startTime).getTime() -
-        today.getTime();
-
-      if (dateDiff < closerDateDiff) {
+        today.getTime()
+      )
+      console.log(diff)
+      if (diff < closerDiff) {
         closerLecture = lec.lecture.id;
-        closerDateDiff = dateDiff;
-        closerTimeDiff = timeDiff;
-      } else if (dateDiff === closerDateDiff && timeDiff < closerTimeDiff) {
-        closerLecture = lec.lecture.id;
-        closerDateDiff = dateDiff;
-        closerTimeDiff = timeDiff;
+        closerDiff = diff;
       }
     });
     redirect(`/${params.slug}/lecture/${String(closerLecture)}`);
