@@ -43,13 +43,13 @@ export default async function Page({ params }: Props) {
     .where(eq(user.id, userProfile.id));
 
   return (
-    <div className="flex flex-col md:flex-row gap-x-6 gap-y-4">
-      <section className="flex flex-col gap-y-3 p-4 rounded outline outline-1 md:outline-0 outline-outline">
+    <div className="flex flex-col flex-row gap-x-6 gap-y-4">
+      <section className="flex flex-col gap-y-3 p-4 rounded outline items-center outline-1 text-center  outline-outline">
         <h1 className="text-4xl font-bold">{userProfile.name}</h1>
         <h2 className="text-lg">{userProfile.email}</h2>
         <LogOutButton />
       </section>
-      <section className="flex flex-col gap-y-2 p-4 rounded outline outline-1 md:outline-0 outline-outline">
+      <section className="flex flex-col gap-y-2 p-4 rounded outline outline-1 outline-outline">
         <h2 className="text-4xl font-bold">{school.name}</h2>
         <h1 className="text-2xl">Roles</h1>
         <ul className="list-disc list-inside text-lg">

@@ -17,7 +17,7 @@ export default function SideNavigationLink({ name, href }: Props) {
     <Link
       className={`${
         pathname.startsWith(href) && "underline"
-      } text-lg text-secondary-600 dark:text-secondary-200`}
+      } text-lg text-black dark:text-secondary-200`}
       href={href}
     >
       {name}
