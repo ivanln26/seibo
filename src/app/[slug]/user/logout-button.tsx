@@ -4,11 +4,11 @@ import { signOut } from "next-auth/react";
 
 import Button from "@/components/button";
 
-export default function LogOutButton() {
+export default function LogOutButton({text = "Cerrar Sesión"}: {text?: string }) {
   return (
     <div>
       <Button onClick={() => signOut()}>
-        Cerrar Sesión
+        {text}
       </Button>
     </div>
   );

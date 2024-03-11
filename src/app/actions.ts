@@ -29,6 +29,7 @@ import { hasRoles } from "@/db/queries";
 import type { UserProfile } from "@/db/queries";
 import env from "@/env";
 import { transporter } from "@/mail";
+import { redirect } from "next/navigation";
 
 const sendMailSchemas = {
   all: z.object({
@@ -279,8 +280,8 @@ export async function updateScores(
     }
   }
 
-  revalidatePath(`/${slug}/test/${testId}`);
-  return { success: true };
+  redirect(`/${slug}/test/`);
+  // return { success: true };
 }
 
 const createAdminSchemas = {
