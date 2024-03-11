@@ -30,7 +30,6 @@ export default async function Page({ params }: Props) {
         new Date("1970-01-01T" + lec.schedule.startTime).getTime() -
         today.getTime()
       )
-      console.log(diff)
       if (diff < closerDiff) {
         closerLecture = lec.lecture.id;
         closerDiff = diff;
