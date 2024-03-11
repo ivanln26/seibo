@@ -1,7 +1,17 @@
 import Link from "next/link";
 
+import { format } from "date-fns";
+
 import { getWeeklyLectures } from "../utils";
 import { getUserProfile } from "@/db/queries";
+
+const weekdays = [
+  { name: "Lunes", value: "monday" },
+  { name: "Martes", value: "tuesday" },
+  { name: "Miercoles", value: "wednesday" },
+  { name: "Jueves", value: "thursday" },
+  { name: "Viernes", value: "friday" },
+];
 
 type props = {
   slug: string;
@@ -29,7 +39,7 @@ export default async function LecturePicker({ slug, lectureID }: props) {
             >
               <p className="text-xl font-bold">{l.course.name}</p>
               <p>{l.grade.name}</p>
-              <p>{l.schedule.weekday}</p>
+              <p>{weekdays.find(day => day.value == l.schedule.weekday)?.name} {format(l.lecture.date.toUTCString(), "dd/MM")}</p>
               <p>{l.schedule.startTime} - {l.schedule.endTime}</p>
             </div>
           </Link>
