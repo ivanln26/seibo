@@ -86,6 +86,7 @@ export default async function Home({ params }: Props) {
         "Toma asistencia de tus clases, anota observaciones sobre las mismas.",
       path: `/${params.slug}/lecture`,
       color: "primary",
+      roles: ["teacher", "tutor"]
     },
     {
       title: "Exámenes",
@@ -93,6 +94,7 @@ export default async function Home({ params }: Props) {
         "Registra información acerca de los exámenes de tus materias y los resultados de los alumnos.",
       path: `/${params.slug}/test`,
       color: "primary",
+      roles: ["teacher"]
     },
     {
       title: "Horarios",
@@ -120,7 +122,7 @@ export default async function Home({ params }: Props) {
         "Administra la información general del colegio y del sistema.",
       path: `/${params.slug}/dashboard`,
       color: "secondary",
-      roles: ["admin", "principal"],
+      roles: ["admin"],
     },
     {
       title: "Historial",

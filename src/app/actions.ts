@@ -48,6 +48,10 @@ const sendMailSchemas = {
   }),
 } as const;
 
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export type SendMailsResult =
   | { success: true; message: string }
   | { success: false; error: string };
@@ -187,15 +191,25 @@ export async function sendMails(
     return { success: false, error: "No hay contactos para enviar mails." };
   }
 
-  const promises = contacts.map(({ email }) =>
-    transporter.sendMail({
+  const mails = contacts.map(({ email, }) => {
+    return {
       from: env.NODEMAILER_EMAIL,
       to: email,
       subject: subject,
-      text: body,
-    })
-  );
-  await Promise.all(promises);
+      text: body
+    }
+  })
+
+  for (let i = 0; i < mails.length; i++) {
+    await transporter.sendMail(mails[i],
+      (err: any, info: any) => {
+        if (err) {
+          console.log(err);
+          return;
+        }
+      });
+    await sleep(500);
+  }
 
   return { success: true, message: "Se han enviado los mails correctamente." };
 }
@@ -308,10 +322,10 @@ export type CreateAdminModelResult<T extends keyof typeof createAdminSchemas> =
   | {
     success: false;
     error:
-      | string
-      | z.inferFlattenedErrors<
-        z.ZodType<z.input<typeof createAdminSchemas[T]>>
-      >;
+    | string
+    | z.inferFlattenedErrors<
+      z.ZodType<z.input<typeof createAdminSchemas[T]>>
+    >;
   };
 
 export async function createAdminModel<
@@ -484,10 +498,10 @@ export type UpdateAdminModelResult<T extends keyof typeof updateAdminSchemas> =
   | {
     success: false;
     error:
-      | string // TODO: remove string type
-      | z.inferFlattenedErrors<
-        z.ZodType<z.input<typeof updateAdminSchemas[T]>>
-      >;
+    | string // TODO: remove string type
+    | z.inferFlattenedErrors<
+      z.ZodType<z.input<typeof updateAdminSchemas[T]>>
+    >;
   };
 
 export async function updateAdminModel<
