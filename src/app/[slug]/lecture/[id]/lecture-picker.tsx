@@ -39,7 +39,7 @@ export default async function LecturePicker({ slug, lectureID }: props) {
             >
               <p className="text-xl font-bold">{l.course.name}</p>
               <p>{l.grade.name}</p>
-              <p>{weekdays.find(day => day.value == l.schedule.weekday)?.name} {format(l.lecture.date.setDate(l.lecture.date.getDate()+1), "dd/MM")}</p>
+              <p>{weekdays.find(day => day.value == l.schedule.weekday)?.name} {format(l.lecture.date.setDate(l.lecture.date.getDate()), "dd/MM")}</p>
               <p>{l.schedule.startTime} - {l.schedule.endTime}</p>
             </div>
           </Link>

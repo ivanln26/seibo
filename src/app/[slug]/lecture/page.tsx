@@ -19,15 +19,22 @@ export default async function Page({ params }: Props) {
 
   function getClosestLecture() {
     let closerLecture = lectures[0].lecture.id;
-    
+
+    const newDate = new Date(lectures[0].lecture.date)
+    newDate.setHours(Number(lectures[0].schedule.startTime.substring(0, 1)))
+    newDate.setMinutes(Number(lectures[0].schedule.startTime.substring(3, 4)))
+
     let closerDiff = Math.abs(
-      new Date("1970-01-01T" + lectures[0].schedule.startTime).getTime() -
+      newDate.getTime() -
       today.getTime()
     )
 
     lectures.forEach((lec) => {
+      const newDate = new Date(lec.lecture.date)
+      newDate.setHours(Number(lec.schedule.startTime.substring(0, 1)))
+      newDate.setMinutes(Number(lec.schedule.startTime.substring(3, 4)))
       const diff = Math.abs(
-        new Date("1970-01-01T" + lec.schedule.startTime).getTime() -
+       newDate.getTime() -
         today.getTime()
       )
       if (diff < closerDiff) {
@@ -35,6 +42,7 @@ export default async function Page({ params }: Props) {
         closerDiff = diff;
       }
     });
+    
     redirect(`/${params.slug}/lecture/${String(closerLecture)}`);
   }
 
