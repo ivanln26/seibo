@@ -101,12 +101,14 @@ export default async function Home({ params }: Props) {
       description: "Revisa tus horarios en la institución.",
       path: `/${params.slug}/schedule`,
       color: "primary",
+      roles: ["teacher", "tutor"]
     },
     {
       title: "Notificaciones",
       description: "Envia e-mails a los tutores de los alumnos.",
       path: `/${params.slug}/notification`,
       color: "primary",
+      roles: ["teacher", "tutor", "principal"]
     },
     {
       title: "Reportes",
@@ -164,7 +166,7 @@ export default async function Home({ params }: Props) {
                     ? primaryColor
                     : secondaryColor}
                 >
-                  Ver detalle
+                  Ir
                 </Button>
               </Link>
             </div>
