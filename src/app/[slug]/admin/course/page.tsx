@@ -68,9 +68,10 @@ export default async function Page({ params, searchParams }: Props) {
         title="Materias"
         data={courses}
         columns={[
-          { attr: "id", name: "ID" },
+          // { attr: "id", name: "ID" },
           { attr: "name", name: "Nombre" },
           { attr: "topics", name: "Temas" },
+          {attr: "icon", name: "Editar"}
         ]}
         href={`/${params.slug}/admin/course`}
         detail="id"
@@ -83,12 +84,12 @@ export default async function Page({ params, searchParams }: Props) {
           confirmButton={{ text: "Crear", type: "submit" }}
         >
           <div>
-            <h1 className="text-2xl">Crear curso</h1>
+            <h1 className="text-2xl">Crear materia</h1>
             <div className="flex flex-col gap-1 mx-5">
               <TextField
                 id="name"
                 name="name"
-                label="Contenido"
+                label="Nombre"
                 required
               />
               <TextField

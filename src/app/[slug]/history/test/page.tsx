@@ -63,13 +63,14 @@ export default async function Page({ params, searchParams }: Props) {
       title="Exámenes"
       data={query}
       columns={[
-        { attr: "id", name: "ID" },
+        // { attr: "id", name: "ID" },
         { attr: "title", name: "Título" },
         { attr: "date", name: "Fecha" },
         { attr: "course", name: "Materia" },
         { attr: "grade", name: "Curso" },
         { attr: "classroom", name: "Aula" },
         { attr: "professor", name: "Profesor" },
+        { attr: "icon", name: "Detalle" }
       ]}
       href={`/${params.slug}/history/test`}
       detail="id"

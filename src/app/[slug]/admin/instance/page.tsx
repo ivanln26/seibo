@@ -107,11 +107,12 @@ export default async function Page({ params, searchParams }: Props) {
         title="Clases"
         data={instances}
         columns={[
-          { attr: "id", name: "ID" },
+          // { attr: "id", name: "ID" },
           { attr: "course", name: "Materia" },
           { attr: "grade", name: "Curso" },
           { attr: "professor", name: "Profesor" },
           { attr: "classroom", name: "Aula" },
+          {attr: "icon", name: "Editar"}
         ]}
         href={`/${params.slug}/admin/instance`}
         detail="id"

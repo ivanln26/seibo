@@ -50,10 +50,11 @@ export default async function Page({ params, searchParams }: Props) {
         title="Preceptores"
         data={tutors}
         columns={[
-          { attr: "id", name: "ID" },
+          // { attr: "id", name: "ID" },
           { attr: "name", name: "Nombre" },
           { attr: "email", name: "Email" },
           { attr: "isActive", name: "Estado" },
+          {attr: "icon", name: "Editar"}
         ]}
         href={`/${params.slug}/admin/tutor`}
         detail="id"

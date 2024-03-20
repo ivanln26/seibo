@@ -122,7 +122,7 @@ export default async function Home({ params }: Props) {
       title: "Admin",
       description:
         "Administra la información general del colegio y del sistema.",
-      path: `/${params.slug}/dashboard`,
+      path: `/${params.slug}/admin`,
       color: "secondary",
       roles: ["admin"],
     },

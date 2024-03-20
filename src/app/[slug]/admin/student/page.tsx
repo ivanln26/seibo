@@ -128,11 +128,12 @@ export default async function Page({ params, searchParams }: Props) {
         title="Estudiantes"
         data={students}
         columns={[
-          { attr: "id", name: "ID" },
+          // { attr: "id", name: "ID" },
           { attr: "studentCode", name: "Legajo" },
           { attr: "lastName", name: "Apellido" },
           { attr: "firstName", name: "Nombre" },
           { attr: "email", name: "Email" },
+          {attr: "icon", name: "Editar"}
         ]}
         href={`/${params.slug}/admin/student`}
         detail="id"

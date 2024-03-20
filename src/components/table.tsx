@@ -2,6 +2,7 @@ import Link from "next/link";
 import { z } from "zod";
 
 import TableSearch from "./table-search";
+import Icon from "@/components/icons/icon";
 
 export const querySchema = z.object({
   page: z.coerce.number()
@@ -18,7 +19,7 @@ type TableProps<TData extends Record<string, string | number>> = {
   title: string;
   data: TData[];
   columns: {
-    attr: keyof TData;
+    attr: keyof TData | "icon";
     name: string;
   }[];
   href: string;
@@ -51,15 +52,15 @@ export default function Table<TData extends Record<string, string | number>>({
         <tbody className="bg-neutral-99 dark:bg-neutral-4">
           {data.map((row, i) => (
             <tr key={i}>
-              {columns.map(({ attr }, j) => (
-                j === 0
+              {columns.map(({ attr, name }, j) => (
+                attr === "icon"
                   ? (
                     <td className="px-2 py-1 border border-outline" key={j}>
                       <Link
-                        className="block w-full font-bold underline text-center text-secondary-600 dark:text-secondary-200"
+                        className="block w-full font-bold underline flex justify-center text-center text-secondary-600 dark:text-secondary-200"
                         href={`${href}/${row[detail]}`}
                       >
-                        {row[attr]}
+                        {name === "Detalle" ? <Icon icon="search" height={24} width={24} /> : <Icon icon="edit" height={24} width={24} />}
                       </Link>
                     </td>
                   )

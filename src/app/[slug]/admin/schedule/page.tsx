@@ -102,11 +102,12 @@ export default async function Page({ params, searchParams }: Props) {
         title="Horarios"
         data={schedules}
         columns={[
-          { attr: "id", name: "ID" },
+          // { attr: "id", name: "ID" },
           { attr: "weekday", name: "Día de la semana" },
           { attr: "time", name: "Hora" },
           { attr: "grade", name: "Curso" },
           { attr: "course", name: "Materia" },
+          {attr: "icon", name: "Editar"}
         ]}
         href={`/${params.slug}/admin/schedule`}
         detail="id"

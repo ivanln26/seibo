@@ -12,6 +12,7 @@ import Menu from "./menu";
 import Person from "./person";
 import Search from "./search";
 import Chart from "./chart";
+import Edit from "./edit";
 
 export type Icon =
   | "add"
@@ -27,7 +28,8 @@ export type Icon =
   | "person"
   | "search"
   | "mail"
-  | "chart";
+  | "chart"
+  | "edit";
 
 export type IconProps = {
   height: number;
@@ -50,6 +52,8 @@ export default function Icon({ icon, ...props }: IconPickerProps) {
       return <Delete {...props} />;
     case "description":
       return <Description {...props} />;
+    case "edit":
+      return <Edit {...props}/>;
     case "expand":
       return <Expand {...props} />;
     case "history":

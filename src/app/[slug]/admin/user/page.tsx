@@ -51,11 +51,12 @@ export default async function Page({ params, searchParams }: Props) {
         title="Usuarios"
         data={users}
         columns={[
-          { attr: "id", name: "ID" },
+          // { attr: "id", name: "ID" },
           { attr: "name", name: "Nombre" },
           { attr: "email", name: "Email" },
           { attr: "role", name: "Rol" },
           { attr: "isActive", name: "Estado" },
+          {attr: "icon", name: "Editar"}
         ]}
         href={`/${params.slug}/admin/user`}
         detail="id"
