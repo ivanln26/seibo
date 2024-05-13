@@ -31,8 +31,8 @@ export default async function Page({ params }: Props) {
 
     lectures.forEach((lec) => {
       const newDate = new Date(lec.lecture.date)
-      newDate.setHours(Number(lec.schedule.startTime.substring(0, 1)))
-      newDate.setMinutes(Number(lec.schedule.startTime.substring(3, 4)))
+      newDate.setHours(Number(lec.schedule.startTime.substring(0, 2)))
+      newDate.setMinutes(Number(lec.schedule.startTime.substring(3, 5)))
       const diff = Math.abs(
        newDate.getTime() -
         today.getTime()
