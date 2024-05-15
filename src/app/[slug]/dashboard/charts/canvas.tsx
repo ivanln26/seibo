@@ -27,6 +27,22 @@ export default function Canvas({ data }: CanvasProps) {
             layout: {
               padding: 50,
             },
+            plugins: {
+              legend:{
+                labels: {
+                  generateLabels: (chart) => {
+                    const datasets = chart.data.datasets;
+                    console.log(chart.data.datasets)
+                    return datasets[0].data.map((data, i) => ({
+                      text: `${chart.data.labels !== undefined ? chart.data.labels[i] : ""}: ${data} asistencias`,
+                      fillStyle: datasets[i].backgroundColor !== undefined ? datasets[i].backgroundColor : "white",
+                      datasetIndex: i,
+                      lineWidth: 0,
+                    }))
+              }
+            }
+          }
+        }
           },
           data: {
             labels: data.map((row) => row.grade),

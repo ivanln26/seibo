@@ -25,7 +25,23 @@ export default function Attendances({ data }: CanvasProps) {
           options: {
             responsive: true,
             maintainAspectRatio: true,
-          },
+            plugins: {
+              legend:{
+                labels: {
+                  generateLabels: (chart) => {
+                    const datasets = chart.data.datasets;
+                    console.log(chart.data.datasets)
+                    return datasets[0].data.map((data, i) => ({
+                      text: `${chart.data.labels !== undefined ? chart.data.labels[i] : ""}: ${data} asistencias`,
+                      fillStyle: datasets[0].backgroundColor !== undefined ? datasets[0].backgroundColor : "white",
+                      datasetIndex: i,
+                      lineWidth: 0,
+                    }))
+              }
+            }
+          }
+        }
+      },
 
           data: {
             labels: data.filter((a) => a.isPresent === true).map((row) =>
@@ -38,12 +54,6 @@ export default function Attendances({ data }: CanvasProps) {
                   row.count
                 ),
                 backgroundColor: "#9BD0F5",
-              },
-              {
-                label: "Inasistencias por curso",
-                data: data.filter((a) => a.isPresent === false).map((row) =>
-                  row.count
-                ),
               },
             ],
           },

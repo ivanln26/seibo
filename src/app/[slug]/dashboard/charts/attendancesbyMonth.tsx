@@ -24,6 +24,24 @@ export default function AttendancesByMonth({ data }: CanvasProps) {
           options: {
             responsive: true,
             maintainAspectRatio: true,
+            plugins: {
+              legend:{
+                position: "bottom",
+                onClick: () => {},
+                labels: {
+                  generateLabels: (chart) => {
+                    const datasets = chart.data.datasets;
+                    console.log(chart.data.datasets)
+                    return datasets[0].data.map((data, i) => ({
+                      text: `${chart.data.labels !== undefined ? chart.data.labels[i] : ""}: ${data} asistencias`,
+                      fillStyle: datasets[0].backgroundColor !== undefined ? datasets[0].backgroundColor : "white",
+                      datasetIndex: i,
+                      lineWidth: 0,
+                    }))
+              }
+            }
+          }
+        }
           },
           data: {
             labels: data.map((row) => {
