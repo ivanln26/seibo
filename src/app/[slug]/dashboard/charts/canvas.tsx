@@ -30,14 +30,13 @@ export default function Canvas({ data }: CanvasProps) {
             plugins: {
               legend:{
                 position: "bottom",
-                align:"start",
                 labels: {
                   generateLabels: (chart) => {
-                    const datasets = chart.data.datasets[0];
+                    const datasets = chart.data.datasets;
                     console.log(chart.data.datasets)
-                    return datasets.data.map((data, i) => ({
+                    return datasets[0].data.map((data, i) => ({
                       text: `${chart.data.labels !== undefined ? chart.data.labels[i] : ""}: ${data} alumnos`,
-                      fillStyle: Array.isArray(datasets.backgroundColor) ? datasets.backgroundColor[i] : "white",
+                      fillStyle: Array.isArray(datasets[0].backgroundColor) ? datasets[0].backgroundColor[i] : datasets[0].backgroundColor,
                       datasetIndex: i,
                       lineWidth: 0,
                     }))
