@@ -29,13 +29,14 @@ export default function Canvas({ data }: CanvasProps) {
             },
             plugins: {
               legend:{
+                position: "bottom",
                 labels: {
                   generateLabels: (chart) => {
                     const datasets = chart.data.datasets;
                     console.log(chart.data.datasets)
                     return datasets[0].data.map((data, i) => ({
                       text: `${chart.data.labels !== undefined ? chart.data.labels[i] : ""}: ${data} asistencias`,
-                      fillStyle: datasets[i].backgroundColor !== undefined ? datasets[i].backgroundColor : "white",
+                      fillStyle: datasets[i].backgroundColor?.toString(),
                       datasetIndex: i,
                       lineWidth: 0,
                     }))

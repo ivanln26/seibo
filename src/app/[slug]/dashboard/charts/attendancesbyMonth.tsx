@@ -31,12 +31,17 @@ export default function AttendancesByMonth({ data }: CanvasProps) {
                 labels: {
                   generateLabels: (chart) => {
                     const datasets = chart.data.datasets;
-                    console.log(chart.data.datasets)
+                    console.log(datasets[0].backgroundColor)
                     return datasets[0].data.map((data, i) => ({
+                      // Label that will be displayed
                       text: `${chart.data.labels !== undefined ? chart.data.labels[i] : ""}: ${data} asistencias`,
-                      fillStyle: datasets[0].backgroundColor !== undefined ? datasets[0].backgroundColor : "white",
-                      datasetIndex: i,
+                      // Fill style of the legend box
+                      fillStyle: datasets[0].backgroundColor?.toString(),
+                      // Index of the associated dataset
+                      datasetIndex: i,     
+                      // Width of box border
                       lineWidth: 0,
+                    
                     }))
               }
             }
