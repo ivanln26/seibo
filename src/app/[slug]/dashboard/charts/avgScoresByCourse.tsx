@@ -34,7 +34,7 @@ export default function AvgScoresByCourse({ data }: CanvasProps) {
                     console.log(chart.data.datasets)
                     return datasets[0].data.map((data, i) => ({
                       text: `${chart.data.labels !== undefined ? chart.data.labels[i] : ""}: ${data} asistencias`,
-                      fillStyle: datasets[0].backgroundColor?.toString(),
+                      fillStyle: Array.isArray(datasets[0].backgroundColor) ? datasets[0].backgroundColor[i] : "white",
                       datasetIndex: i,
                       lineWidth: 0,
                     }))

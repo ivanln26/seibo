@@ -36,7 +36,7 @@ export default function AttendancesByMonth({ data }: CanvasProps) {
                       // Label that will be displayed
                       text: `${chart.data.labels !== undefined ? chart.data.labels[i] : ""}: ${data} asistencias`,
                       // Fill style of the legend box
-                      fillStyle: datasets[0].backgroundColor?.toString(),
+                      fillStyle: Array.isArray(datasets[0].backgroundColor) ? datasets[0].backgroundColor[i] : "white",
                       // Index of the associated dataset
                       datasetIndex: i,     
                       // Width of box border
