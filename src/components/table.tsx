@@ -15,6 +15,21 @@ export const querySchema = z.object({
   query: z.string().default(""),
 });
 
+const weekdays = [
+  { name: "monday", value: "Lunes" },
+  { name: "tuesday", value: "Martes" },
+  { name: "wednesday", value: "Miercoles" },
+  { name: "thursday", value: "Jueves" },
+  { name: "friday", value: "Viernes" },
+];
+
+const roles = [
+  { name: "teacher", value: "Profesor" },
+  { name: "tutor", value: "Preceptor" },
+  { name: "principal", value: "Director" },
+  { name: "admin", value: "Administrador" },
+];
+
 type TableProps<TData extends Record<string, string | number>> = {
   title: string;
   data: TData[];
@@ -66,7 +81,9 @@ export default function Table<TData extends Record<string, string | number>>({
                   )
                   : (
                     <td className="px-2 py-1 border border-outline" key={j}>
-                      {row[attr]}
+                      {weekdays.find((w) => w.name === row[attr])?.value ||
+                      roles.find((r) => r.name === row[attr])?.value ||
+                      row[attr]}
                     </td>
                   )
               ))}
