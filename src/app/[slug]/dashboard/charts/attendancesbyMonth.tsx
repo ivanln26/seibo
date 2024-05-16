@@ -57,6 +57,15 @@ export default function AttendancesByMonth({ data }: CanvasProps) {
               {
                 label: "Asistencias",
                 data: data.map((row) => row.count),
+                backgroundColor: [
+                  "rgba(54,162,235,255)",
+                  "rgba(255,99,132,255)",
+                  "rgba(75,192,192,255)",
+                  "rgba(255,159,64,255)",
+                  "rgba(153,102,255,255)",
+                  "rgba(255,205,86,255)",
+                  "rgba(201,203,207,255)"
+                ]
               },
             ],
           },
