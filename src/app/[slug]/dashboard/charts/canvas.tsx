@@ -27,6 +27,23 @@ export default function Canvas({ data }: CanvasProps) {
             layout: {
               padding: 50,
             },
+            plugins: {
+              legend:{
+                position: "bottom",
+                labels: {
+                  generateLabels: (chart) => {
+                    const datasets = chart.data.datasets;
+                    console.log(chart.data.datasets)
+                    return datasets[0].data.map((data, i) => ({
+                      text: `${chart.data.labels !== undefined ? chart.data.labels[i] : ""}: ${data} alumnos`,
+                      fillStyle: Array.isArray(datasets[0].backgroundColor) ? datasets[0].backgroundColor[i] : datasets[0].backgroundColor,
+                      datasetIndex: i,
+                      lineWidth: 0,
+                    }))
+              }
+            }
+          }
+        }
           },
           data: {
             labels: data.map((row) => row.grade),
