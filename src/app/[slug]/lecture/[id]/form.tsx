@@ -75,7 +75,7 @@ export default function Form({ slug, lectureID, attendances, notes }: Props) {
         defaultValue={notes}
       />
       <div className="fixed bottom-2 right-5 flex flex-row gap-5">
-        <UndoButton lectureID={lectureID} />
+        {/* <UndoButton lectureID={lectureID} /> */}
         <Modal
           buttonText="Guardar"
           confirmButton={{ text: "Guardar", type: "submit" }}

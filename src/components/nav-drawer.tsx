@@ -27,7 +27,7 @@ const buttons: DrawerButton[] = [
     name: "Reporte",
     icon: "chart",
     href: "/dashboard",
-    roles: ["principal", "admin"],
+    roles: ["principal"],
   },
   {
     name: "Asistencia",
@@ -51,7 +51,7 @@ const buttons: DrawerButton[] = [
     name: "Historial",
     icon: "history",
     href: "/history",
-    roles: ["principal", "admin"],
+    roles: ["principal"],
   },
   {
     name: "Mail",

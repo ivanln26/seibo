@@ -116,7 +116,7 @@ export default async function Home({ params }: Props) {
         "Visualiza e imprime reportes con indicadores y estadisticas relevantes.",
       path: `/${params.slug}/dashboard`,
       color: "secondary",
-      roles: ["admin", "principal"],
+      roles: ["principal"],
     },
     {
       title: "Admin",
@@ -132,7 +132,7 @@ export default async function Home({ params }: Props) {
         "Información histórica acerca de los exámenes y asistencias.",
       path: `/${params.slug}/history`,
       color: "secondary",
-      roles: ["admin", "principal"],
+      roles: ["principal"],
     },
   ];
 
