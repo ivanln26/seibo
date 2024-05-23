@@ -70,7 +70,7 @@ export default async function Page({ params }: Props) {
         </div>
         <div className="col-span-4 lg:col-span-2 flex flex-col justify-center items-center p-2 outline outline-1 outline-outline rounded-xl">
           <h1 className="text-center text-xl">
-            Cantidad de asistencias / inasistencias por curso
+            Cantidad de asistencias por curso
           </h1>
           <Attendances data={all} />
         </div>

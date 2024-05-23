@@ -26,7 +26,8 @@ export async function getAttendances(lectureID: number) {
   return await db.select()
     .from(attendance)
     .innerJoin(student, eq(attendance.studentId, student.id))
-    .where(eq(attendance.lectureId, Number(lectureID)));
+    .where(eq(attendance.lectureId, Number(lectureID)))
+    .orderBy(student.lastName);
 }
 
 export async function getStudents(lectureID: number) {
@@ -37,7 +38,7 @@ export async function getStudents(lectureID: number) {
     .innerJoin(grade, eq(instance.gradeId, grade.id))
     .innerJoin(studentGrade, eq(grade.id, studentGrade.gradeId))
     .innerJoin(student, eq(studentGrade.studentId, student.id))
-    .where(eq(lecture.id, lectureID));
+    .where(eq(lecture.id, lectureID)).orderBy(student.lastName);
 }
 
 export function getMonday(d: Date) {

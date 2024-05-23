@@ -142,7 +142,7 @@ export default async function Page({ params, searchParams }: Props) {
             <Select
               id="grade"
               name="grade"
-              label="Materia"
+              label="Curso"
               required
               options={createInstanceData.grades.map((g) => ({
                 value: g.id,

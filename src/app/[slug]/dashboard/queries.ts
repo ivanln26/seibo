@@ -24,7 +24,8 @@ export async function getAtendancesbyMonth(slug: string) {
     .innerJoin(grade, eq(instance.gradeId, grade.id))
     .innerJoin(school, eq(grade.schoolId, school.id))
     .where(and(eq(attendance.isPresent, true), eq(school.slug, slug)))
-    .groupBy(sql<number>`MONTH(${lecture.date})`);
+    .groupBy(sql<number>`MONTH(${lecture.date})`)
+    .orderBy(sql<number>`MONTH(${lecture.date})`);
 }
 
 export async function getAttendancesByCourse(slug: string) {
